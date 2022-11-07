@@ -1,0 +1,5004 @@
+---------------------------------------------------------------------------
+                         Searching and Sorting
+----------------------------------------------------------------------------
+
+Find first and last positions of an element in a sorted array	
+------------------------------------------------------------------
+
+Given a sorted array arr[] with possibly duplicate elements, the task is to find indexes of the first and last occurrences of an element x in the given array. 
+
+Examples: 
+
+Input : arr[] = {1, 3, 5, 5, 5, 5, 67, 123, 125}, x = 5
+Output : First Occurrence = 2
+         Last Occurrence = 5
+
+Input : arr[] = {1, 3, 5, 5, 5, 5, 7, 123, 125 }, x = 7
+
+
+Output : First Occurrence = 6
+         Last Occurrence = 6
+
+A Naive Approach:
+
+The idea to solve this problem is iterate on the elements of given array and check given elements in an array and keep track of first and last occurrence of the found element’s index.
+
+Below are the steps to implement the above idea:
+
+Run a for loop and for i = 0 to n-1
+Take first = -1 and last = -1 
+When we find an element first time then we update first = i 
+We always update last=i whenever we find the element.
+We print first and last.
+
+// C++ program to find first and last occurrence of
+// an elements in given sorted array
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function for finding first and last occurrence
+// of an elements
+void findFirstAndLast(int arr[], int n, int x)
+{
+    int first = -1, last = -1;
+    for (int i = 0; i < n; i++) {
+        if (x != arr[i])
+            continue;
+        if (first == -1)
+            first = i;
+        last = i;
+    }
+    if (first != -1)
+        cout << "First Occurrence = " << first
+             << "\nLast Occurrence = " << last;
+    else
+        cout << "Not Found";
+}
+ 
+// Driver code
+int main()
+{
+    int arr[] = { 1, 2, 2, 2, 2, 3, 4, 7, 8, 8 };
+    int n = sizeof(arr) / sizeof(int);
+    int x = 8;
+    findFirstAndLast(arr, n, x);
+    return 0;
+}
+ 
+Output
+First Occurrence = 8
+Last Occurrence = 9
+Time Complexity: O(n) 
+Auxiliary Space: O(1)
+
+An efficient approach using binary search: 
+1. For the first occurrence of a number 
+
+a) If (high >= low)
+b) Calculate  mid = low + (high – low)/2;
+c) If ((mid == 0 || x > arr[mid-1]) && arr[mid] == x)
+        return mid;
+d) Else if (x > arr[mid])
+       return first(arr, (mid + 1), high, x, n);
+e) Else
+       return first(arr, low, (mid -1), x, n);
+f) Otherwise return -1;
+
+
+2. For the last occurrence of a number 
+
+a) if (high >= low)
+b) calculate mid = low + (high – low)/2;
+c)if( ( mid == n-1 || x < arr[mid+1]) && arr[mid] == x )
+        return mid;
+d) else if(x < arr[mid])
+       return last(arr, low, (mid -1), x, n);
+e) else
+      return last(arr, (mid + 1), high, x, n);      
+f) otherwise return -1;
+
+// C++ program to find first and last occurrences of
+// a number in a given sorted array
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* if x is present in arr[] then returns the index of
+   FIRST occurrence of x in arr[0..n-1], otherwise
+   returns -1 */
+int first(int arr[], int low, int high, int x, int n)
+{
+    if (high >= low) {
+        int mid = low + (high - low) / 2;
+        if ((mid == 0 || x > arr[mid - 1]) && arr[mid] == x)
+            return mid;
+        else if (x > arr[mid])
+            return first(arr, (mid + 1), high, x, n);
+        else
+            return first(arr, low, (mid - 1), x, n);
+    }
+    return -1;
+}
+ 
+/* if x is present in arr[] then returns the index of
+   LAST occurrence of x in arr[0..n-1], otherwise
+   returns -1 */
+int last(int arr[], int low, int high, int x, int n)
+{
+    if (high >= low) {
+        int mid = low + (high - low) / 2;
+        if ((mid == n - 1 || x < arr[mid + 1])
+            && arr[mid] == x)
+            return mid;
+        else if (x < arr[mid])
+            return last(arr, low, (mid - 1), x, n);
+        else
+            return last(arr, (mid + 1), high, x, n);
+    }
+    return -1;
+}
+ 
+// Driver program
+int main()
+{
+    int arr[] = { 1, 2, 2, 2, 2, 3, 4, 7, 8, 8 };
+    int n = sizeof(arr) / sizeof(int);
+ 
+    int x = 8;
+    printf("First Occurrence = %d\t",
+           first(arr, 0, n - 1, x, n));
+    printf("\nLast Occurrence = %d\n",
+           last(arr, 0, n - 1, x, n));
+    return 0;
+}
+Output
+First Occurrence = 8    
+Last Occurrence = 9
+Time Complexity: O(log n) 
+Auxiliary Space: O(1)
+
+Using inbuilt functions
+
+#include <bits/stdc++.h>
+using namespace std;
+ 
+void findFirstAndLast(int arr[], int n, int x)
+{
+    int first, last;
+    // to store first occurrence
+    first = lower_bound(arr, arr + n, x) - arr;
+    // to store last occurrence
+    last = upper_bound(arr, arr + n, x) - arr - 1;
+ 
+    if (first == n) {
+        first = -1;
+        last = -1;
+    }
+    cout << "First Occurrence = " << first
+         << "\nLast Occurrence = " << last;
+}
+ 
+// Driver code
+int main()
+{
+    int arr[] = { 1, 2, 2, 2, 2, 3, 4, 7, 8, 8 };
+    int n = sizeof(arr) / sizeof(int);
+    int x = 8;
+    findFirstAndLast(arr, n, x);
+    return 0;
+}
+Output
+First Occurrence = 8
+Last Occurrence = 9
+Time Complexity: O(log n)
+Auxiliary Space: O(1) 
+
+Find a Fixed Point (Value equal to index) in a given array	
+------------------------------------------------------------
+Given an array of n distinct integers sorted in ascending order, write a function that returns a Fixed Point in the array, if there is any Fixed Point present in array, else returns -1. Fixed Point in an array is an index i such that arr[i] is equal to i. Note that integers in array can be negative. 
+Examples: 
+ 
+  Input: arr[] = {-10, -5, 0, 3, 7}
+  Output: 3  // arr[3] == 3 
+
+  Input: arr[] = {0, 2, 5, 8, 17}
+  Output: 0  // arr[0] == 0 
+
+  Input: arr[] = {-10, -5, 3, 4, 7, 9}
+  Output: -1  // No Fixed Point
+
+Method 1 (Linear Search) 
+Linearly search for an index i such that arr[i] == i. Return the first such index found. Thanks to pm for suggesting this solution. 
+
+// C++ program to check fixed point
+// in an array using linear search
+#include <bits/stdc++.h>
+using namespace std;
+ 
+int linearSearch(int arr[], int n)
+{
+    int i;
+    for (i = 0; i < n; i++) {
+        if (arr[i] == i)
+            return i;
+    }
+ 
+    /* If no fixed point present then return -1 */
+    return -1;
+}
+ 
+/* Driver code */
+int main()
+{
+    int arr[] = { -10, -1, 0, 3, 10, 11, 30, 50, 100 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+    cout << "Fixed Point is " << linearSearch(arr, n);
+    return 0;
+}
+Output:  
+Fixed Point is 3
+Time Complexity: O(n) 
+Auxiliary Space: O(1) 
+
+Method 2 (Binary Search) 
+First check whether middle element is Fixed Point or not. If it is, then return it; otherwise if the index of middle + 1 element is less than or equal to the value at the high index, then Fixed Point(s) might lie on the right side of the middle point (obviously only if there is a Fixed Point). Similarly, check if the index of middle – 1 element is greater than or equal to the value at the low index, then Fixed Point(s) might lie on the left side of the middle point. 
+
+// C++ program to check fixed point
+// in an array using binary search
+#include <bits/stdc++.h>
+using namespace std;
+ 
+int binarySearch(int arr[], int low, int high)
+{
+    if (high >= low) {
+        int mid = low + (high - low) / 2;
+        if (mid == arr[mid])
+            return mid;
+        int res = -1;
+        if (mid + 1 <= arr[high])
+            res = binarySearch(arr, (mid + 1), high);
+        if (res != -1)
+            return res;
+        if (mid - 1 >= arr[low])
+            return binarySearch(arr, low, (mid - 1));
+    }
+ 
+    /* Return -1 if there is no Fixed Point */
+    return -1;
+}
+ 
+/* Driver code */
+int main()
+{
+    int arr[10] = { -10, -1, 0, 3, 10, 11, 30, 50, 100 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+    cout << "Fixed Point is " << binarySearch(arr, 0, n - 1);
+    return 0;
+}
+Output: 
+Fixed Point is 3
+Algorithmic Paradigm: Divide & Conquer 
+Time Complexity: O(log n)
+Auxiliary Space: O(log n) (As implicit stack is used for recursive calls)
+
+Search in a rotated sorted array	
+---------------------------------------
+Given a sorted and rotated array arr[] of size N and a key, the task is to find the key in the array.
+
+Note: Find the element in O(logN) time and assume that all the elements are distinct.
+
+Example:  
+
+Input  : arr[] = {5, 6, 7, 8, 9, 10, 1, 2, 3}, key = 3
+Output : Found at index 8
+
+Input  : arr[] = {5, 6, 7, 8, 9, 10, 1, 2, 3}, key = 30
+Output : Not found
+
+Input : arr[] = {30, 40, 50, 10, 20}, key = 10   
+Output : Found at index 3
+
+Approach 1 (Finding Pivot where rotation has happened): The primary idea to solve the problem is as follows. 
+
+The idea is to find the pivot point, divide the array into two sub-arrays and perform a binary search.
+
+The main idea for finding a pivot is – 
+
+For a sorted (in increasing order) and rotated array, the pivot element is the only element for which the next element to it is smaller than it.
+Using binary search based on the above idea, pivot can be found.
+It can be observed that for a search space of indices in range [l, r] where the middle index is mid, 
+If rotation has happened in the left half, then obviously the element at l will be greater than the one at mid.
+Otherwise the left half will be sorted but the element at mid will be greater than the one at r.
+After the pivot is found divide the array into two sub-arrays.
+Now the individual sub-arrays are sorted so the element can be searched using Binary Search.
+Follow the steps mentioned below to implement the idea:  
+
+Find out the pivot point using binary search. We will set the low pointer as the first array index and high with the last array index.
+From the high and low we will calculate the mid value. 
+If the value at mid-1 is greater than the one at mid, return that value as the pivot.
+Else if the value at the mid+1 is less than mid, return mid value as the pivot.
+Otherwise, if the value at low position is greater than mid position, consider the left half. Otherwise, consider the right half.
+Divide the array into two sub-arrays based on the pivot that was found.
+Now call binary search for one of the two sub-arrays.
+If the element is greater than the 0th element then search in the left array
+Else search in the right array.
+If the element is found in the selected sub-array then return the index
+Else return -1.
+Follow the below illustration for a better understanding
+
+Illustration:
+
+Consider arr[] = {3, 4, 5, 1, 2}, key = 1
+
+
+Pivot finding:
+
+low = 0, high = 4:
+        =>  mid = 2
+        =>  arr[mid] = 5, arr[mid + 1] = 1
+        => arr[mid] > arr[mid +1],
+        => Therefore the pivot = mid = 2
+
+Array is divided into two parts {3, 4, 5}, {1, 2}
+Now  according to the conditions and the key, we need to find in the part {1, 2} 
+
+Key Finding:
+
+We will apply Binary search on {1, 2}. 
+low = 3 , high = 4.
+            =>  mid = 3
+            =>  arr[mid] = 1 , key = 1, hence arr[mid] = key matches.
+            =>  The required index = mid = 3
+
+So the element is  found at index 3.
+
+// C++ Program to search an element
+// in a sorted and pivoted array
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Standard Binary Search function
+int binarySearch(int arr[], int low, int high, int key)
+{
+    if (high < low)
+        return -1;
+ 
+    int mid = (low + high) / 2;
+    if (key == arr[mid])
+        return mid;
+ 
+    if (key > arr[mid])
+        return binarySearch(arr, (mid + 1), high, key);
+ 
+    return binarySearch(arr, low, (mid - 1), key);
+}
+ 
+// Function to get pivot. For array 3, 4, 5, 6, 1, 2
+// it returns 3 (index of 6)
+int findPivot(int arr[], int low, int high)
+{
+    // Base cases
+    if (high < low)
+        return -1;
+    if (high == low)
+        return low;
+ 
+    // low + (high - low)/2;
+    int mid = (low + high) / 2;
+    if (mid < high && arr[mid] > arr[mid + 1])
+        return mid;
+ 
+    if (mid > low && arr[mid] < arr[mid - 1])
+        return (mid - 1);
+ 
+    if (arr[low] >= arr[mid])
+        return findPivot(arr, low, mid - 1);
+ 
+    return findPivot(arr, mid + 1, high);
+}
+ 
+// Searches an element key in a pivoted
+// sorted array arr[] of size n
+int pivotedBinarySearch(int arr[], int n, int key)
+{
+    int pivot = findPivot(arr, 0, n - 1);
+ 
+    // If we didn't find a pivot,
+    // then array is not rotated at all
+    if (pivot == -1)
+        return binarySearch(arr, 0, n - 1, key);
+ 
+    // If we found a pivot, then first compare with pivot
+    // and then search in two subarrays around pivot
+    if (arr[pivot] == key)
+        return pivot;
+ 
+    if (arr[0] <= key)
+        return binarySearch(arr, 0, pivot - 1, key);
+ 
+    return binarySearch(arr, pivot + 1, n - 1, key);
+}
+ 
+// Driver program to check above functions
+int main()
+{
+    // Let us search 3 in below array
+    int arr1[] = { 5, 6, 7, 8, 9, 10, 1, 2, 3 };
+    int n = sizeof(arr1) / sizeof(arr1[0]);
+    int key = 3;
+ 
+    // Function calling
+    cout << "Index of the element is : "
+         << pivotedBinarySearch(arr1, n, key);
+ 
+    return 0;
+}
+Output
+Index of the element is : 8
+Time Complexity: O(log N) Binary Search requires log n comparisons to find the element.
+Space Complexity: O(1)
+
+Approach 2 (Direct Binary search on Array without finding Pivot): 
+
+The idea is to instead of two or more passes of binary search, the result can be found in one pass of binary search. 
+
+The idea is to create a recursive function to implement the binary search where the search region is [l, r]. For each recursive call:
+
+We calculate the mid value as mid = (l + h) / 2
+Then try to figure out if l to mid is sorted, or (mid+1) to h is sorted
+Based on that decide the next search region and keep on doing this till the element is found or l overcomes h.
+Follow the steps mentioned below to implement the idea:  
+
+Use a recursive function to implement binary search to find the key:
+Find middle-point mid = (l + h)/2 
+If the key is present at the middle point, return mid.
+Else if the value at l is less than the one at mid then arr[l . . . mid] is sorted
+If the key to be searched lies in the range from arr[l] to arr[mid], recur for arr[l . . . mid].
+Else recur for arr[mid+1 . . . h]  
+Else arr[mid+1. . . h] is sorted: 
+If the key to be searched lies in the range from arr[mid+1] to arr[h], recur for arr[mid+1. . . h].
+Else recur for arr[l. . . mid] 
+Follow the below illustration for a better understanding:
+
+Illustration:
+
+Input arr[] = {3, 4, 5, 1, 2}, key = 1
+Initially low = 0, high = 4.
+
+low = 0, high = 4:
+        => mid = 2
+        => arr[mid] = 5, which is not the desired value.
+        => arr[low] < arr[mid] So, the left half is sorted.
+        => key < arr[low], So the next search region is 3 to 4.
+
+low = 3, high = 4:
+        => mid = 3
+        => arr[mid] = 1 = key
+        => So the element is found at index 3.
+
+The element is found at index 3.
+
+Below is the implementation of the above idea:  
+
+// Search an element in sorted and rotated
+// array using single pass of Binary Search
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Returns index of key in arr[l..h] if
+// key is present, otherwise returns -1
+int search(int arr[], int l, int h, int key)
+{
+    if (l > h)
+        return -1;
+ 
+    int mid = (l + h) / 2;
+    if (arr[mid] == key)
+        return mid;
+ 
+    /* If arr[l...mid] is sorted */
+    if (arr[l] <= arr[mid]) {
+        /* As this subarray is sorted, we can quickly
+        check if key lies in half or other half */
+        if (key >= arr[l] && key <= arr[mid])
+            return search(arr, l, mid - 1, key);
+        /*If key not lies in first half subarray,
+           Divide other half  into two subarrays,
+           such that we can quickly check if key lies
+           in other half */
+        return search(arr, mid + 1, h, key);
+    }
+ 
+    /* If arr[l..mid] first subarray is not sorted, then
+    arr[mid... h] must be sorted subarray */
+    if (key >= arr[mid] && key <= arr[h])
+        return search(arr, mid + 1, h, key);
+ 
+    return search(arr, l, mid - 1, key);
+}
+ 
+// Driver program
+int main()
+{
+    int arr[] = { 4, 5, 6, 7, 8, 9, 1, 2, 3 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int key = 3;
+    int i = search(arr, 0, n - 1, key);
+ 
+    if (i != -1)
+        cout << "Index: " << i << endl;
+    else
+        cout << "Key not found";
+}
+ 
+Output
+Index: 8
+Time Complexity: O(log N). Binary Search requires log n comparisons to find the element. So time complexity is O(log n).
+Space Complexity: O(1). As no extra space is required.
+
+How to handle duplicates? 
+At first look, it doesn’t look possible to search in O(Log N) time in all cases when duplicates are allowed. 
+For example consider searching 0 in {2, 2, 2, 2, 2, 2, 2, 2, 0, 2} and {2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}. 
+
+Square root of an integer	
+---------------------------------
+Given an integer X, find its square root. If X is not a perfect square, then return floor(√x).
+
+Examples : 
+
+Input: x = 4
+Output: 2
+Explanation: The square root of 4 is 2.
+
+Input: x = 11
+Output: 3
+Explanation:  The square root of 11 lies in between 3 and 4 so floor of the square root is 3.
+
+Naive Approach: To find the floor of the square root, try with all-natural numbers starting from 1. Continue incrementing the number until the square of that number is greater than the given number.
+
+Follow the steps below to implement the above idea
+
+Create a variable (counter) i and take care of some base cases, (i.e when the given number is 0 or 1).
+Run a loop until i*i <= n, where n is the given number. Increment i by 1.
+The floor of the square root of the number is i – 1
+
+// A C++ program to find floor(sqrt(x)
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Returns floor of square root of x
+int floorSqrt(int x)
+{
+    // Base cases
+    if (x == 0 || x == 1)
+        return x;
+ 
+    // Starting from 1, try all numbers until
+    // i*i is greater than or equal to x.
+    int i = 1, result = 1;
+    while (result <= x) {
+        i++;
+        result = i * i;
+    }
+    return i - 1;
+}
+ 
+// Driver program
+int main()
+{
+    int x = 11;
+    cout << floorSqrt(x) << endl;
+    return 0;
+}
+Output
+3
+Complexity Analysis: 
+Time Complexity: O(√X). Only one traversal of the solution is needed, so the time complexity is O(√X).
+Auxiliary Space: O(1).
+
+Using Binary search:
+The idea is to find the largest integer i whose square is less than or equal to the given number. The values of i * i is monotonically increasing, so the problem can be solved using binary search.
+
+Below is the implementation of the above idea: 
+
+Base cases for the given problem are when the given number is 0 or 1, then return X;
+Create some variables, for storing the lower bound say l = 0, and for upper bound r = X / 2 (i.e, The floor of the square root of x cannot be more than x/2 when x > 1).
+Run a loop until l <= r, the search space vanishes
+Check if the square of mid (mid = (l + r)/2 ) is less than or equal to X, If yes then search for a larger value in the second half of the search space, i.e l = mid + 1, update ans = mid
+Else if the square of mid is more than X then search for a smaller value in the first half of the search space, i.e r = mid – 1
+Finally, Return the ans
+
+#include <iostream>
+using namespace std;
+int floorSqrt(int x)
+{
+    // Base cases
+    if (x == 0 || x == 1)
+        return x;
+ 
+    // Do Binary Search for floor(sqrt(x))
+    int start = 1, end = x / 2, ans;
+    while (start <= end) {
+        int mid = (start + end) / 2;
+ 
+        // If x is a perfect square
+        int sqr = mid * mid;
+        if (sqr == x)
+            return mid;
+ 
+        // Since we need floor, we update answer when
+        // mid*mid is smaller than x, and move closer to
+        // sqrt(x)
+ 
+        /*
+           if(mid*mid<=x)
+                   {
+                           start = mid+1;
+                           ans = mid;
+                   }
+            Here basically if we multiply mid with itself so
+           there will be integer overflow which will throw
+           tle for larger input so to overcome this
+           situation we can use long or we can just divide
+            the number by mid which is same as checking
+           mid*mid < x
+ 
+           */
+        if (sqr <= x) {
+            start = mid + 1;
+            ans = mid;
+        }
+        else // If mid*mid is greater than x
+            end = mid - 1;
+    }
+    return ans;
+}
+ 
+// Driver program
+int main()
+{
+    int x = 11;
+    cout << floorSqrt(x) << endl;
+    return 0;
+}
+Output
+3
+Complexity Analysis: 
+Time Complexity: O(log(X)). 
+Auxiliary Space: O(1).
+
+Using built-in functions:
+
+#include <bits/stdc++.h>
+using namespace std;
+int countSquares(int x)
+{
+    int sqr = sqrt(x);
+    int result = (int)(sqr);
+    return result;
+}
+int main()
+{
+ 
+    int x = 9;
+    cout << (countSquares(x));
+ 
+    return 0;
+}
+
+Output
+3
+Time Complexity: O(log(X))
+Auxiliary Space: O(1)
+
+Maximum and minimum of an array using minimum number of comparisons	
+---------------------------------------------------------------------
+Given an array of size N. The task is to find the maximum and the minimum element of the array using the minimum number of comparisons.
+
+Examples:
+
+Input: arr[] = {3, 5, 4, 1, 9}
+Output: Minimum element is: 1
+              Maximum element is: 9
+
+Input: arr[] = {22, 14, 8, 17, 35, 3}
+Output:  Minimum element is: 3
+              Maximum element is: 35
+
+First of all, how do we return multiple values from a function? We can do it either using structures or pointers. 
+We have created a structure named pair (which contains min and max) to return multiple values. 
+
+
+struct pair {
+    int min;
+    int max;
+};
+
+Maximum and minimum of an array using Linear search:
+Initialize values of min and max as minimum and maximum of the first two elements respectively. Starting from 3rd, compare each element with max and min, and change max and min accordingly (i.e., if the element is smaller than min then change min, else if the element is greater than max then change max, else ignore the element) 
+
+// C++ program of above implementation
+#include<iostream>
+using namespace std;
+ 
+// Pair struct is used to return
+// two values from getMinMax()
+struct Pair
+{
+    int min;
+    int max;
+};
+ 
+Pair getMinMax(int arr[], int n)
+{
+    struct Pair minmax;    
+    int i;
+     
+    // If there is only one element
+    // then return it as min and max both
+    if (n == 1)
+    {
+        minmax.max = arr[0];
+        minmax.min = arr[0];    
+        return minmax;
+    }
+     
+    // If there are more than one elements,
+    // then initialize min and max
+    if (arr[0] > arr[1])
+    {
+        minmax.max = arr[0];
+        minmax.min = arr[1];
+    }
+    else
+    {
+        minmax.max = arr[1];
+        minmax.min = arr[0];
+    }
+     
+    for(i = 2; i < n; i++)
+    {
+        if (arr[i] > minmax.max)    
+            minmax.max = arr[i];
+             
+        else if (arr[i] < minmax.min)    
+            minmax.min = arr[i];
+    }
+    return minmax;
+}
+ 
+// Driver code
+int main()
+{
+    int arr[] = { 1000, 11, 445,
+                  1, 330, 3000 };
+    int arr_size = 6;
+     
+    struct Pair minmax = getMinMax(arr, arr_size);
+     
+    cout << "Minimum element is "
+         << minmax.min << endl;
+    cout << "Maximum element is "
+         << minmax.max;
+          
+    return 0;
+}
+ 
+Output: 
+Minimum element is 1
+Maximum element is 3000
+Time Complexity: O(n)
+Auxiliary Space: O(1) as no extra space was needed.
+
+In this method, the total number of comparisons is 1 + 2(n-2) in the worst case and 1 + n – 2 in the best case. 
+In the above implementation, the worst case occurs when elements are sorted in descending order and the best case occurs when elements are sorted in ascending order.
+
+Maximum and minimum of an array using the tournament method:
+Divide the array into two parts and compare the maximums and minimums of the two parts to get the maximum and the minimum of the whole array.
+
+Pair MaxMin(array, array_size)
+    if array_size = 1
+        return element as both max and min
+    else if arry_size = 2
+        one comparison to determine max and min
+         return that pair
+    else    /* array_size  > 2 */
+        recur for max and min of left half
+        recur for max and min of right half
+        one comparison determines true max of the two candidates
+        one comparison determines true min of the two candidates
+        return the pair of max and min
+
+// C++ program of above implementation
+#include <iostream>
+using namespace std;
+ 
+// structure is used to return
+// two values from minMax()
+struct Pair {
+    int min;
+    int max;
+};
+ 
+struct Pair getMinMax(int arr[], int low, int high)
+{
+    struct Pair minmax, mml, mmr;
+    int mid;
+ 
+    // If there is only one element
+    if (low == high) {
+        minmax.max = arr[low];
+        minmax.min = arr[low];
+        return minmax;
+    }
+ 
+    // If there are two elements
+    if (high == low + 1) {
+        if (arr[low] > arr[high]) {
+            minmax.max = arr[low];
+            minmax.min = arr[high];
+        }
+        else {
+            minmax.max = arr[high];
+            minmax.min = arr[low];
+        }
+        return minmax;
+    }
+ 
+    // If there are more than 2 elements
+    mid = (low + high) / 2;
+    mml = getMinMax(arr, low, mid);
+    mmr = getMinMax(arr, mid + 1, high);
+ 
+    // Compare minimums of two parts
+    if (mml.min < mmr.min)
+        minmax.min = mml.min;
+    else
+        minmax.min = mmr.min;
+ 
+    // Compare maximums of two parts
+    if (mml.max > mmr.max)
+        minmax.max = mml.max;
+    else
+        minmax.max = mmr.max;
+ 
+    return minmax;
+}
+ 
+// Driver code
+int main()
+{
+    int arr[] = { 1000, 11, 445, 1, 330, 3000 };
+    int arr_size = 6;
+ 
+    struct Pair minmax = getMinMax(arr, 0, arr_size - 1);
+ 
+    cout << "Minimum element is " << minmax.min << endl;
+    cout << "Maximum element is " << minmax.max;
+ 
+    return 0;
+}
+
+Output
+Minimum element is 1
+Maximum element is 3000
+Time Complexity: O(n)
+Auxiliary Space: O(log n) as the stack space will be filled for the maximum height of the tree formed during recursive calls same as a binary tree.
+
+Total number of comparisons: let the number of comparisons be T(n). T(n) can be written as follows: 
+Algorithmic Paradigm: Divide and Conquer 
+
+T(n) = T(floor(n/2)) + T(ceil(n/2)) + 2
+T(2) = 1
+T(1) = 0
+If n is a power of 2, then we can write T(n) as: 
+
+T(n) = 2T(n/2) + 2
+After solving the above recursion, we get 
+
+T(n)  = 3n/2 -2
+Thus, the approach does 3n/2 -2 comparisons if n is a power of 2. And it does more than 3n/2 -2 comparisons if n is not a power of 2.
+
+Maximum and minimum of an array by comparing in pairs:
+If n is odd then initialize min and max as the first element. 
+If n is even then initialize min and max as minimum and maximum of the first two elements respectively. 
+For the rest of the elements, pick them in pairs and compare their 
+maximum and minimum with max and min respectively. 
+
+// C++ program of above implementation
+#include<iostream>
+using namespace std;
+ 
+// Structure is used to return
+// two values from minMax()
+struct Pair
+{
+    int min;
+    int max;
+};
+ 
+struct Pair getMinMax(int arr[], int n)
+{
+    struct Pair minmax;    
+    int i;
+     
+    // If array has even number of elements
+    // then initialize the first two elements
+    // as minimum and maximum
+    if (n % 2 == 0)
+    {
+        if (arr[0] > arr[1])    
+        {
+            minmax.max = arr[0];
+            minmax.min = arr[1];
+        }
+        else
+        {
+            minmax.min = arr[0];
+            minmax.max = arr[1];
+        }
+         
+        // Set the starting index for loop
+        i = 2;
+    }
+     
+    // If array has odd number of elements
+    // then initialize the first element as
+    // minimum and maximum
+    else
+    {
+        minmax.min = arr[0];
+        minmax.max = arr[0];
+         
+        // Set the starting index for loop
+        i = 1;
+    }
+     
+    // In the while loop, pick elements in
+    // pair and compare the pair with max
+    // and min so far
+    while (i < n - 1)
+    {        
+        if (arr[i] > arr[i + 1])        
+        {
+            if(arr[i] > minmax.max)    
+                minmax.max = arr[i];
+                 
+            if(arr[i + 1] < minmax.min)        
+                minmax.min = arr[i + 1];    
+        }
+        else       
+        {
+            if (arr[i + 1] > minmax.max)    
+                minmax.max = arr[i + 1];
+                 
+            if (arr[i] < minmax.min)        
+                minmax.min = arr[i];    
+        }
+         
+        // Increment the index by 2 as
+        // two elements are processed in loop
+        i += 2;
+    }        
+    return minmax;
+}
+ 
+// Driver code
+int main()
+{
+    int arr[] = { 1000, 11, 445,
+                1, 330, 3000 };
+    int arr_size = 6;
+     
+    Pair minmax = getMinMax(arr, arr_size);
+     
+    cout << "nMinimum element is "
+        << minmax.min << endl;
+    cout << "nMaximum element is "
+        << minmax.max;
+         
+    return 0;
+}
+ 
+Output: 
+Minimum element is 1
+Maximum element is 3000
+Time Complexity: O(n)
+Auxiliary Space: O(1) as no extra space was needed.
+
+Total number of comparisons: Different for even and odd n, see below: 
+
+       If n is odd:    3*(n-1)/2  
+       If n is even:   1 Initial comparison for initializing min and max, 
+                           and 3(n-2)/2 comparisons for rest of the elements  
+                      =  1 + 3*(n-2)/2 = 3n/2 -2
+Second and third approaches make the equal number of comparisons when n is a power of 2. 
+
+Optimum location of point to minimize total distance	
+--------------------------------------------------------
+Given a set of points as and a line as ax+by+c = 0. We need to find a point on given line for which sum of distances from given set of points is minimum. 
+
+Example: 
+
+In above figure optimum location of point of x - y - 3 = 0 line 
+is (2, -1), whose total distance with other points is 20.77, 
+which is minimum obtainable total distance.
+
+If we take one point on given line at infinite distance then total distance cost will be infinite, now when we move this point on line towards given points the total distance cost starts decreasing and after some time, it again starts increasing which reached to infinite on the other infinite end of line so distance cost curve looks like a U-curve and we have to find the bottom value of this U-curve. 
+
+As U-curve is not monotonically increasing or decreasing we can’t use binary search for finding bottom most point, here we will use ternary search for finding bottom most point, ternary search skips one third of search space at each iteration, you can read more about ternary search here. 
+
+So solution proceeds as follows, we start with low and high initialized as some smallest and largest values respectively, then we start iteration, in each iteration we calculate two mids, mid1 and mid2, which represent 1/3rd and 2/3rd position in search space, we calculate total distance of all points with mid1 and mid2 and update low or high by comparing these distance cost, this iteration continues until low and high become approximately equal. 
+
+//  C/C++ program to find optimum location and total cost
+#include <bits/stdc++.h>
+using namespace std;
+#define sq(x) ((x) * (x))
+#define EPS 1e-6
+#define N 5
+ 
+//  structure defining a point
+struct point {
+    int x, y;
+    point() {}
+    point(int x, int y)
+        : x(x)
+        , y(y)
+    {
+    }
+};
+ 
+//  structure defining a line of ax + by + c = 0 form
+struct line {
+    int a, b, c;
+    line(int a, int b, int c)
+        : a(a)
+        , b(b)
+        , c(c)
+    {
+    }
+};
+ 
+//  method to get distance of point (x, y) from point p
+double dist(double x, double y, point p)
+{
+    return sqrt(sq(x - p.x) + sq(y - p.y));
+}
+ 
+/*  Utility method to compute total distance all points
+    when choose point on given line has x-coordinate
+    value as X   */
+double compute(point p[], int n, line l, double X)
+{
+    double res = 0;
+ 
+    //  calculating Y of chosen point by line equation
+    double Y = -1 * (l.c + l.a * X) / l.b;
+    for (int i = 0; i < n; i++)
+        res += dist(X, Y, p[i]);
+ 
+    return res;
+}
+ 
+//  Utility method to find minimum total distance
+double findOptimumCostUtil(point p[], int n, line l)
+{
+    double low = -1e6;
+    double high = 1e6;
+ 
+    // loop until difference between low and high
+    // become less than EPS
+    while ((high - low) > EPS) {
+        // mid1 and mid2 are representative x co-ordiantes
+        // of search space
+        double mid1 = low + (high - low) / 3;
+        double mid2 = high - (high - low) / 3;
+ 
+        //
+        double dist1 = compute(p, n, l, mid1);
+        double dist2 = compute(p, n, l, mid2);
+ 
+        // if mid2 point gives more total distance,
+        // skip third part
+        if (dist1 < dist2)
+            high = mid2;
+ 
+        // if mid1 point gives more total distance,
+        // skip first part
+        else
+            low = mid1;
+    }
+ 
+    // compute optimum distance cost by sending average
+    // of low and high as X
+    return compute(p, n, l, (low + high) / 2);
+}
+ 
+//  method to find optimum cost
+double findOptimumCost(int points[N][2], line l)
+{
+    point p[N];
+ 
+    //  converting 2D array input to point array
+    for (int i = 0; i < N; i++)
+        p[i] = point(points[i][0], points[i][1]);
+ 
+    return findOptimumCostUtil(p, N, l);
+}
+ 
+//  Driver code to test above method
+int main()
+{
+    line l(1, -1, -3);
+    int points[N][2] = {
+        { -3, -2 }, { -1, 0 }, { -1, 2 }, { 1, 2 }, { 3, 4 }
+    };
+    cout << findOptimumCost(points, l) << endl;
+    return 0;
+}
+Output
+20.7652
+Time Complexity: O(n2) 
+Auxiliary Space: O(n)
+
+Find the repeating and the missing	
+---------------------------------------
+Given an unsorted array of size n. Array elements are in the range of 1 to n. One number from set {1, 2, …n} is missing and one number occurs twice in the array. Find these two numbers.
+
+Examples: 
+
+Input: arr[] = {3, 1, 3}
+Output: Missing = 2, Repeating = 3
+Explanation: In the array, 2 is missing and 3 occurs twice 
+
+Input: arr[] = {4, 3, 6, 2, 1, 1}
+Output: Missing = 5, Repeating = 1
+
+Method 1 (Use Sorting)
+Approach: 
+
+Sort the input array.
+Traverse the array and check for missing and repeating.
+Time Complexity: O(nLogn)
+
+Method 2 (Use count array)
+Approach: 
+
+Create a temp array temp[] of size n with all initial values as 0.
+Traverse the input array arr[], and do following for each arr[i] 
+if(temp[arr[i]] == 0) temp[arr[i]] = 1;
+if(temp[arr[i]] == 1) output “arr[i]” //repeating
+Traverse temp[] and output the array element having value as 0 (This is the missing element)
+Time Complexity: O(n)
+Auxiliary Space: O(n)
+
+Method 3 (Use elements as Index and mark the visited places)
+Approach: 
+Traverse the array. While traversing, use the absolute value of every element as an index and make the value at this index as negative to mark it visited. If something is already marked negative then this is the repeating element. To find missing, traverse the array again and look for a positive value.
+
+// C++ program to Find the repeating
+// and missing elements
+#include <bits/stdc++.h>
+using namespace std;
+ 
+void printTwoElements(int arr[], int size)
+{
+    int i;
+    cout << "The repeating element is ";
+ 
+    for (i = 0; i < size; i++) {
+        if (arr[abs(arr[i]) - 1] > 0)
+            arr[abs(arr[i]) - 1] = -arr[abs(arr[i]) - 1];
+        else
+            cout << abs(arr[i]) << "\n";
+    }
+ 
+    cout << "and the missing element is ";
+    for (i = 0; i < size; i++) {
+        if (arr[i] > 0)
+            cout << (i + 1);
+    }
+}
+ 
+/* Driver code */
+int main()
+{
+    int arr[] = { 7, 3, 4, 5, 5, 6, 2 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+    printTwoElements(arr, n);
+}
+ 
+Output
+The repeating element is 5
+and the missing element is 1
+ 
+Time Complexity: O(n)
+Auxiliary Space: O(1) as it is using constant variables
+
+Method 4 (Make two equations)
+Approach:
+
+Let x be the missing and y be the repeating element.
+Get the sum of all numbers using formula S = n(n+1)/2 – x + y
+Get product of all numbers using formula P = 1*2*3*…*n * y / x
+The above two steps give us two equations, we can solve the equations and get the values of x and y.
+Time Complexity: O(n)
+Thanks to disappearedng for suggesting this solution. 
+
+Note: This method can cause arithmetic overflow as we calculate product and sum of all array elements.
+
+Method 5 (Use XOR)
+
+Approach:
+
+Let x and y be the desired output elements.
+Calculate XOR of all the array elements.
+xor1 = arr[0]^arr[1]^arr[2]…..arr[n-1]
+
+XOR the result with all numbers from 1 to n
+xor1 = xor1^1^2^…..^n
+
+In the result xor1, all elements would nullify each other except x and y. All the bits that are set in xor1 will be set in either x or y. So if we take any set bit (We have chosen the rightmost set bit in code) of xor1 and divide the elements of the array in two sets – one set of elements with the same bit set and other set with same bit not set. By doing so, we will get x in one set and y in another set. Now if we do XOR of all the elements in first set, we will get x, and by doing same in other set we will get y. 
+
+// C++ program to Find the repeating
+// and missing elements
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* The output of this function is stored at
+*x and *y */
+void getTwoElements(int arr[], int n,
+                    int* x, int* y)
+{
+    /* Will hold xor of all elements
+    and numbers from 1 to n */
+    int xor1;
+ 
+    /* Will have only single set bit of xor1 */
+    int set_bit_no;
+ 
+    int i;
+    *x = 0;
+    *y = 0;
+ 
+    xor1 = arr[0];
+ 
+    /* Get the xor of all array elements */
+    for (i = 1; i < n; i++)
+        xor1 = xor1 ^ arr[i];
+ 
+    /* XOR the previous result with numbers
+    from 1 to n*/
+    for (i = 1; i <= n; i++)
+        xor1 = xor1 ^ i;
+ 
+    /* Get the rightmost set bit in set_bit_no */
+    set_bit_no = xor1 & ~(xor1 - 1);
+ 
+    /* Now divide elements into two
+    sets by comparing a rightmost set
+    bit of xor1 with the bit at the same
+    position in each element. Also,
+    get XORs of two sets. The two
+    XORs are the output elements.
+    The following two for loops
+    serve the purpose */
+    for (i = 0; i < n; i++) {
+        if (arr[i] & set_bit_no)
+            /* arr[i] belongs to first set */
+            *x = *x ^ arr[i];
+ 
+        else
+            /* arr[i] belongs to second set*/
+            *y = *y ^ arr[i];
+    }
+    for (i = 1; i <= n; i++) {
+        if (i & set_bit_no)
+            /* i belongs to first set */
+            *x = *x ^ i;
+ 
+        else
+            /* i belongs to second set*/
+            *y = *y ^ i;
+    }
+ 
+    /* *x and *y hold the desired
+        output elements */
+}
+ 
+/* Driver code */
+int main()
+{
+    int arr[] = { 1, 3, 4, 5, 5, 6, 2 };
+    int* x = (int*)malloc(sizeof(int));
+    int* y = (int*)malloc(sizeof(int));
+    int n = sizeof(arr) / sizeof(arr[0]);
+ 
+    getTwoElements(arr, n, x, y);
+    cout << " The missing element is " << *x << " and the repeating"
+         << " number is " << *y;
+    getchar();
+}
+
+Output
+The missing element is 7 and the repeating number is 5
+Time Complexity: O(n)
+Auxiliary Space: O(1) as it is using constant space if input array is excluded
+
+This method doesn’t cause overflow, but it doesn’t tell which one occurs twice and which one is missing. We can add one more step that checks which one is missing and which one is repeating. This can be easily done in O(n) time.
+
+Method 6 (Use a Map)
+Approach: 
+This method involves creating a Hashtable with the help of Map. In this, the elements are mapped to their natural index. In this process, if an element is mapped twice, then it is the repeating element. And if an element’s mapping is not there, then it is the missing element.
+
+// C++ program to find the repeating
+// and missing elements using Maps
+#include <iostream>
+#include <unordered_map>
+using namespace std;
+ 
+int main()
+{
+    int arr[] = { 4, 3, 6, 2, 1, 1 };
+    int n = 6;
+     
+    unordered_map<int, bool> numberMap;
+     
+    for(int i : arr)
+    {
+        if (numberMap.find(i) ==
+            numberMap.end())
+        {
+            numberMap[i] = true;
+        }
+        else
+        {
+            cout << "Repeating = " << i;
+        }
+    }
+    cout << endl;
+     
+    for(int i = 1; i <= n; i++)
+    {
+        if (numberMap.find(i) ==
+            numberMap.end())
+        {
+            cout << "Missing = " << i;
+        }
+    }
+    return 0;
+}
+ 
+Output
+Repeating = 1
+Missing = 5
+
+Find majority element	
+--------------------------------
+Find the majority element in the array. A majority element in an array A[] of size n is an element that appears more than n/2 times (and hence there is at most one such element). 
+
+Examples : 
+
+Input : {3, 3, 4, 2, 4, 4, 2, 4, 4}
+Output : 4
+Explanation: The frequency of 4 is 5 which is greater than the half of the size of the array size. 
+
+Input : {3, 3, 4, 2, 4, 4, 2, 4}
+Output : No Majority Element
+Explanation: There is no element whose frequency is greater than the half of the size of the array size.
+
+Naive Approach: 
+The basic solution is to have two loops and keep track of the maximum count for all different elements. If the maximum count becomes greater than n/2 then break the loops and return the element having the maximum count. If the maximum count doesn’t become more than n/2 then the majority element doesn’t exist.
+
+Illustration:
+
+arr[] = {3, 4, 3, 2, 4, 4, 4, 4}, n = 8
+
+For i = 0:
+
+count = 0
+Loop over the array, whenever an element is equal to arr[i] (is 3), increment count
+count of arr[i] is 2, which is less than n/2, hence it can’t be majority element.
+For i = 1:
+
+count = 0
+Loop over the array, whenever an element is equal to arr[i] (is 4), increment count
+count of arr[i] is 5, which is greater than n/2 (i.e 4), hence it will be majority element.
+Hence, 4 is the majority element.
+
+Follow the steps below to solve the given problem:
+
+Create a variable to store the max count, count = 0
+Traverse through the array from start to end.
+For every element in the array run another loop to find the count of similar elements in the given array.
+If the count is greater than the max count update the max count and store the index in another variable.
+If the maximum count is greater than half the size of the array, print the element. Else print there is no majority element.
+
+// C++ program to find Majority
+// element in an array
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to find Majority element
+// in an array
+void findMajority(int arr[], int n)
+{
+    int maxCount = 0;
+    int index = -1; // sentinels
+    for (int i = 0; i < n; i++) {
+        int count = 0;
+        for (int j = 0; j < n; j++) {
+            if (arr[i] == arr[j])
+                count++;
+        }
+ 
+        // update maxCount if count of
+        // current element is greater
+        if (count > maxCount) {
+            maxCount = count;
+            index = i;
+        }
+    }
+ 
+    // if maxCount is greater than n/2
+    // return the corresponding element
+    if (maxCount > n / 2)
+        cout << arr[index] << endl;
+ 
+    else
+        cout << "No Majority Element" << endl;
+}
+ 
+// Driver code
+int main()
+{
+    int arr[] = { 1, 1, 2, 1, 3, 5, 1 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+ 
+    // Function calling
+    findMajority(arr, n);
+ 
+    return 0;
+}
+Output
+1
+Time Complexity: O(n*n), A nested loop is needed where both the loops traverse the array from start to end.
+Auxiliary Space: O(1), No extra space is required.
+
+Using Binary Search Tree
+Insert elements in BST one by one and if an element is already present then increment the count of the node. At any stage, if the count of a node becomes more than n/2 then return.
+
+Illustration:
+
+Follow the steps below to solve the given problem:
+
+Create a binary search tree, if the same element is entered in the binary search tree the frequency of the node is increased.
+traverse the array and insert the element in the binary search tree.
+If the maximum frequency of any node is greater than half the size of the array, then perform an inorder traversal and find the node with a frequency greater than half
+Else print No majority Element.
+
+// C++ program to demonstrate insert operation in binary
+// search tree.
+#include <bits/stdc++.h>
+using namespace std;
+ 
+struct node {
+    int key;
+    int c = 0;
+    struct node *left, *right;
+};
+ 
+// A utility function to create a new BST node
+struct node* newNode(int item)
+{
+    struct node* temp
+        = (struct node*)malloc(sizeof(struct node));
+    temp->key = item;
+    temp->c = 1;
+    temp->left = temp->right = NULL;
+    return temp;
+}
+ 
+// A utility function to insert a new node with given key in
+// BST
+struct node* insert(struct node* node, int key, int& ma)
+{
+    // If the tree is empty, return a new node
+    if (node == NULL) {
+        if (ma == 0)
+            ma = 1;
+ 
+        return newNode(key);
+    }
+ 
+    // Otherwise, recur down the tree
+    if (key < node->key)
+        node->left = insert(node->left, key, ma);
+    else if (key > node->key)
+        node->right = insert(node->right, key, ma);
+    else
+        node->c++;
+ 
+    // find the max count
+    ma = max(ma, node->c);
+ 
+    // return the (unchanged) node pointer
+    return node;
+}
+ 
+// A utility function to do inorder traversal of BST
+void inorder(struct node* root, int s)
+{
+    if (root != NULL) {
+        inorder(root->left, s);
+ 
+        if (root->c > (s / 2))
+            printf("%d \n", root->key);
+ 
+        inorder(root->right, s);
+    }
+}
+// Driver Code
+int main()
+{
+    int a[] = { 1, 3, 3, 3, 2 };
+    int size = (sizeof(a)) / sizeof(a[0]);
+ 
+    struct node* root = NULL;
+    int ma = 0;
+ 
+    for (int i = 0; i < size; i++) {
+        root = insert(root, a[i], ma);
+    }
+ 
+    // Function call
+    if (ma > (size / 2))
+        inorder(root, size);
+    else
+        cout << "No majority element\n";
+    return 0;
+}
+Output
+3
+Time Complexity: If a Binary Search Tree is used then time complexity will be O(n²). If a self-balancing-binary-search tree is used then it will be O(nlogn)
+Auxiliary Space: O(n), As extra space is needed to store the array in the tree.
+
+Searching in an array where adjacent differ by at most k	
+------------------------------------------------------------------
+A step array is an array of integers where each element has a difference of at most k with its neighbor. Given a key x, we need to find the index value of x if multiple-element exist to return the first occurrence of the key.
+Examples: 
+
+Input : arr[] = {4, 5, 6, 7, 6}
+           k = 1
+           x = 6
+Output : 2
+The first index of 6 is 2.
+
+Input : arr[] = {20, 40, 50, 70, 70, 60}  
+          k = 20
+          x = 60
+Output : 5
+The index of 60 is 5.
+
+A Simple Approach is to traverse the given array one by one and compare every element with the given element ‘x’. If matches, then return index.
+The above solution can be Optimized using the fact that the difference between all adjacent elements is at most k. The idea is to start comparing from the leftmost element and find the difference between the current array element and x. Let this difference be ‘diff’. From the given property of the array, we always know that x must be at least ‘diff/k’ away, so instead of searching one by one, we jump ‘diff/k’. 
+
+// C++ program to search an element in an array
+// where difference between adjacent elements is atmost k
+#include<bits/stdc++.h>
+using namespace std;
+
+// x is the element to be searched in arr[0..n-1]
+// such that all elements differ by at-most k.
+int search(int arr[], int n, int x, int k)
+{
+    // Traverse the given array starting from
+    // leftmost element
+    int i = 0;
+    while (i < n)
+    {
+        // If x is found at index i
+        if (arr[i] == x)
+            return i;
+ 
+        // Jump the difference between current
+        // array element and x divided by k
+        // We use max here to make sure that i
+        // moves at-least one step ahead.
+        i = i + max(1, abs(arr[i]-x)/k);
+    }
+ 
+    cout << "number is not present!";
+    return -1;
+}
+ 
+// Driver program to test above function
+int main()
+{
+    int arr[] = {2, 4, 5, 7, 7, 6};
+    int x = 6;
+    int k = 2;
+    int n = sizeof(arr)/sizeof(arr[0]);
+    cout << "Element " << x  << " is present at index "
+         << search(arr, n, x, k);
+    return 0;
+}
+Output: 
+Element 6 is present at index 5
+Time Complexity: O(n)
+Auxiliary Space: O(1)
+
+Find a pair with a given difference	
+-----------------------------------------
+Given an unsorted array and a number n, find if there exists a pair of elements in the array whose difference is n. 
+Examples: 
+
+Input: arr[] = {5, 20, 3, 2, 50, 80}, n = 78
+Output: Pair Found: (2, 80)
+
+Input: arr[] = {90, 70, 20, 80, 50}, n = 45
+Output: No Such Pair
+
+Method 1: The simplest method is to run two loops, the outer loop picks the first element (smaller element) and the inner loop looks for the element picked by outer loop plus n. Time complexity of this method is O(n2).
+Method 2: We can use sorting and Binary Search to improve time complexity to O(nLogn). The first step is to sort the array in ascending order. Once the array is sorted, traverse the array from left to right, and for each element arr[i], binary search for arr[i] + n in arr[i+1..n-1]. If the element is found, return the pair. Both first and second steps take O(nLogn). So overall complexity is O(nLogn). 
+Method 3: The second step of the Method -2 can be improved to O(n). The first step remains the same. The idea for the second step is to take two index variables i and j, and initialize them as 0 and 1 respectively. Now run a linear loop. If arr[j] – arr[i] is smaller than n, we need to look for greater arr[j], so increment j. If arr[j] – arr[i] is greater than n, we need to look for greater arr[i], so increment i. Thanks to Aashish Barnwal for suggesting this approach. 
+The following code is only for the second step of the algorithm, it assumes that the array is already sorted.  
+
+// C++ program to find a pair with the given difference
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// The function assumes that the array is sorted
+bool findPair(int arr[], int size, int n)
+{
+    // Initialize positions of two elements
+    int i = 0;
+    int j = 1;
+ 
+    // Search for a pair
+    while (i < size && j < size)
+    {
+        if (i != j && (arr[j] - arr[i] == n || arr[i] - arr[j] == n) )
+        {
+            cout << "Pair Found: (" << arr[i] <<
+                        ", " << arr[j] << ")";
+            return true;
+        }
+        else if (arr[j]-arr[i] < n)
+            j++;
+        else
+            i++;
+    }
+ 
+    cout << "No such pair";
+    return false;
+}
+ 
+// Driver program to test above function
+int main()
+{
+    int arr[] = {1, 8, 30, 40, 100};
+    int size = sizeof(arr)/sizeof(arr[0]);
+    int n = -60;
+    findPair(arr, size, n);
+    return 0;
+}
+ 
+Output
+Pair Found: (100, 40)
+Time Complexity: O(n*log(n)) [Sorting is still required as first step], Where n is number of element in given array
+Auxiliary Space: O(1)
+
+The above code can be simplified and can be made more understandable by reducing bunch of If-Else checks . Thanks to Nakshatra Chhillar for suggesting this simplification. We will understand simplifications through following code:
+
+// C++ program to find a pair with the given difference
+#include <bits/stdc++.h>
+using namespace std;
+bool findPair(int arr[], int size, int n)
+{
+    // Step-1 Sort the array
+    sort(arr, arr + size);
+ 
+    // Initialize positions of two elements
+    int l = 0;
+    int r = 1;
+ 
+    // take absolute value of difference
+    // this does not affect the pair as A-B=diff is same as
+    // B-A= -diff
+    n = abs(n);
+ 
+    // Search for a pair
+ 
+    // These roop running conditions are sufficient
+    while (l <= r and r < size) {
+        int diff = arr[r] - arr[l];
+        if (diff == n
+            and l != r) // we need distinct elements in pair
+                        // so l!=r
+        {
+            cout << "Pair Found: (" << arr[l] << ", "
+                 << arr[r] << ")";
+            return true;
+        }
+        else if (diff > n) // try to reduce the diff
+            l++;
+        else // Note if l==r then r will be advanced thus no
+             // pair will be missed
+            r++;
+    }
+    cout << "No such pair";
+    return false;
+}
+ 
+// Driver program to test above function
+int main()
+{
+    int arr[] = { 1, 8, 30, 40, 100 };
+    int size = sizeof(arr) / sizeof(arr[0]);
+    int n = -60;
+    findPair(arr, size, n);
+    cout << endl;
+    n = 20;
+    findPair(arr, size, n);
+    return 0;
+}
+ 
+Output
+Pair Found: (40, 100)
+No such pair
+Time Complexity: O(n*log(n)) [Sorting is still required as first step], Where n is number of element in given array
+Auxiliary Space: O(1)
+
+Method 4 :Hashing can also be used to solve this problem. Create an empty hash table HT. Traverse the array, use array elements as hash keys and enter them in HT. Traverse the array again look for value n + arr[i] in HT. 
+
+// C++ program to find a pair with the given difference
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// The function assumes that the array is sorted
+bool findPair(int arr[], int size, int n)
+{
+    unordered_map<int, int> mpp;
+    for (int i = 0; i < size; i++) {
+        mpp[arr[i]]++;
+ 
+        // Check if any element whose frequency
+        // is greater than 1 exist or not for n == 0
+        if (n == 0 && mpp[arr[i]] > 1)
+            return true;
+    }
+ 
+    // Check if difference is zero and
+    // we are unable to find any duplicate or
+    // element whose frequency is greater than 1
+    // then no such pair found.
+    if (n == 0)
+        return false;
+ 
+    for (int i = 0; i < size; i++) {
+        if (mpp.find(n + arr[i]) != mpp.end()) {
+            cout << "Pair Found: (" << arr[i] << ", "
+                 << n + arr[i] << ")";
+            return true;
+        }
+    }
+ 
+    cout << "No Pair found";
+    return false;
+}
+ 
+// Driver program to test above function
+int main()
+{
+    int arr[] = { 1, 8, 30, 40, 100 };
+    int size = sizeof(arr) / sizeof(arr[0]);
+    int n = -60;
+    findPair(arr, size, n);
+    return 0;
+}
+Output
+Pair Found: (100, 40)
+Time Complexity: O(n), Where n is number of element in given array
+Auxiliary Space: O(n)
+ 
+Find four elements that sum to a given value	
+-------------------------------------------------
+Given an array of integers, find all combination of four elements in the array whose sum is equal to a given value X. 
+For example, if the given array is {10, 2, 3, 4, 5, 9, 7, 8} and X = 23, then your function should print “3 5 7 8” (3 + 5 + 7 + 8 = 23).
+
+A Naive Solution is to generate all possible quadruples and compare the sum of every quadruple with X. The following code implements this simple method using four nested loops 
+
+// C++ program for naive solution to
+// print all combination of 4 elements
+// in A[] with sum equal to X
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* A naive solution to print all combination
+of 4 elements in A[]with sum equal to X */
+void findFourElements(int A[], int n, int X)
+{
+     
+// Fix the first element and find other three
+for (int i = 0; i < n - 3; i++)
+{
+    // Fix the second element and find other two
+    for (int j = i + 1; j < n - 2; j++)
+    {
+         
+        // Fix the third element and find the fourth
+        for (int k = j + 1; k < n - 1; k++)
+        {
+            // find the fourth
+            for (int l = k + 1; l < n; l++)
+            if (A[i] + A[j] + A[k] + A[l] == X)
+                cout << A[i] <<", " << A[j]
+                     << ", " << A[k] << ", " << A[l];
+        }
+    }
+}
+}
+ 
+// Driver Code
+int main()
+{
+    int A[] = {10, 20, 30, 40, 1, 2};
+    int n = sizeof(A) / sizeof(A[0]);
+    int X = 91;
+    findFourElements (A, n, X);
+    return 0;
+}
+
+Output
+20, 30, 40, 1
+Time Complexity: O(n^4)
+Auxiliary Space: O(1)
+
+
+The time complexity can be improved to O(n^3) with the use of sorting as a preprocessing step, and then using method 1 of this post to reduce a loop.
+Following are the detailed steps. 
+
+Sort the input array. 
+Fix the first element as A[i] where i is from 0 to n–3. After fixing the first element of quadruple, fix the second element as A[j] where j varies from i+1 to n-2. Find remaining two elements in O(n) time, using the method 1 of this post 
+Following is the implementation of O(n^3) solution. 
+
+// C++ program for to  print all combination
+// of 4 elements in A[] with sum equal to X
+#include<bits/stdc++.h>
+using namespace std;
+ 
+/* Following function is needed
+for library function qsort(). */
+int compare (const void *a, const void * b)
+{
+    return ( *(int *)a - *(int *)b );
+}
+ 
+/* A sorting based solution to print
+all combination of 4 elements in A[]
+with sum equal to X */
+void find4Numbers(int A[], int n, int X)
+{
+    int l, r;
+ 
+    // Sort the array in increasing
+    // order, using library function
+    // for quick sort
+    qsort (A, n, sizeof(A[0]), compare);
+ 
+    /* Now fix the first 2 elements
+    one by one and find
+    the other two elements */
+    for (int i = 0; i < n - 3; i++)
+    {
+        for (int j = i+1; j < n - 2; j++)
+        {
+            // Initialize two variables as
+            // indexes of the first and last
+            // elements in the remaining elements
+            l = j + 1;
+            r = n-1;
+ 
+            // To find the remaining two
+            // elements, move the index
+            // variables (l & r) toward each other.
+            while (l < r)
+            {
+                if( A[i] + A[j] + A[l] + A[r] == X)
+                {
+                    cout << A[i]<<", " << A[j] <<
+                        ", " << A[l] << ", " << A[r];
+                    l++; r--;
+                }
+                else if (A[i] + A[j] + A[l] + A[r] < X)
+                    l++;
+                else // A[i] + A[j] + A[l] + A[r] > X
+                    r--;
+            } // end of while
+        } // end of inner for loop
+    } // end of outer for loop
+}
+ 
+/* Driver code */
+int main()
+{
+    int A[] = {1, 4, 45, 6, 10, 12};
+    int X = 21;
+    int n = sizeof(A) / sizeof(A[0]);
+    find4Numbers(A, n, X);
+    return 0;
+}
+ 
+Output
+1, 4, 6, 10
+Time Complexity : O(n^3)
+Auxiliary Space: O(1)
+
+Maximum sum such that no 2 elements are adjacent	
+--------------------------------------------------
+Given an array arr[] of positive numbers, The task is to find the maximum sum of a subsequence such that no 2 numbers in the sequence should be adjacent in the array.
+
+Examples: 
+
+Input: arr[] = {5, 5, 10, 100, 10, 5}
+Output: 110
+Explanation: Pick the subsequence {5, 100, 5}.
+The sum is 110 and no two elements are adjacent. This is the highest possible sum.
+
+Input: arr[] = {3, 2, 7, 10}
+Output: 13
+Explanation: The subsequence is {3, 10}. This gives sum = 13.
+This is the highest possible sum of a subsequence following the given criteria
+
+Input: arr[] = {3, 2, 5, 10, 7}
+Output: 15
+Explanation: Pick the subsequence {3, 5, 7}. The sum is 15.
+
+Naive Approach: Below is the idea to solve the problem:
+
+Each element has two choices: either it can be the part of the subsequence with the highest sum or it cannot be part of the subsequence. So to solve the problem, build all the subsequences of the array and find the subsequence with the maximum sum such that no two adjacent elements are present in the subsequence.
+
+Time Complexity: O(2N)
+Auxiliary Space: O(N)
+
+Using Dynamic Programming:
+
+As seen above, each element has two choices. If one element is picked then its neighbours cannot be picked. Otherwise, its neighbours may be picked or may not be. 
+So the maximum sum till ith index has two possibilities: the subsequence includes arr[i] or it does not include arr[i].
+If arr[i] is included then the maximum sum depends on the maximum subsequence sum till (i-1)th element excluding arr[i-1].
+Otherwise, the maximum sum is the same as the maximum subsequence sum till (i-1) where arr[i-1] may be included or excluded.
+So build a 2D dp[N][2] array where dp[i][0] stores maximum subsequence sum till ith index with arr[i] excluded and dp[i][1] stores the sum when arr[i] is included.
+The values will be obtained by the following relations: dp[i][1] = dp[i-1][0] + arr[i] and dp[i][0] = max(dp[i-1][0], dp[i-1][1])
+
+Follow the steps mentioned below to implement the above idea:
+
+If the size of the array is 1, then the answer is arr[0].
+Initialize the values of dp[0][0] = 0 and dp[0][1] = arr[0].
+Iterate from i = 1 to N-1:
+Fill the dp array as per the relation shown above.
+Return the maximum between dp[N-1][1] and dp[N-1][0] as that will be the answer.
+
+// C++ code to implement the approach
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to find the maximum sum
+int findMaxSum(vector<int> arr, int N)
+{
+    // Declare dp array
+    int dp[N][2];
+    if (N == 1) {
+        return arr[0];
+    }
+   
+    // Initialize the values in dp array
+    dp[0][0] = 0;
+    dp[0][1] = arr[0];
+   
+    // Loop to find the maximum possible sum
+    for (int i = 1; i < N; i++) {
+        dp[i][1] = dp[i - 1][0] + arr[i];
+        dp[i][0] = max(dp[i - 1][1],
+                       dp[i - 1][0]);
+    }
+   
+    // Return the maximum sum
+    return max(dp[N - 1][0], dp[N - 1][1]);
+}
+ 
+// Driver Code
+int main()
+{
+    // Creating the array
+    vector<int> arr = { 5, 5, 10, 100, 10, 5 };
+    int N = arr.size();
+ 
+    // Function call
+    cout << findMaxSum(arr, N) << endl;
+    return 0;
+}
+Output
+110
+Time Complexity: O(N)
+Auxiliary Space: O(N)
+
+Space Optimized Approach: The above approach can be optimized to be done in constant space based on the following observation:
+
+As seen from the previous dynamic programming approach, the value of current states (for ith element) depends upon only two states of the previous element. So instead of creating a 2D array, we can use only two variables to store the two states of the previous element.
+
+Say excl stores the value of the maximum subsequence sum till i-1 when arr[i-1] is excluded and 
+incl stores the value of the maximum subsequence sum till i-1 when arr[i-1] is included.
+The value of excl for the current state( say excl_new) will be max(excl ,incl). And the value of incl will be updated to excl + arr[i].
+Illustration:
+
+Consider arr[] = {5,  5, 10, 100, 10, 5}
+
+Initially at i = 0:  incl = 5, excl = 0
+
+For i = 1: arr[i] = 5
+        => excl_new = 5
+        => incl = (excl + arr[i]) = 5
+        => excl = excl_new = 5
+
+For i = 2: arr[i] = 10
+        => excl_new =  max(excl, incl) = 5
+        => incl =  (excl + arr[i]) = 15
+        => excl = excl_new = 5
+
+For i = 3: arr[i] = 100
+        => excl_new =  max(excl, incl) = 15
+        => incl =  (excl + arr[i]) = 105
+        => excl = excl_new = 15
+
+For i = 4: arr[i] = 10
+        => excl_new =  max(excl, incl) = 105
+        => incl =  (excl + arr[i]) = 25
+        => excl = excl_new = 105
+
+For i = 5: arr[i] = 5
+        => excl_new =  max(excl, incl) = 105
+        => incl =  (excl + arr[i]) = 110
+        => excl = excl_new = 105
+
+So, answer is max(incl, excl) =  110
+
+Follow the steps mentioned below to implement the above approach:
+
+Initialize incl and excl with arr[0] and 0 respectively.
+Iterate from i = 1 to N-1:
+Update the values of incl and excl as mentioned above.
+Return the maximum of incl and excl after the iteration is over as the answer.
+
+// C++ code to implement the above approach
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to return max sum such that
+// no two elements are adjacent
+int FindMaxSum(vector<int> arr, int n)
+{
+    int incl = arr[0];
+    int excl = 0;
+    int excl_new;
+    int i;
+ 
+    for (i = 1; i < n; i++) {
+        // Current max excluding i
+        excl_new = max(incl, excl);
+ 
+        // Current max including i
+        incl = excl + arr[i];
+        excl = excl_new;
+    }
+ 
+    // Return max of incl and excl
+    return max(incl, excl);
+}
+ 
+// Driver code
+int main()
+{
+    vector<int> arr = { 5, 5, 10, 100, 10, 5 };
+    int N = arr.size();
+ 
+    // Function call
+    cout << FindMaxSum(arr, N);
+    return 0;
+}
+Output
+110
+Time Complexity: O(N)
+Auxiliary Space: O(1).
+
+Count triplet with sum smaller than a given value	
+----------------------------------------------------
+Given an array of distinct integers and a sum value. Find count of triplets with sum smaller than given sum value. The expected Time Complexity is O(n2).
+Examples: 
+ 
+
+Input : arr[] = {-2, 0, 1, 3}
+        sum = 2.
+Output : 2
+Explanation :  Below are triplets with sum less than 2
+               (-2, 0, 1) and (-2, 0, 3) 
+
+Input : arr[] = {5, 1, 3, 4, 7}
+        sum = 12.
+Output : 4
+Explanation :  Below are triplets with sum less than 12
+               (1, 3, 4), (1, 3, 5), (1, 3, 7) and (1, 4, 5)
+
+A Simple Solution is to run three loops to consider all triplets one by one. For every triplet, compare the sums and increment count if the triplet sum is smaller than the given sum. 
+
+// A Simple C++ program to count triplets with sum smaller
+// than a given value
+#include <bits/stdc++.h>
+using namespace std;
+ 
+int countTriplets(int arr[], int n, int sum)
+{
+    // Initialize result
+    int ans = 0;
+ 
+    // Fix the first element as A[i]
+    for (int i = 0; i < n - 2; i++) {
+        // Fix the second element as A[j]
+        for (int j = i + 1; j < n - 1; j++) {
+            // Now look for the third number
+            for (int k = j + 1; k < n; k++)
+                if (arr[i] + arr[j] + arr[k] < sum)
+                    ans++;
+        }
+    }
+    return ans;
+}
+ 
+// Driver program
+int main()
+{
+    int arr[] = { 5, 1, 3, 4, 7 };
+    int n = sizeof arr / sizeof arr[0];
+    int sum = 12;
+    cout << countTriplets(arr, n, sum) << endl;
+    return 0;
+}
+ 
+Output: 
+4
+Time Complexity: O(n3)
+Auxiliary Space: O(1)
+
+An Efficient Solution can count triplets in O(n2) by sorting the array first, and then using method 1 of this post in a loop.
+ 
+1) Sort the input array in increasing order.
+2) Initialize result as 0.
+3) Run a loop from i = 0 to n-2.  An iteration of this loop finds all
+   triplets with arr[i] as first element.
+     a) Initialize other two elements as corner elements of subarray
+        arr[i+1..n-1], i.e., j = i+1 and k = n-1
+     b) Move j and k toward each other until they meet, i.e., while (j<k),
+            (i) If arr[i] + arr[j] + arr[k] >= sum
+                then k--
+            // Else for current i and j, there can (k-j) possible third elements
+            // that satisfy the constraint.
+            (ii) Else Do ans += (k - j) followed by j++ 
+
+// C++ program to count triplets with sum smaller than a given value
+#include<bits/stdc++.h>
+using namespace std;
+ 
+int countTriplets(int arr[], int n, int sum)
+{
+    // Sort input array
+    sort(arr, arr+n);
+ 
+    // Initialize result
+    int ans = 0;
+ 
+    // Every iteration of loop counts triplet with
+    // first element as arr[i].
+    for (int i = 0; i < n - 2; i++)
+    {
+        // Initialize other two elements as corner elements
+        // of subarray arr[j+1..k]
+        int j = i + 1, k = n - 1;
+ 
+        // Use Meet in the Middle concept
+        while (j < k)
+        {
+            // If sum of current triplet is more or equal,
+            // move right corner to look for smaller values
+            if (arr[i] + arr[j] + arr[k] >= sum)
+                k--;
+ 
+            // Else move left corner
+            else
+            {
+                // This is important. For current i and j, there
+                // can be total k-j third elements.
+                ans += (k - j);
+                j++;
+            }
+        }
+    }
+    return ans;
+}
+ 
+// Driver program
+int main()
+{
+    int arr[] = {5, 1, 3, 4, 7};
+    int n = sizeof arr / sizeof arr[0];
+    int sum = 12;
+    cout << countTriplets(arr, n, sum) << endl;
+    return 0;
+}
+Output: 
+4
+Time Complexity: O(n2)
+Auxiliary Space: O(1)
+
+Merge 2 sorted arrays	
+----------------------------
+We are given two sorted arrays. We need to merge these two arrays such that the initial numbers (after complete sorting) are in the first array and the remaining numbers are in the second array. Extra space is allowed in O(1).
+
+Example: 
+
+Input: ar1[] = {10};
+       ar2[] = {2, 3};
+Output: ar1[] = {2}
+        ar2[] = {3, 10}  
+
+Input: ar1[] = {1, 5, 9, 10, 15, 20};
+       ar2[] = {2, 3, 8, 13};
+Output: ar1[] = {1, 2, 3, 5, 8, 9}
+        ar2[] = {10, 13, 15, 20}
+
+This task is simple and O(m+n) if we are allowed to use extra space. But it becomes really complicated when extra space is not allowed and doesn’t look possible in less than O(m*n) worst-case time.  Though further optimizations are possible
+The idea is to begin from the last element of ar2[] and search it in ar1[]. If there is a greater element in ar1[], then we move the last element of ar1[] to ar2[]. To keep ar1[] and ar2[] sorted, we need to place the last element of ar2[] at the correct place in ar1[]. We can use Insertion Sort type of insertion for this. 
+
+1. Method 1
+
+Algorithm: 
+
+1) Iterate through every element of ar2[] starting from last 
+   element. Do following for every element ar2[i]
+    a) Store last element of ar1[i]: last = ar1[i]
+    b) Loop from last element of ar1[] while element ar1[j] is 
+       greater than ar2[i].
+          ar1[j+1] = ar1[j] // Move element one position ahead
+          j--
+    c) If any element of ar1[] was moved
+          ar1[j+1] = ar2[i] 
+          ar2[i] = last
+In the above loop, elements in ar1[] and ar2[] are always kept sorted.
+
+Below is the implementation of the above algorithm. 
+
+
+// C++ program to merge two sorted arrays with O(1) extra
+// space.
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Merge ar1[] and ar2[] with O(1) extra space
+void merge(int ar1[], int ar2[], int m, int n)
+{
+    // Iterate through all elements
+    // of ar2[] starting from the last element
+    for (int i = n - 1; i >= 0; i--) {
+        // Find the smallest element greater than ar2[i].
+        // Move all elements one position ahead till the
+        // smallest greater element is not found */
+        int j, last = ar1[m - 1];
+        for (j = m - 2; j >= 0 && ar1[j] > ar2[i]; j--)
+            ar1[j + 1] = ar1[j];
+ 
+        // If there was a greater element
+        if (last > ar2[i]) {
+            ar1[j + 1] = ar2[i];
+            ar2[i] = last;
+        }
+    }
+}
+ 
+// Driver program
+int main()
+{
+    int ar1[] = { 1, 5, 9, 10, 15, 20 };
+    int ar2[] = { 2, 3, 8, 13 };
+    int m = sizeof(ar1) / sizeof(ar1[0]);
+    int n = sizeof(ar2) / sizeof(ar2[0]);
+    merge(ar1, ar2, m, n);
+ 
+    cout << "After Merging \nFirst Array: ";
+    for (int i = 0; i < m; i++)
+        cout << ar1[i] << " ";
+    cout << "\nSecond Array: ";
+    for (int i = 0; i < n; i++)
+        cout << ar2[i] << " ";
+    return 0;
+}
+Output
+After Merging 
+First Array: 1 2 3 5 8 9 
+Second Array: 10 13 15 20 
+Time Complexity: The worst-case time complexity of code/algorithm is O(m*n). The worst case occurs when all elements of ar1[] are greater than all elements of ar2[].
+
+Illustration: 
+
+<!— Initial Arrays: 
+ar1[] = {1, 5, 9, 10, 15, 20}; 
+ar2[] = {2, 3, 8, 13};
+After First Iteration: 
+ar1[] = {1, 5, 9, 10, 13, 15}; 
+ar2[] = {2, 3, 8, 20}; 
+// 20 is moved from ar1[] to ar2[] 
+// 13 from ar2[] is inserted in ar1[]
+After Second Iteration: 
+ar1[] = {1, 5, 8, 9, 10, 13}; 
+ar2[] = {2, 3, 15, 20}; 
+// 15 is moved from ar1[] to ar2[] 
+// 8 from ar2[] is inserted in ar1[]
+After Third Iteration: 
+ar1[] = {1, 3, 5, 8, 9, 10}; 
+ar2[] = {2, 13, 15, 20}; 
+// 13 is moved from ar1[] to ar2[] 
+// 3 from ar2[] is inserted in ar1[]
+After Fourth Iteration: 
+ar1[] = {1, 2, 3, 5, 8, 9}; 
+ar2[] = {10, 13, 15, 20}; 
+// 10 is moved from ar1[] to ar2[] 
+// 2 from ar2[] is inserted in ar1[] 
+—!>
+
+
+Method 2:
+
+The solution can be further optimized by observing that while traversing the two sorted arrays parallelly, if we encounter the jth second array element is smaller than ith first array element, then jth element is to be included and replace some kth element in the first array. This observation helps us with the following algorithm
+
+Algorithm
+
+1) Initialize i,j,k as 0,0,n-1 where n is size of arr1 
+2) Iterate through every element of arr1 and arr2 using two pointers i and j respectively
+    if arr1[i] is less than arr2[j]
+        increment i
+    else
+        swap the arr2[j] and arr1[k]
+        increment j and decrement k
+
+3) Sort both arr1 and arr2 
+Below is the implementation of the above algorithm
+
+
+// CPP program for the above approach
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to merge two arrays
+void merge(int arr1[], int arr2[], int n, int m)
+{
+    int i = 0, j = 0, k = n - 1;
+   
+    // Until i less than equal to k
+    // or j is less than m
+    while (i <= k && j < m) {
+        if (arr1[i] < arr2[j])
+            i++;
+        else {
+            swap(arr2[j++], arr1[k--]);
+        }
+    }
+   
+    // Sort first array
+    sort(arr1, arr1 + n);
+   
+    // Sort second array
+    sort(arr2, arr2 + m);
+}
+ 
+// Driver Code
+int main()
+{
+ 
+    int ar1[] = { 1, 5, 9, 10, 15, 20 };
+    int ar2[] = { 2, 3, 8, 13 };
+    int m = sizeof(ar1) / sizeof(ar1[0]);
+    int n = sizeof(ar2) / sizeof(ar2[0]);
+    merge(ar1, ar2, m, n);
+ 
+    cout << "After Merging \nFirst Array: ";
+    for (int i = 0; i < m; i++)
+        cout << ar1[i] << " ";
+    cout << "\nSecond Array: ";
+    for (int i = 0; i < n; i++)
+        cout << ar2[i] << " ";
+    return 0;
+}
+Output
+After Merging 
+First Array: 1 2 3 5 8 9 
+Second Array: 10 13 15 20 
+Complexities:
+Time Complexity: The time complexity while traversing the arrays in while loop is O(n+m) in worst case and sorting is O(nlog(n) + mlog(m)). So overall time complexity of the code becomes O((n+m)log(n+m)).
+Space Complexity: As the function doesn’t use any extra array for any operations, the space complexity is O(1).
+
+Method 3:
+Algorithm:
+
+1) Initialize i with 0
+2) Iterate while loop until last element of array 1 is greater than first element of array 2
+          if arr1[i] greater than first element of arr2
+              swap arr1[i] with arr2[0]
+              sort arr2
+          incrementing i 
+
+#include<iostream>
+#include<bits/stdc++.h>
+using namespace std;
+ 
+void merge(int arr1[], int arr2[], int n, int m) {
+        int i=0;
+        // while loop till last element of array 1(sorted) is greater than
+          // first element of array 2(sorted)
+        while(arr1[n-1]>arr2[0])
+        {
+            if(arr1[i]>arr2[0])
+            {
+                // swap arr1[i] with first element
+                  // of arr2 and sorting the updated
+                // arr2(arr1 is already sorted)
+                swap(arr1[i],arr2[0]);
+                sort(arr2,arr2+m);
+            }
+            i++;
+        }
+    }
+ 
+int main()
+{
+ 
+    int ar1[] = { 1, 5, 9, 10, 15, 20 };
+    int ar2[] = { 2, 3, 8, 13 };
+    int m = sizeof(ar1) / sizeof(ar1[0]);
+    int n = sizeof(ar2) / sizeof(ar2[0]);
+    merge(ar1, ar2, m, n);
+ 
+    cout << "After Merging \nFirst Array: ";
+    for (int i = 0; i < m; i++)
+        cout << ar1[i] << " ";
+    cout << "\nSecond Array: ";
+    for (int i = 0; i < n; i++)
+        cout << ar2[i] << " ";
+    return 0;
+ 
+}
+Output
+After Merging 
+First Array: 1 2 3 5 8 9 
+Second Array: 10 13 15 20 
+
+Product array Puzzle	
+-----------------------------------------
+Given an array arr[] of n integers, construct a Product Array prod[] (of same size) such that prod[i] is equal to the product of all the elements of arr[] except arr[i]. Solve it without division operator and in O(n).
+
+Example: 
+
+Input: arr[] = {10, 3, 5, 6, 2}
+Output: prod[] = {180, 600, 360, 300, 900}
+The elements of output array are 
+{3*5*6*2, 10*5*6*2, 10*3*6*2, 
+10*3*5*2, 10*3*5*6}
+
+Input: arr[] = {1, 2, 1, 3, 4}
+Output: prod[] = {24, 12, 24, 8, 6}
+The elements of output array are 
+{3*4*1*2, 1*1*3*4, 4*3*2*1, 1*1*4*2, 1*1*3*2}
+
+Solution 1: Using log property. 
+
+Approach: In this post, a better approach has been discussed which uses log property to find the product of all elements of the array except at a particular index. This approach uses no extra space.
+
+Use property of log to multiply large numbers  
+
+x = a * b * c * d
+log(x) = log(a * b * c * d)
+log(x) = log(a) + log(b) + log(c) + log(d)
+x = antilog(log(a) + log(b) + log(c) + log(d))
+So the idea is simple,  
+Traverse the array and find the sum of log of all the elements,   
+
+log(a[0]) + log(a[1]) + 
+.. + log(a[n-1])
+Then again traverse through the array and find the product using this formula.  
+
+antilog((log(a[0]) + log(a[1]) +
+ .. + log(a[n-1])) - log(a[i]))
+This equals to product of all the elements except a[i], i.e antilog(sum- log(a[i])). 
+
+Implementation:
+
+// C++ program for product array puzzle
+// with O(n) time and O(1) space.
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// epsilon value to maintain precision
+#define EPS 1e-9
+ 
+void productPuzzle(int a[], int n)
+{
+    // to hold sum of all values
+    long double sum = 0;
+    for (int i = 0; i < n; i++)
+        sum += (long double)log10(a[i]);
+ 
+    // output product for each index
+    // antilog to find original product value
+    for (int i = 0; i < n; i++)
+        cout << (int)(EPS + pow((long double)10.00, sum - log10(a[i]))) << " ";
+}
+ 
+// Driver code
+int main()
+{
+    int a[] = { 10, 3, 5, 6, 2 };
+    int n = sizeof(a) / sizeof(a[0]);
+    cout << "The product array is: \n";
+    productPuzzle(a, n);
+    return 0;
+}
+ 
+Output: 
+The product array is: 
+180 600 360 300 900
+
+Complexity Analysis: 
+Time Complexity: O(n). 
+Only two traversals of the array is required.
+Space Complexity: O(1). 
+No extra space is required.
+
+Alternate Approach: Here’s another approach to solve the above problem by the use of pow() function, does not use division and works in O(n) time. 
+Traverse the array and find the product of all the elements in the array. Store the product in a variable. 
+
+Then again traverse the array and find the product of all the elements except that number by using the formula (product * pow(a[i], -1)) 
+
+Implementation:
+
+// C++ program for product array puzzle
+// with O(n) time and O(1) space.
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Solve function which prints the answer
+void solve(int arr[], int n)
+{
+ 
+    // Initialize a variable to store the
+    // total product of the array elements
+    int prod = 1;
+    for (int i = 0; i < n; i++)
+        prod *= arr[i];
+ 
+    // we know x/y mathematically is same
+    // as x*(y to power -1)
+    for (int i = 0; i < n; i++) {
+        cout << (int)(prod * pow(arr[i], -1)) << ' ';
+    }
+}
+ 
+// Driver Code
+int main()
+{
+    int arr[] = { 10, 3, 5, 6, 2 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+    solve(arr, n);
+    return 0;
+}
+ 
+Output: 
+180 600 360 300 900
+
+Complexity Analysis: 
+Time complexity: O(n), Only two traversals of the array is required.
+Space complexity: O(1), No extra space is required.
+
+Sort array according to count of set bits	
+-------------------------------------------------
+Given an array of positive integers, sort the array in decreasing order of count of set bits in binary representations of array elements. For integers having the same number of set bits in their binary representation, sort according to their position in the original array i.e., a stable sort. For example, if the input array is {3, 5}, then the output array should also be {3, 5}. Note that both 3 and 5 have the same number set bits.
+
+Examples:
+
+Input: arr[] = {5, 2, 3, 9, 4, 6, 7, 15, 32};
+Output: 15 7 5 3 9 6 2 4 32
+Explanation:
+The integers in their binary representation are:
+    15 -1111
+    7  -0111
+    5  -0101
+    3  -0011
+    9  -1001
+    6  -0110
+    2  -0010
+    4- -0100
+    32 -10000
+hence the non-increasing sorted order is:
+{15}, {7}, {5, 3, 9, 6}, {2, 4, 32}
+
+Input: arr[] = {1, 2, 3, 4, 5, 6};
+Output: 3 5 6 1 2 4
+Explanation:
+    3  - 0011
+    5  - 0101
+    6  - 0110
+    1  - 0001
+    2  - 0010
+    4  - 0100
+hence the non-increasing sorted order is
+{3, 5, 6}, {1, 2, 4}
+
+Method 1: Simple
+
+Create an auxiliary array and store the set-bit counts of all integers in the aux array
+Simultaneously sort both arrays according to the non-increasing order of auxiliary array. (Note that we need to use a stable sort algorithm)
+Before sort:
+int arr[] = {1, 2, 3, 4, 5, 6};
+int aux[] = {1, 1, 2, 1, 2, 2}
+After sort:
+arr = {3, 5, 6, 1, 2, 4}
+aux = {2, 2, 2, 1, 1, 1}
+Implementation:
+
+// C++ program to implement simple approach to sort an array
+// according to count of set bits.
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// a utility function that returns total set bits count in an integer
+int countBits(int a)
+{
+    int count = 0;
+    while (a) {
+        if (a & 1)
+            count += 1;
+        a = a >> 1;
+    }
+    return count;
+}
+ 
+// Function to simultaneously sort both arrays using insertion sort
+void insertionSort(int arr[], int aux[], int n)
+{
+    for (int i = 1; i < n; i++) {
+        // use 2 keys because we need to sort both arrays simultaneously
+        int key1 = aux[i];
+        int key2 = arr[i];
+        int j = i - 1;
+ 
+        // Move elements of arr[0..i-1] and aux[0..i-1],
+        // such that elements of aux[0..i-1] are greater
+        // than key1, to one position ahead of their current
+        // position
+        while (j >= 0 && aux[j] < key1) {
+            aux[j + 1] = aux[j];
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }
+        aux[j + 1] = key1;
+        arr[j + 1] = key2;
+    }
+}
+ 
+// Function to sort according to bit count using an auxiliary array
+void sortBySetBitCount(int arr[], int n)
+{
+    // Create an array and store count of set bits in it.
+    int aux[n];
+    for (int i = 0; i < n; i++)
+        aux[i] = countBits(arr[i]);
+ 
+    // Sort arr[] according to values in aux[]
+    insertionSort(arr, aux, n);
+}
+ 
+// Utility function to print an array
+void printArr(int arr[], int n)
+{
+    for (int i = 0; i < n; i++)
+        cout << arr[i] << " ";
+}
+ 
+// Driver Code
+int main()
+{
+    int arr[] = { 1, 2, 3, 4, 5, 6 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+    sortBySetBitCount(arr, n);
+    printArr(arr, n);
+    return 0;
+}
+ 
+Output
+3 5 6 1 2 4 
+Auxiliary Space: O(n)
+Time complexity: O(n2)
+
+Note: Time complexity can be improved to O(nLogn) by using a stable O(nlogn) sorting algorithm.
+
+Method 2: Using std::sort()
+
+Using custom comparator of std::sort to sort the array according to set-bit count
+
+// C++ program to sort an array according to count of set
+// bits using std::sort()
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// a utility function that returns total set bits count in an integer
+int countBits(int a)
+{
+    int count = 0;
+    while (a) {
+        if (a & 1)
+            count += 1;
+        a = a >> 1;
+    }
+    return count;
+}
+ 
+// custom comparator of std::sort
+int cmp(int a, int b)
+{
+    int count1 = countBits(a);
+    int count2 = countBits(b);
+ 
+    // this takes care of the stability of sorting algorithm too
+    if (count1 <= count2)
+        return false;
+    return true;
+}
+ 
+// Function to sort according to bit count using std::sort
+void sortBySetBitCount(int arr[], int n)
+{
+    stable_sort(arr, arr + n, cmp);
+}
+ 
+// Utility function to print an array
+void printArr(int arr[], int n)
+{
+    for (int i = 0; i < n; i++)
+        cout << arr[i] << " ";
+}
+ 
+// Driver Code
+int main()
+{
+    int arr[] = { 1, 2, 3, 4, 5, 6 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+    sortBySetBitCount(arr, n);
+    printArr(arr, n);
+    return 0;
+}
+ 
+Output
+3 5 6 1 2 4 
+Auxiliary Space: O(1)
+Time complexity: O(n log n)
+
+Minimum no. of swaps required to sort the array	
+--------------------------------------------------
+Given an array of n distinct elements, find the minimum number of swaps required to sort the array.
+
+Examples: 
+
+Input: {4, 3, 2, 1}
+Output: 2
+Explanation: Swap index 0 with 3 and 1 with 2 to 
+              form the sorted array {1, 2, 3, 4}.
+
+Input: {1, 5, 4, 3, 2}
+Output: 2
+
+This can be easily done by visualizing the problem as a graph. We will have n nodes and an edge directed from node i to node j if the element at i’th index must be present at j’th index in the sorted array. 
+
+Graph for {4, 3, 2, 1}
+The graph will now contain many non-intersecting cycles. Now a cycle with 2 nodes will only require 1 swap to reach the correct ordering, similarly, a cycle with 3 nodes will only require 2 swaps to do so. 
+
+Graph for {4, 5, 2, 1, 3}
+Hence,
+
+ans = Σi = 1k(cycle_size – 1)
+where, k is the number of cycles
+
+// C++ program to find 
+// minimum number of swaps
+// required to sort an array
+#include<bits/stdc++.h>
+ 
+using namespace std;
+ 
+// Function returns the
+// minimum number of swaps
+// required to sort the array
+int minSwaps(int arr[], int n)
+{
+    // Create an array of
+    // pairs where first
+    // element is array element
+    // and second element
+    // is position of first element
+    pair<int, int> arrPos[n];
+    for (int i = 0; i < n; i++)
+    {
+        arrPos[i].first = arr[i];
+        arrPos[i].second = i;
+    }
+ 
+    // Sort the array by array
+    // element values to
+    // get right position of
+    // every element as second
+    // element of pair.
+    sort(arrPos, arrPos + n);
+ 
+    // To keep track of visited elements.
+    // Initialize
+    // all elements as not visited or false.
+    vector<bool> vis(n, false);
+ 
+    // Initialize result
+    int ans = 0;
+ 
+    // Traverse array elements
+    for (int i = 0; i < n; i++)
+    {
+        // already swapped and corrected or
+        // already present at correct pos
+        if (vis[i] || arrPos[i].second == i)
+            continue;
+ 
+        // find out the number of  node in
+        // this cycle and add in ans
+        int cycle_size = 0;
+        int j = i;
+        while (!vis[j])
+        {
+            vis[j] = 1;
+ 
+            // move to next node
+            j = arrPos[j].second;
+            cycle_size++;
+        }
+ 
+        // Update answer by adding current cycle.
+        if (cycle_size > 0)
+        {
+            ans += (cycle_size - 1);
+        }
+    }
+ 
+    // Return result
+    return ans;
+}
+ 
+// Driver program to test the above function
+int main()
+{
+    int arr[] = {1, 5, 4, 3, 2};
+    int n = (sizeof(arr) / sizeof(int));
+    cout << minSwaps(arr, n);
+    return 0;
+}
+Output
+2
+Time Complexity: O(n Log n) 
+Auxiliary Space: O(n)
+
+Approach: As Pair class available in java from java 8 so we can use hashmap in older java version.
+
+#include <bits/stdc++.h>
+using namespace std;
+// Function returns the
+// minimum number of swaps
+// required to sort the array
+int minSwaps(int nums[], int n)
+{
+    int len = n;
+    map<int, int> map;
+    for (int i = 0; i < len; i++)
+        map[nums[i]] = i;
+ 
+    sort(nums, nums + n);
+ 
+    // To keep track of visited elements. Initialize
+    // all elements as not visited or false.
+    bool visited[len] = { 0 };
+ 
+    // Initialize result
+    int ans = 0;
+    for (int i = 0; i < len; i++) {
+ 
+        // already swapped and corrected or
+        // already present at correct pos
+        if (visited[i] || map[nums[i]] == i)
+            continue;
+ 
+        int j = i, cycle_size = 0;
+        while (!visited[j]) {
+            visited[j] = true;
+ 
+            // move to next node
+            j = map[nums[j]];
+            cycle_size++;
+        }
+ 
+        // Update answer by adding current cycle.
+        if (cycle_size > 0) {
+            ans += (cycle_size - 1);
+        }
+    }
+    return ans;
+}
+int main()
+{
+    // Driver program to test the above function
+    int a[] = { 1, 5, 4, 3, 2 };
+    int n = 5;
+    cout << minSwaps(a, n);
+    return 0;
+}
+ 
+Output
+2
+Time Complexity: O(n Log n) 
+Auxiliary Space: O(n)
+
+Straight forward solution(Greedy Solution):
+
+While iterating over the array, check the current element, and if not in the correct place, replace that element with the index of the element which should have come in this place greedily which will give the optimal answer.
+
+// C++ program to find minimum number
+// of swaps required to sort an array
+#include <bits/stdc++.h>
+using namespace std;
+ 
+void swap(vector<int> &arr, int i, int j)
+{
+    int temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+}
+ 
+int indexOf(vector<int> &arr, int ele)
+{
+    for(int i = 0; i < arr.size(); i++)
+    {
+        if (arr[i] == ele)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+ 
+// Return the minimum number
+// of swaps required to sort the array
+int minSwaps(vector<int> arr, int N)
+{
+    int ans = 0;
+    vector<int> temp(arr.begin(),arr.end());
+    sort(temp.begin(),temp.end());
+     
+    for(int i = 0; i < N; i++)
+    {
+         
+        // This is checking whether
+        // the current element is
+        // at the right place or not
+        if (arr[i] != temp[i])
+        {
+            ans++;
+ 
+            // Swap the current element
+            // with the right index
+            // so that arr[0] to arr[i] is sorted
+            swap(arr, i, indexOf(arr, temp[i]));
+        }
+    }
+    return ans;
+}
+ 
+// Driver Code
+int main()
+{
+ 
+    vector<int> a = {101, 758, 315, 730,472, 619, 460, 479};
+     
+    int n = a.size();
+     
+    // Output will be 5
+    cout << minSwaps(a, n);
+}
+ 
+Output
+5
+Time Complexity: O(n*n) 
+Auxiliary Space: O(n)
+
+Bishu and Soldiers	
+---------------------------
+Bishu went to fight for Coding Club. There were N soldiers with various powers. There will be Q rounds to fight and in each round, Bishu's power will be varied. With power M, Bishu can kill all the soldiers whose power is less than or equal to M(<=M). After each round, All the soldiers who are dead in the previous round will reborn. Such that in each round there will be N soldiers to fight. As Bishu is weak in mathematics, help him to count the number of soldiers that he can kill in each round and the total sum of their powers.
+
+#include<bits/stdc++.h>
+using namespace std;
+
+int main()
+    {
+        int n;
+        cin>>n;
+        int A[n];
+        for(int i=0;i<n;i++)
+        {
+            cin>>A[i];
+        }
+        sort(A,A+n);
+        int q;
+        cin>>q;
+        int power;
+        for(int j=0;j<q;j++)
+        {
+            cin>>power;
+            int i=0;
+            int count=0,sum=0;
+            while(A[i]<=power && i<n)
+            {
+                count++;
+                sum+=A[i];
+                i++;
+            }
+            cout<<count<<" "<<sum<<endl;
+        }
+    }
+
+Rasta and Kheshtak	
+-------------------------
+Rasta is a big fan of Kheshtaks. A Kheshtak is a rectangle that in each of it cells there is an integer.
+
+Today rasta came up with an interesting problem, Biggest Common Subsquare (BCS). A Kheshtak is called a Square if the number of its columns is equal to the number of its rows. A Square S is called a subsqaue of a Kheshtak A if and only if we can turn A to S by deleting some of its rows and some of its columns (maybe none).
+
+He gives you two Kheshtaks, A and B (A one is n × m and B is x × y).
+
+#include <bits/stdc++.h>
+using namespace std;
+
+long long s1[1 << 10][1 << 10], s2[1 << 10][1 << 10],
+ar1[1 << 10][1 << 10], ar2[1 << 10][1 << 10], pw1[1 << 22], pw2[1 << 22], n2, m2;
+long long l, r;
+long long n1, m1;
+
+long long get1(long a, long b, long c)
+{
+    long long res = s1[a + c][b + c] - s1[a][b + c] - s1[a + c][b] + s1[a][b];
+    res *= pw1[2000000 - a] * pw2[2000000 - b];
+    return res;
+}
+long long get2(long a, long b, long c)
+{
+    long long res = s2[a + c][b + c] - s2[a][b + c] - s2[a + c][b] + s2[a][b];
+    res *= pw1[2000000 - a] * pw2[2000000 - b];
+    return res;
+}
+
+vector<long long> have;
+
+bool solve(int X)
+{
+    have.clear();
+    for (int i = 0;i + X <= n1;i++)
+        for (int j = 0;j + X <= m1;j++)
+            have.push_back(get1(i, j, X));
+
+    sort(have.begin(), have.end());
+    for (int i = 0;i + X <= n2;i++)
+        for (int j = 0;j + X <= m2;j++)
+        {
+            long long res = get2(i, j, X);
+            int id = lower_bound(have.begin(), have.end(), res) - have.begin();
+            if (id != have.size() && have[id] == res)
+                return true;
+        }
+    return false;
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    //cin.tie(0);
+
+    pw1[0] = 1;
+    for (int i = 1;i <= 2000000;i++)
+        pw1[i] = pw1[i - 1] * 173;
+
+    pw2[0] = 1;
+    for (int i = 1;i <= 2000000;i++)
+        pw2[i] = pw2[i - 1] * 137;
+
+
+    cin >> n1 >> m1;
+    for (int i = 1;i <= n1;i++)
+        for (int j = 1;j <= m1;j++)
+            cin >> ar1[i][j];
+
+    cin >> n2 >> m2;
+    for (int i = 1;i <= n2;i++)
+        for (int j = 1;j <= m2;j++)
+            cin >> ar2[i][j];
+
+    for (int i = 1;i <= n1;i++)
+        for (int j = 1;j <= m1;j++)
+            s1[i][j] = s1[i][j - 1] + s1[i - 1][j] - s1[i - 1][j - 1] + ar1[i][j] * pw1[i] * pw2[j];
+
+    for (int i = 1;i <= n2;i++)
+        for (int j = 1;j <= m2;j++)
+            s2[i][j] = s2[i][j - 1] + s2[i - 1][j] - s2[i - 1][j - 1] + ar2[i][j] * pw1[i] * pw2[j];
+
+    l = 0;
+    r = 700;
+
+    while (l < r)
+    {
+        int mid = l + r + 1;
+        mid /= 2;
+        if (solve(mid))l = mid;
+        else
+            r = mid - 1;
+    }
+
+    cout << l << endl;
+
+    return 0;
+}
+
+Kth smallest number again	
+-------------------------------
+Given n and q, i.e, the number of ranges and number of queries, find the kth smallest element for each query (assume k>1).Print the value of kth smallest element if it exists, else print -1.
+
+Examples : 
+
+Input : arr[] = {{1, 4}, {6, 8}}
+        queries[] = {2, 6, 10};
+Output : 2
+         7
+        -1
+After combining the given ranges, the numbers
+become 1 2 3 4 6 7 8. As here 2nd element is 2,
+so we print 2. As 6th element is 7, so we print
+7 and as 10th element doesn't exist, so we
+print -1.
+
+Input : arr[] = {{2, 6}, {5, 7}}
+        queries[] = {5, 8};
+Output : 6
+        -1
+After combining the given ranges, the numbers 
+become 2 3 4 5 6 7. As here 5th element is 6, 
+so we print 6 and as 8th element doesn't exist, 
+so we print -1.
+
+The idea is to first Prerequisite : Merge Overlapping Intervals and keep all intervals sorted in ascending order of start time. After merging in an array merged[], we use linear search to find kth smallest element.
+
+// C++ implementation to solve k queries
+// for given n ranges
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Structure to store the
+// start and end point
+struct Interval
+{
+    int s;
+    int e;
+};
+ 
+// Comparison function for sorting
+bool comp(Interval a, Interval b)
+{
+    return a.s < b.s;
+}
+ 
+// Function to find Kth smallest number in a vector
+// of merged intervals
+int kthSmallestNum(vector<Interval> merged, int k)
+{
+    int n = merged.size();
+ 
+    // Traverse merged[] to find
+    // Kth smallest element using Linear search.
+    for (int j = 0; j < n; j++)
+    {
+        if (k <= abs(merged[j].e -
+                     merged[j].s + 1))
+            return (merged[j].s + k - 1);
+ 
+        k = k - abs(merged[j].e -
+                     merged[j].s + 1);
+    }
+ 
+    if (k)
+        return -1;
+}
+ 
+// To combined both type of ranges,
+// overlapping as well as non-overlapping.
+void mergeIntervals(vector<Interval> &merged,
+                 Interval arr[], int n)
+{
+    // Sorting intervals according to start
+    // time
+    sort(arr, arr + n, comp);
+ 
+    // Merging all intervals into merged
+    merged.push_back(arr[0]);
+    for (int i = 1; i < n; i++)
+    {
+        // To check if starting point of next
+        // range is lying between the previous
+        // range and ending point of next range
+        // is greater than the Ending point
+        // of previous range then update ending
+        // point of previous range by ending
+        // point of next range.
+        Interval prev = merged.back();
+        Interval curr = arr[i];
+        if ((curr.s >= prev.s &&
+             curr.s <= prev.e) &&
+            (curr.e > prev.e))
+ 
+            merged.back().e = curr.e;
+ 
+        else
+        {
+            // If starting point of next range
+            // is greater than the ending point
+            // of previous range then store next range
+            // in merged[].
+            if (curr.s > prev.e)
+                merged.push_back(curr);
+        }
+    }
+}
+ 
+// Driver\'s Function
+int main()
+{
+    Interval arr[] = {{2, 6}, {4, 7}};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    int query[] = {5, 8};
+    int q = sizeof(query)/sizeof(query[0]);
+ 
+    // Merge all intervals into merged[]
+    vector<Interval>merged;
+    mergeIntervals(merged, arr, n);
+ 
+    // Processing all queries on merged
+    // intervals
+    for (int i = 0; i < q; i++)
+        cout << kthSmallestNum(merged, query[i])
+             << endl;
+ 
+    return 0;
+}
+Output
+6
+-1
+Time Complexity : O(nlog(n) + qn) 
+ Auxiliary Space: O(n)
+
+Efficient Approach using binary search:
+The first step is same as the above approach. Sort the range intervals and then merge the overlapping intervals.
+
+Now instead of searching linearly in merged ranges we can search using binary search if we store the prefix sum of number of elements in each range in a set.
+
+For example: For the range { {1 4}, {6 8}, {9 10} }  the number of elements in each range are : 4,3,2 respectively. Hence, prefix sum set would store {4 7 9}.
+
+We can use the fact that the numbers are sorted to our advantage and use binary search to look for kth smallest element.
+
+For kth smallest element we just have to find the lower_bound of k in set. the corresponding index will give us the index of the merged interval in which the required element is stored.
+
+This works much faster for large number of queries and large N. Since the search time for each query is reduce to O(logn) from O(n).
+
+Below is the implementation of the above approach :  
+
+
+#include <bits/stdc++.h>
+using namespace std;
+ 
+vector<vector<int>> mergeIntervals(vector<vector<int>>&range){
+    int n=range.size();
+    vector<vector<int>>fin;
+    for(int i=0;i<n-1;i++){
+        if(range[i][1] >= range[i+1][0]){
+            range[i+1][0]=min(range[i][0],range[i+1][0]);
+            range[i+1][1]=max(range[i][1],range[i+1][1]);
+        }
+        else{
+            fin.push_back(range[i]);
+        }
+    }
+    fin.push_back(range[n-1]);
+    return fin;
+}
+ 
+vector<int>kthSmallestNum(vector<vector<int>>&range, vector<int>queries){
+     
+    //sort the ranges
+    sort(range.begin(),range.end());
+     
+    //merge the overlapping intervals
+    vector<vector<int>>merged=mergeIntervals(range);
+     
+    //set to store the cumulative sum of number of elements in each range
+    //eg {1 4} {6 8} {9 10} would store {4 7 9} in set.
+    set<int>s;
+    int cumsum=0;
+    for(auto cur_range:merged){
+        int num_ele=cur_range[1]-cur_range[0]+1;
+        cumsum+=num_ele;
+        s.insert(cumsum);
+    }
+     
+    //final vector to store the result of each query
+    vector<int>fin;
+     
+    //for each query get the lower bound of required kth smallest element.
+    // go to the index returned by lower_bound and get the required element
+    for(auto q:queries){
+        auto it=s.lower_bound(q);
+        if(it==s.end())fin.push_back(-1);
+         
+        //if the required element is in first range
+        else if(it==s.begin()){
+            fin.push_back(merged[0][0]+q-1);
+        }
+         
+        //if the required element is in ith range. then discard previous range elements
+        // if previous elements are prevele. then look for k=q-prevele in the current range
+        else{
+            int prevele=*prev(it);
+            int kth=q-prevele;
+            int idx=distance(s.begin(),it);
+            fin.push_back(merged[idx][0]+kth-1);
+        }
+             
+    }
+     
+    return fin;
+}
+ 
+  
+// Driver\'s Function
+int main()
+{
+    vector<vector<int>>range = {{1, 4}, {6, 8}};
+    int n =range.size();
+    vector<int>queries = {2, 6, 10};
+    int q = queries.size();
+  
+    vector<int>ans=kthSmallestNum(range, queries);
+    for(auto it:ans)
+        cout<<it<<" ";
+    return 0;
+}
+Output
+2 7 -1 
+Time Complexity : O(nlog(n) + qlog(n))
+Auxiliary Space: O(n)
+
+Find pivot element in a sorted array	
+------------------------------------------
+Given a sorted array arr[] (may be distinct or may contain duplicates) of size N that is rotated at some unknown point, the task is to find the minimum element in it. 
+
+Examples: 
+
+Input: arr[] = {5, 6, 1, 2, 3, 4}
+Output: 1
+Explanation: 1 is the minimum element present in the array.
+
+Input: arr[] = {1, 2, 3, 4}
+Output: 1
+
+Input: arr[] = {2, 1}
+Output: 1
+
+Using Linear Serach:
+A simple solution is to use linear search to traverse the complete array and find a minimum. 
+
+Follow the steps mentioned below to implement the idea:
+
+Declare a variable (say min_ele) to store the minimum value and initialize it with arr[0].
+Traverse the array from the start.
+Update the minimum value (min_ele) if the current element is less than it.
+Return the final value of min_ele as the required answer.
+
+// C++ code  to implement the approach
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to find the minimum value
+int findMin(int arr[], int n)
+{
+    int min_ele = arr[0];
+ 
+    // Traversing over array to
+    // find minimum element
+    for (int i = 0; i < n; i++) {
+        if (arr[i] < min_ele) {
+            min_ele = arr[i];
+        }
+    }
+ 
+    return min_ele;
+}
+ 
+// Driver code
+int main()
+{
+    int arr[] = { 5, 6, 1, 2, 3, 4 };
+    int N = sizeof(arr) / sizeof(arr[0]);
+ 
+    // Function call
+    cout << findMin(arr, N) << endl;
+    return 0;
+}
+Output
+1
+Time Complexity: O(N)
+Auxiliary Space: O(1)
+
+Find the minimum element in a sorted and rotated array using Binary Search: 
+This approach is based on the following idea:
+
+As the array is sorted and rotated, there are two segments that are themselves sorted but their meeting point is the only position where the smallest element is and that is not sorted. 
+
+
+So we just need to find the position whose neighbours are greater than it and based on the extreme end values we can decide in which half we should search for that element.
+
+Follow the steps below to solve the given problem: 
+
+If we take a closer look at the above examples, we can easily figure out the following pattern:
+
+The minimum element is the only element whose previous is greater than it. If there is no previous element, then there is no rotation (the first element is minimum). 
+We check this condition for the middle element by comparing it with (mid-1)th and (mid+1)th elements.
+If the minimum element is not at the middle (neither mid nor mid + 1), then: 
+If the middle element is smaller than the last element, then the minimum element lies in the left half
+Else minimum element lies in the right half.
+Follow the below illustration for a better understanding
+
+Illustration:
+
+Let the array be arr[]={15, 18, 2, 3, 6, 12}
+low = 0 , high = 5.
+            =>  mid = 2
+            =>  arr[mid]=2 , arr[mid-1] > arr[mid] , hence condition is matched
+            =>  The required index = mid = 2
+
+So the element is  found at index 2 and arr[2] = 2
+
+// C++ program to find minimum
+// element in a sorted and rotated array
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+int findMin(int arr[], int low, int high)
+{
+    // This condition is needed to
+    // handle the case when array is not
+    // rotated at all
+    if (high < low)
+        return arr[0];
+ 
+    // If there is only one element left
+    if (high == low)
+        return arr[low];
+ 
+    // Find mid
+    int mid = low + (high - low) / 2; /*(low + high)/2;*/
+ 
+    // Check if element (mid+1) is minimum element. Consider
+    // the cases like {3, 4, 5, 1, 2}
+    if (mid < high && arr[mid + 1] < arr[mid])
+        return arr[mid + 1];
+ 
+    // Check if mid itself is minimum element
+    if (mid > low && arr[mid] < arr[mid - 1])
+        return arr[mid];
+ 
+    // Decide whether we need to go to left half or right
+    // half
+    if (arr[high] > arr[mid])
+        return findMin(arr, low, mid - 1);
+    return findMin(arr, mid + 1, high);
+}
+ 
+// Driver program to test above functions
+int main()
+{
+    int arr[] = { 5, 6, 1, 2, 3, 4 };
+    int N = sizeof(arr) / sizeof(arr[0]);
+   
+    // Function call
+    cout << "The minimum element is "
+         << findMin(arr, 0, N - 1) << endl;
+ 
+    return 0;
+}
+
+Output
+The minimum element is 1
+Time Complexity: O(logN), using binary search 
+Auxiliary Space: O(1)
+
+K-th Element of Two Sorted Arrays	
+--------------------------------------
+Given two sorted arrays of size m and n respectively, you are tasked with finding the element that would be at the k’th position of the final sorted array.
+
+Examples: 
+
+Input : Array 1 - 2 3 6 7 9
+        Array 2 - 1 4 8 10
+        k = 5
+Output : 6
+Explanation: The final sorted array would be -
+1, 2, 3, 4, 6, 7, 8, 9, 10
+The 5th element of this array is 6.
+
+Input : Array 1 - 100 112 256 349 770
+        Array 2 - 72 86 113 119 265 445 892
+        k = 7
+Output : 256
+Explanation: Final sorted array is -
+72, 86, 100, 112, 113, 119, 256, 265, 349, 445, 770, 892
+7th element of this array is 256.
+
+Basic Approach 
+Since we are given two sorted arrays, we can use the merging technique to get the final merged array. From this, we simply go to the k’th index. 
+
+// Program to find kth element from two sorted arrays
+#include <iostream>
+using namespace std;
+ 
+int kth(int arr1[], int arr2[], int m, int n, int k)
+{
+    int sorted1[m + n];
+    int i = 0, j = 0, d = 0;
+    while (i < m && j < n)
+    {
+        if (arr1[i] < arr2[j])
+            sorted1[d++] = arr1[i++];
+        else
+            sorted1[d++] = arr2[j++];
+    }
+    while (i < m)
+        sorted1[d++] = arr1[i++];
+    while (j < n)
+        sorted1[d++] = arr2[j++];
+    return sorted1[k - 1];
+}
+ 
+// Driver Code
+int main()
+{
+    int arr1[5] = {2, 3, 6, 7, 9};
+    int arr2[4] = {1, 4, 8, 10};
+    int k = 5;
+    cout << kth(arr1, arr2, 5, 4, k);
+    return 0;
+}
+Output
+6
+Time Complexity: O(n) 
+Auxiliary Space : O(m + n) 
+
+Space Optimized Version of above approach: We can avoid the use of extra array.
+
+
+// C++ program to find kth element
+// from two sorted arrays
+#include <bits/stdc++.h>
+using namespace std;
+ 
+int find(int A[], int B[], int m,
+         int n, int k_req)
+{
+    int k = 0, i = 0, j = 0;
+ 
+    // Keep taking smaller of the current
+    // elements of two sorted arrays and
+    // keep incrementing k
+    while(i < m && j < n)
+    {
+        if(A[i] < B[j])
+        {
+            k++;
+            if(k == k_req)
+                return A[i];
+            i++;
+        }
+        else
+        {
+            k++;
+            if(k == k_req)
+                return B[j];
+            j++;
+        }
+    }
+ 
+    // If array B[] is completely traversed
+    while(i < m)
+    {
+        k++;
+        if(k == k_req)
+            return A[i];
+        i++;
+    }
+ 
+    // If array A[] is completely traversed
+    while(j < n)
+    {
+        k++;
+        if(k == k_req)
+            return B[j];
+        j++;
+    }
+}
+ 
+// Driver Code
+int main()
+{
+    int A[5] = { 2, 3, 6, 7, 9 };
+    int B[4] = { 1, 4, 8, 10 };
+    int k = 5;
+     
+    cout << find(A, B, 5, 4, k);
+     
+    return 0;
+}
+ 
+Output
+6
+Time Complexity: O(k) 
+Auxiliary Space: O(1)
+
+Divide And Conquer Approach 1 
+While the previous method works, can we make our algorithm more efficient? The answer is yes. By using a divide and conquer approach, similar to the one used in binary search, we can attempt to find the k’th element in a more efficient way.
+Compare the middle elements of arrays arr1 and arr2, let us call these indices mid1 and mid2 respectively. Let us assume arr1[mid1]  k, then clearly the elements after mid2 cannot be the required element. Set the last element of arr2 to be arr2[mid2].
+In this way, define a new subproblem with half the size of one of the arrays.
+
+// Program to find k-th element from two sorted arrays
+#include <iostream>
+using namespace std;
+ 
+int kth(int *arr1, int *arr2, int *end1, int *end2, int k)
+{
+    if (arr1 == end1)
+        return arr2[k];
+    if (arr2 == end2)
+        return arr1[k];
+    int mid1 = (end1 - arr1) / 2;
+    int mid2 = (end2 - arr2) / 2;
+    if (mid1 + mid2 < k)
+    {
+        if (arr1[mid1] > arr2[mid2])
+            return kth(arr1, arr2 + mid2 + 1, end1, end2,
+                k - mid2 - 1);
+        else
+            return kth(arr1 + mid1 + 1, arr2, end1, end2,
+                k - mid1 - 1);
+    }
+    else
+    {
+        if (arr1[mid1] > arr2[mid2])
+            return kth(arr1, arr2, arr1 + mid1, end2, k);
+        else
+            return kth(arr1, arr2, end1, arr2 + mid2, k);
+    }
+}
+ 
+int main()
+{
+    int arr1[5] = {2, 3, 6, 7, 9};
+    int arr2[4] = {1, 4, 8, 10};
+ 
+    int k = 5;
+    cout << kth(arr1, arr2, arr1 + 5, arr2 + 4,  k - 1);
+    return 0;
+}
+Output
+6
+
+Another Approach: (Using Min Heap)
+
+Push the elements of both arrays to a priority queue (min-heap).
+Pop-out k-1 elements from the front.
+Element at the front of the priority queue is the required answer.
+
+// C++ Program to find kth
+// element from two sorted arrays
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to find K-th min
+int kth(int* a, int* b, int n, int m, int k)
+{
+      // Declaring a min heap
+    priority_queue<int, vector<int>,
+                   greater<int> > pq;
+       
+      // Pushing elements for
+    // array a to min-heap
+    for (int i = 0; i < n; i++) {
+        pq.push(a[i]);
+    }
+   
+      // Pushing elements for
+    // array b to min-heap
+    for (int i = 0; i < m; i++) {
+        pq.push(b[i]);
+    }
+   
+      // Popping-out K-1 elements
+    while (k-- > 1) {
+        pq.pop();
+    }
+    return pq.top();
+}
+ 
+//Driver Code
+int main()
+{
+    int arr1[5] = {2, 3, 6, 7, 9};
+    int arr2[4] = {1, 4, 8, 10};
+    int k = 5;
+    cout << kth(arr1, arr2, 5, 4, k);
+    return 0;
+}
+ 
+Output
+6
+Time Complexity: O(NlogN)
+
+Auxiliary Space: O(m+n)
+
+Another Approach : (Using Upper Bound STL)
+
+Given two sorted arrays of size m and n respectively, you are tasked with finding the element that would be at the k’th position of the final sorted array.
+
+Examples :
+
+Input : Array 1 – 2 3 6 7 9
+
+          Array 2 – 1 4 8 10
+
+          k = 5
+
+Output : 6
+
+Explanation: The final sorted array would be –
+
+1, 2, 3, 4, 6, 7, 8, 9, 10
+
+The 5th element of this array is 6, The 1st element of this array is 1. The thing to notice here is upper_bound(6) gives 5, upper_bound(4) gives 4 that is number of element equal to or less than the number we are giving as input to upper_bound().
+
+Here is another example
+
+Input : Array 1 – 100 112 256 349 770
+
+      Array 2 – 72 86 113 119 265 445 892
+
+      k = 7
+
+Output : 256
+
+Explanation: Final sorted array is –
+
+72, 86, 100, 112, 113, 119, 256, 265, 349, 445, 770, 892
+
+7th element of this array is 256.
+
+Observation required :
+
+The simplest method to solve this question is using upper_bound to check what is the position of a element in the sorted array. The upper_bound function return the pointer to element which is greater than the element we searched.
+
+So to find the kth element we need to just find the element whose upper_bound() is 4. So again now we now what upper_bound() gives us we need 1 last observation to solve this question. If we have been given 2 arrays, We just need to the sum of upper_bound for the 2 arrays
+
+Input : Array 1 – 2 3 6 7 9
+
+     Array 2 – 1 4 8 10
+
+     k = 5
+
+Value of upper_bound for value(6) in array1 is 3 and for array 2 is 2. This give us a total of 5. which is the answer.
+
+Algorithm :
+
+We take a mid between [L,R] using the formula mid = (L+R)/2.
+Check if the middle can be the kth element using upper_bound() function
+Find the sum of upper_bound() for both the arrays and if the sum is >= K, It’s a possible value of kth element.
+If sum is >= K then we assign R = mid – 1.
+else if sum <k then the current mid is too small and we assign L = mid+1.
+Repeat from top
+Return the smallest value found.
+
+Here is the implementation for the optimized method :
+
+// C++ program to find the kth element
+#include <bits/stdc++.h>
+using namespace std;
+ 
+long long int maxN
+    = 1e10; // the maximum value in the array possible.
+ 
+long long int kthElement(int arr1[], int arr2[], int n,
+                         int m, int k)
+{
+    long long int left = 1,
+                  right
+                  = maxN; // The range of where ans can lie.
+    long long int ans = 1e15; // We have to find min of all
+                              // the ans so take .
+ 
+    // using binary search to check all possible values of
+    // kth element
+    while (left <= right) {
+        long long int mid = (left + right) / 2;
+        long long int up_cnt
+            = upper_bound(arr1, arr1 + n, mid) - arr1;
+        up_cnt += upper_bound(arr2, arr2 + m, mid) - arr2;
+ 
+        if (up_cnt >= k) {
+            ans = min(ans,
+                      mid); // find the min of all answers.
+            right
+                = mid - 1; // Try to find a smaller answer.
+        }
+        else
+            left = mid + 1; // Current mid is too small so
+                            // shift right.
+    }
+ 
+    return ans;
+}
+ 
+// Driver code
+int main()
+{
+    // Example 1
+    int n = 5, m = 7, k = 7;
+    int arr1[n] = { 100, 112, 256, 349, 770 };
+    int arr2[m] = { 72, 86, 113, 119, 265, 445, 892 };
+    cout << kthElement(arr1, arr2, n, m, k) << endl;
+    return 0;
+}
+Output
+256
+Time Complexity : O( Log( maxN ).log( N+M ) )
+Auxiliary Space : O( 1 )
+
+EKOSPOJ
+----------------------
+Lumberjack Mirko needs to chop down M metres of wood. It is an easy job for him since he has a nifty new woodcutting machine that can take down forests like wildfire. However, Mirko is only allowed to cut a single row of trees.
+
+Mirko‟s machine works as follows: Mirko sets a height parameter H (in metres), and the machine raises a giant sawblade to that height and cuts off all tree parts higher than H (of course, trees not higher than H meters remain intact). Mirko then takes the parts that were cut off. For example, if the tree row contains trees with heights of 20, 15, 10, and 17 metres, and Mirko raises his sawblade to 15 metres, the remaining tree heights after cutting will be 15, 15, 10, and 15 metres, respectively, while Mirko will take 5 metres off the first tree and 2 metres off the fourth tree (7 metres of wood in total).
+
+Mirko is ecologically minded, so he doesn‟t want to cut off more wood than necessary. That‟s why he wants to set his sawblade as high as possible. Help Mirko find the maximum integer height of the sawblade that still allows him to cut off at least M metres of wood.
+
+/*
+    using binary search
+    TC: O(n logn)
+    SC: O(1)
+*/
+
+// return amount of wood will be cutted for the given height of machine
+ll total_wood(vector<long long>& h, int n, int machine_height) {
+    ll wood = 0;
+    for (int i = 0;i < n;i++) {
+        if (h[i] > machine_height) wood += h[i] - machine_height;
+    }
+    return wood;
+}
+
+void solve() {
+    long long n, m;
+    cin >> n >> m;
+
+    vector<long long> h(n), res(n);
+
+    ll mx = LONG_LONG_MIN;
+    for (int i = 0;i < n;i++) {
+        cin >> h[i];
+        mx = max(h[i], mx);
+    }
+
+    // we will implement binary_search for 0 height to max height
+    ll l = 0, r = mx;
+    ll ans = 0;
+    while (l <= r) {
+        // we will find mid and will get wood cutted
+        ll mid = l + (r - l) / 2;
+
+        debug(mid);
+        ll wood = total_wood(h, n, mid);
+
+        // if wood cutted is of exact amount then ans = mid;
+        if (wood == m) {
+            ans = mid;
+            break;
+        }
+        // if wood cutted is less then we will decrease the height of the machine.
+        else if (wood < m) {
+            r = mid - 1;
+        }
+        // if wood cutted is more than enough then we will store ans as well as increase height of machine.
+        else {
+            ans = max(ans, mid);
+            l = mid + 1;
+        }
+    }
+    cout << ans << endl;
+}
+
+/*
+    using sorting
+    TC: O(N logN)
+    SC: O(N)
+*/
+void solve() {
+    long long n, m;
+    cin >> n >> m;
+
+    vector<long long> h(n), res(n);
+    for (int i = 0;i < n;i++) cin >> h[i];
+
+    // sort the height
+    sort(h.begin(), h.end());
+
+    // cutting at the height of max is 0.
+    res[n - 1] = 0;
+    int high = n - 1;
+    for (int i = high - 1;i >= 0;i--) {
+        // this mathematical equation will store the wood will be cutted at curr. height
+        res[i] = (high - i) * (h[i + 1] - h[i]) + res[i + 1];
+    }
+
+    int r = high;
+    // traverse till the total wood is less than required
+    while (r >= 0 && res[r] < m) r--;
+
+    if (res[r] == m) cout << h[r] << endl;
+    else {
+        // here wood will be more than enough hence increase the height and decrease the wood.
+        long long ans = h[r] + (res[r] - m) / (high - r);
+        cout << ans << endl;
+    }
+}
+
+Job Scheduling Algo	
+----------------------------
+Given N jobs where every job is represented by following three elements of it.
+
+Start Time
+Finish Time
+Profit or Value Associated
+Find the maximum profit subset of jobs such that no two jobs in the subset overlap.
+Example: 
+
+Input: Number of Jobs n = 4
+       Job Details {Start Time, Finish Time, Profit}
+       Job 1:  {1, 2, 50} 
+       Job 2:  {3, 5, 20}
+       Job 3:  {6, 19, 100}
+       Job 4:  {2, 100, 200}
+Output: The maximum profit is 250.
+We can get the maximum profit by scheduling jobs 1 and 4.
+Note that there is longer schedules possible Jobs 1, 2 and 3 
+but the profit with this schedule is 20+50+100 which is less than 250.  
+We strongly recommend to refer below article as a prerequisite for this. 
+Weighted Job Scheduling
+The above problem can be solved using following recursive solution. 
+
+1) First sort jobs according to finish time.
+2) Now apply following recursive process. 
+   // Here arr[] is array of n jobs
+   findMaximumProfit(arr[], n)
+   {
+     a) if (n == 1) return arr[0];
+     b) Return the maximum of following two profits.
+         (i) Maximum profit by excluding current job, i.e., 
+             findMaximumProfit(arr, n-1)
+         (ii) Maximum profit by including the current job            
+   }
+
+How to find the profit including current job?
+The idea is to find the latest job before the current job (in 
+sorted array) that doesn't conflict with current job 'arr[n-1]'. 
+Once we find such a job, we recur for all jobs till that job and
+add profit of current job to result.
+In the above example, "job 1" is the latest non-conflicting
+for "job 4" and "job 2" is the latest non-conflicting for "job 3".
+We have discussed recursive and Dynamic Programming based approaches in the previous article. The implementations discussed in above post uses linear search to find the previous non-conflicting job. In this post, Binary Search based solution is discussed. The time complexity of Binary Search based solution is O(n Log n).
+The algorithm is: 
+
+
+Sort the jobs by non-decreasing finish times.
+For each i from 1 to n, determine the maximum value of the schedule from the subsequence of jobs[0..i]. Do this by comparing the inclusion of job[i] to the schedule to the exclusion of job[i] to the schedule, and then taking the max.
+To find the profit with inclusion of job[i]. we need to find the latest job that doesn’t conflict with job[i]. The idea is to use Binary Search to find the latest non-conflicting job.
+ 
+// C++ program for weighted job scheduling using Dynamic 
+// Programming and Binary Search
+#include <iostream>
+#include <algorithm>
+using namespace std;
+   
+// A job has start time, finish time and profit.
+struct Job
+{
+    int start, finish, profit;
+};
+   
+// A utility function that is used for sorting events
+// according to finish time
+bool myfunction(Job s1, Job s2)
+{
+    return (s1.finish < s2.finish);
+}
+   
+// A Binary Search based function to find the latest job
+// (before current job) that doesn't conflict with current
+// job.  "index" is index of the current job.  This function
+// returns -1 if all jobs before index conflict with it.
+// The array jobs[] is sorted in increasing order of finish
+// time.
+int binarySearch(Job jobs[], int index)
+{
+    // Initialize 'lo' and 'hi' for Binary Search
+    int lo = 0, hi = index - 1;
+   
+    // Perform binary Search iteratively
+    while (lo <= hi)
+    {
+        int mid = (lo + hi) / 2;
+        if (jobs[mid].finish <= jobs[index].start)
+        {
+            if (jobs[mid + 1].finish <= jobs[index].start)
+                lo = mid + 1;
+            else
+                return mid;
+        }
+        else
+            hi = mid - 1;
+    }
+   
+    return -1;
+}
+   
+// The main function that returns the maximum possible
+// profit from given array of jobs
+int findMaxProfit(Job arr[], int n)
+{
+    // Sort jobs according to finish time
+    sort(arr, arr+n, myfunction);
+   
+    // Create an array to store solutions of subproblems.  table[i]
+    // stores the profit for jobs till arr[i] (including arr[i])
+    int *table = new int[n];
+    table[0] = arr[0].profit;
+   
+    // Fill entries in table[] using recursive property
+    for (int i=1; i<n; i++)
+    {
+        // Find profit including the current job
+        int inclProf = arr[i].profit;
+        int l = binarySearch(arr, i);
+        if (l != -1)
+            inclProf += table[l];
+   
+        // Store maximum of including and excluding
+        table[i] = max(inclProf, table[i-1]);
+    }
+   
+    // Store result and free dynamic memory allocated for table[]
+    int result = table[n-1];
+    delete[] table;
+    
+    return result;
+}
+   
+// Driver program
+int main()
+{
+    Job arr[] = {{3, 10, 20}, {1, 2, 50}, {6, 19, 100}, {2, 100, 200}};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    cout << "Optimal profit is " << findMaxProfit(arr, n);
+    return 0;
+}
+Output:
+Optimal profit is 250
+Time complexity: O(n Log n)
+Auxiliary Space: O(n) because using extra space for array table
+
+Painters Partition Problem
+-----------------------------------
+Dilpreet wants to paint his dog's home that has n boards with different lengths. The length of ith board is given by arr[i] where arr[] is an array of n integers. He hired k painters for this work and each painter takes 1 unit time to paint 1 unit of the board. 
+
+The problem is to find the minimum time to get this job done if all painters start together with the constraint that any painter will only paint continuous boards, say boards numbered {2,3,4} or only board {1} or nothing but not boards {2,4,5}.
+
+bool isValid(int* arr, int n, int k, long long maxTime) {
+    long long painters = 1;
+    long long t = 0;
+    for (long long i = 0;i < n;i++) {
+        t += arr[i];
+        if (t > maxTime) {
+            painters++;
+            t = arr[i];
+        }
+        if (painters > k) return false;
+    }
+    return true;
+}
+
+long long minTime(int arr[], int n, int k)
+{
+    long long lb = 0, ub = 0;
+    long long ans = 0;
+    for (long long i = 0;i < n;i++) {
+        lb = max(lb, (long long)arr[i]);
+        ub += arr[i];
+    }
+
+    while (lb <= ub) {
+        long long mid = (lb + ub) / 2;
+
+        if (isValid(arr, n, k, mid)) {
+            ans = mid;
+            ub = mid - 1;
+        }
+        else lb = mid + 1;
+    }
+    return ans;
+}
+
+ROTI-Prata SPOJ	
+-----------------------
+
+IEEE is having its AGM next week and the president wants to serve cheese prata after the meeting. The subcommittee members are asked to go to food connection and get P (P<=1000) pratas packed for the function. The stall has L cooks (L<=50) and each cook has a rank R (1<=R<=8). A cook with a rank R can cook 1 prata in the first R minutes 1 more prata in the next 2R minutes, 1 more prata in 3R minutes and so on(he can only cook a complete prata) ( For example if a cook is ranked 2.. he will cook one prata in 2 minutes one more prata in the next 4 mins an one more in the next 6 minutes hence in total 12 minutes he cooks 3 pratas in 13 minutes also he can cook only 3 pratas as he does not have enough time for the 4th prata). The webmaster wants to know the minimum time to get the order done. Please write a program to help him out.
+
+#include<bits/stdc++.h>
+using namespace std;
+
+bool util(int* a, int n, int reqP, int mid) {
+    int cnt = 0;
+
+    for (int i = 0;i < n;i++) {
+        int time = a[i];
+        int j = 2;
+
+        while (time <= mid) {
+            cnt++;
+            time += (a[i] * j);
+            j++;
+        }
+        if (cnt >= reqP) return true;
+    }
+    return false;
+}
+
+int main() {
+    int t;
+    cin >> t;
+    while (t--) {
+        int parathas;
+        cin >> parathas;
+
+        int n;
+        cin >> n;
+        int a[n];
+        for (int i = 0;i < n;i++) cin >> a[i];
+
+        int lb = 0;
+        int ub = 1e8;
+        int ans = 0;
+
+        while (lb <= ub) {
+            int mid = (lb + ub) / 2;
+
+            if (util(a, n, parathas, mid)) {
+                ans = mid;
+                ub = mid - 1;
+            }
+            else lb = mid + 1;
+        }
+
+        cout << ans << endl;
+    }
+}
+
+DoubleHelix SPOJ	
+---------------------------
+
+Two ﬁnite, strictly increasing, integer sequences are given. Any common integer between the two sequences constitute an intersection point. Take for example the following two sequences where intersection points are
+printed in bold:
+
+First= 3 5 7 9 20 25 30 40 55 56 57 60 62
+Second= 1 4 7 11 14 25 44 47 55 57 100
+You can ‘walk” over these two sequences in the following way:
+
+You may start at the beginning of any of the two sequences. Now start moving forward.
+At each intersection point, you have the choice of either continuing with the same sequence you’re currently on, or switching to the other sequence.
+The objective is ﬁnding a path that produces the maximum sum of data you walked over. In the above example, the largest possible sum is 450, which is the result of adding 3, 5, 7, 9, 20, 25, 44, 47, 55, 56, 57, 60, and 62
+
+#include<bits/stdc++.h>
+using namespace std;
+
+void io() {
+#ifndef ONLINE_JUDGE
+    freopen("io/i.txt", "r", stdin);
+    freopen("io/o.txt", "w", stdout);
+    freopen("io/e.txt", "w", stderr);
+#endif
+}
+
+int main() {
+    io();
+    while (true) {
+        int s1 = 0;
+        cin >> s1;
+        if (s1 == 0) break;
+
+        int a[s1];
+        for (int i = 0; i < s1; i++) cin >> a[i];
+
+
+
+        int s2 = 0;
+        cin >> s2;
+        int b[s2];
+        for (int i = 0; i < s2; i++) cin >> b[i];
+
+
+        int i = 0, j = 0, sum1 = 0, sum2 = 0, ans = 0;
+
+        while (i < s1 && j < s2) {
+            if (a[i] < b[j]) sum1 += a[i++];
+            else if (b[j] < a[i]) sum2 += b[j++];
+            else {
+                ans += max(sum1, sum2) + a[i];
+                i++;
+                j++;
+                sum1 = sum2 = 0;
+            }
+        }
+
+        while (i < s1) {
+            sum1 += a[i++];
+        }
+        while (j < s2) {
+            sum2 += b[j++];
+        }
+        ans += max(sum1, sum2);
+        cout << ans << endl;
+    }
+}
+
+Subset Sums	
+--------------------
+Given a sequence of N (1 ≤ N ≤ 34) numbers S1, ..., SN (-20,000,000 ≤ Si ≤ 20,000,000), determine how many subsets of S (including the empty one) have a sum between A and B (-500,000,000 ≤ A ≤ B ≤ 500,000,000), inclusive.
+
+/*
+    TC: O(2^(n/2))
+*/
+#include<bits/stdc++.h>
+using namespace std;
+
+void solve(long long* a, vector<long long>& v, long long start, long long end) {
+    long long n = end - start + 1;
+
+    for (long long i = 0;i < (1 << n);i++) {
+        long long x = i;
+        long long j = start;
+        long long sum = 0;
+        while (x) {
+            long long bit = x & 1;
+            if (bit) sum += a[j];
+            j++;
+            x = x >> 1;
+        }
+        v.push_back(sum);
+    }
+}
+
+int main() {
+    long long n, a, b;
+    cin >> n >> a >> b;
+
+    long long arr[n];
+    for (long long i = 0;i < n;i++) cin >> arr[i];
+
+    long long count = 0;
+
+    vector<long long> v1, v2;
+    solve(arr, v1, 0, n / 2 - 1);
+    solve(arr, v2, n / 2, n - 1);
+
+    sort(v2.begin(), v2.end());
+
+    for (long long i = 0;i < v1.size();i++) {
+        long long low = lower_bound(v2.begin(), v2.end(), a - v1[i]) - v2.begin();
+        long long high = upper_bound(v2.begin(), v2.end(), b - v1[i]) - v2.begin();
+        count += high - low;
+    }
+
+    cout << count;
+}
+
+Find the inversion count	
+----------------------------
+Inversion Count for an array indicates – how far (or close) the array is from being sorted. If the array is already sorted, then the inversion count is 0, but if the array is sorted in reverse order, the inversion count is the maximum. 
+
+Given an array a[]. The task is to find the inversion count of a[]. Where two elements a[i] and a[j] form an inversion if a[i] > a[j] and i < j.
+
+Examples: 
+
+Input: arr[] = {8, 4, 2, 1}
+Output: 6
+Explanation: Given array has six inversions: (8, 4), (4, 2), (8, 2), (8, 1), (4, 1), (2, 1).
+
+Input: arr[] = {1, 20, 6, 4, 5}
+Output: 5
+Explanation: Given array has five inversions: (20, 6), (20, 4), (20, 5), (6, 4), (6, 5). 
+
+Naive Approach:
+
+Traverse through the array, and for every index, find the number of smaller elements on its right side of the array. This can be done using a nested loop. Sum up the counts for all indices in the array and print the sum.
+
+Follow the below steps to Implement the idea:
+
+Traverse through the array from start to end
+For every element, find the count of elements smaller than the current number up to that index using another loop.
+Sum up the count of inversion for every index.
+Print the count of inversions.
+Below is the Implementation of the above approach:
+
+
+// C++ program to Count Inversions
+// in an array
+#include <bits/stdc++.h>
+using namespace std;
+ 
+int getInvCount(int arr[], int n)
+{
+    int inv_count = 0;
+    for (int i = 0; i < n - 1; i++)
+        for (int j = i + 1; j < n; j++)
+            if (arr[i] > arr[j])
+                inv_count++;
+ 
+    return inv_count;
+}
+ 
+// Driver Code
+int main()
+{
+    int arr[] = { 1, 20, 6, 4, 5 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+    cout << " Number of inversions are "
+         << getInvCount(arr, n);
+    return 0;
+}
+ 
+// This code is contributed
+// by Akanksha Rai
+Output
+ Number of inversions are 5
+Time Complexity: O(N2), Two nested loops are needed to traverse the array from start to end.
+Auxiliary Space: O(1), No extra space is required.
+
+Implement Merge-sort in-place	
+----------------------------------
+Implement Merge Sort i.e. standard implementation keeping the sorting algorithm as in-place. 
+In-place means it does not occupy extra memory for merge operation as in the standard case.
+
+Examples: 
+
+Input: arr[] = {2, 3, 4, 1} 
+Output: 1 2 3 4
+
+Input: arr[] = {56, 2, 45} 
+Output: 2 45 56 
+
+Approach 1:
+
+Maintain two pointers that point to the start of the segments which have to be merged.
+Compare the elements at which the pointers are present.
+If element1 < element2 then element1 is at right position, simply increase pointer1.
+Else shift all the elements between element1 and element2(including element1 but excluding element2) right by 1 and then place the element2 in the previous place(i.e. before shifting right) of element1. Increment all the pointers by 1.
+
+// C++ program in-place Merge Sort
+#include <iostream>
+using namespace std;
+  
+// Merges two subarrays of arr[].
+// First subarray is arr[l..m]
+// Second subarray is arr[m+1..r]
+// Inplace Implementation
+void merge(int arr[], int start, int mid, int end)
+{
+    int start2 = mid + 1;
+  
+    // If the direct merge is already sorted
+    if (arr[mid] <= arr[start2]) {
+        return;
+    }
+  
+    // Two pointers to maintain start
+    // of both arrays to merge
+    while (start <= mid && start2 <= end) {
+  
+        // If element 1 is in right place
+        if (arr[start] <= arr[start2]) {
+            start++;
+        }
+        else {
+            int value = arr[start2];
+            int index = start2;
+  
+            // Shift all the elements between element 1
+            // element 2, right by 1.
+            while (index != start) {
+                arr[index] = arr[index - 1];
+                index--;
+            }
+            arr[start] = value;
+  
+            // Update all the pointers
+            start++;
+            mid++;
+            start2++;
+        }
+    }
+}
+  
+/* l is for left index and r is right index of the
+   sub-array of arr to be sorted */
+void mergeSort(int arr[], int l, int r)
+{
+    if (l < r) {
+  
+        // Same as (l + r) / 2, but avoids overflow
+        // for large l and r
+        int m = l + (r - l) / 2;
+  
+        // Sort first and second halves
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+  
+        merge(arr, l, m, r);
+    }
+}
+  
+/* UTILITY FUNCTIONS */
+/* Function to print an array */
+void printArray(int A[], int size)
+{
+    int i;
+    for (i = 0; i < size; i++)
+        cout <<" "<< A[i];
+    cout <<"\n";
+}
+  
+/* Driver program to test above functions */
+int main()
+{
+    int arr[] = { 12, 11, 13, 5, 6, 7 };
+    int arr_size = sizeof(arr) / sizeof(arr[0]);
+  
+    mergeSort(arr, 0, arr_size - 1);
+  
+    printArray(arr, arr_size);
+    return 0;
+}
+  
+Output
+5 6 7 11 12 13 
+Note: Time Complexity of above approach is O(n2 * log(n)) because merge is O(n2). Time complexity of standard merge sort is less, O(n Log n).
+
+Approach 2: The idea: We start comparing elements that are far from each other rather than adjacent. Basically we are using shell sorting to merge two sorted arrays with O(1) extra space.
+
+Calculate mid two split the array in two halves(left sub-array and right sub-array)
+Recursively call merge sort on left sub-array and right sub-array to sort them
+Call merge function to merge left sub-array and right sub-array
+merge():
+
+For every pass, we calculate the gap and compare the elements towards the right of the gap.
+Initiate the gap with ceiling value of n/2 where n is the combined length of left and right sub-array.
+Every pass, the gap reduces to the ceiling value of gap/2.
+Take a pointer i to pass the array.
+Swap the ith and (i+gap)th elements if (i+gap)th element is smaller than(or greater than when sorting in decreasing order) ith element.
+Stop when (i+gap) reaches n.
+Input: 10, 30, 14, 11, 16, 7, 28
+
+Note: Assume left and right subarrays has been sorted so we are merging sorted subarrays [10, 14, 30] and [7, 11, 16, 28]
+
+Start with
+
+gap =  ceiling of n/2 = 7/2 = 4
+
+[This gap is for whole merged array]
+
+10, 14, 30, 7, 11, 16, 28
+
+10, 14, 30, 7, 11, 16, 28
+
+10, 14, 30, 7, 11, 16, 28
+
+10, 14, 28, 7, 11, 16, 30
+
+gap =  ceiling of 4/2 = 2
+
+10, 14, 28, 7, 11, 16, 30
+
+10, 14, 28, 7, 11, 16, 30
+
+10, 7, 28, 14, 11, 16, 30
+
+10, 7, 11, 14, 28, 16, 30
+
+10, 7, 11, 14, 28, 16, 30
+
+ 
+
+gap =  ceiling of 2/2 = 1
+
+10, 7, 11, 14, 28, 16, 30
+
+7, 10, 11, 14, 28, 16, 30
+
+7, 10, 11, 14, 28, 16, 30
+
+7, 10, 11, 14, 28, 16, 30
+
+7, 10, 11, 14, 28, 16, 30
+
+7, 10, 11, 14, 16, 28, 30
+
+Output: 7, 10, 11, 14, 16, 28, 30
+
+// C++ program for the above approach
+#include <bits/stdc++.h>
+using namespace std;
+  
+// Calculating next gap
+int nextGap(int gap)
+{
+    if (gap <= 1)
+        return 0;
+          
+    return (int)ceil(gap / 2.0);
+}
+  
+// Function for swapping
+void swap(int nums[], int i, int j)
+{
+    int temp = nums[i];
+    nums[i] = nums[j];
+    nums[j] = temp;
+}
+  
+// Merging the subarrays using shell sorting
+// Time Complexity: O(nlog n)
+// Space Complexity: O(1)
+void inPlaceMerge(int nums[], int start,
+                              int end)
+{
+    int gap = end - start + 1;
+      
+    for(gap = nextGap(gap); 
+        gap > 0; gap = nextGap(gap)) 
+    {
+        for(int i = start; i + gap <= end; i++) 
+        {
+            int j = i + gap;
+            if (nums[i] > nums[j])
+                swap(nums, i, j);
+        }
+    }
+}
+  
+// merge sort makes log n recursive calls
+// and each time calls merge()
+// which takes nlog n steps
+// Time Complexity: O(n*log n + 2((n/2)*log(n/2)) +
+// 4((n/4)*log(n/4)) +.....+ 1)
+// Time Complexity: O(logn*(n*log n))
+// i.e. O(n*(logn)^2)
+// Space Complexity: O(1)
+void mergeSort(int nums[], int s, int e)
+{
+    if (s == e)
+        return;
+  
+    // Calculating mid to slice the
+    // array in two halves
+    int mid = (s + e) / 2;
+  
+    // Recursive calls to sort left
+    // and right subarrays
+    mergeSort(nums, s, mid);
+    mergeSort(nums, mid + 1, e);
+      
+    inPlaceMerge(nums, s, e);
+}
+  
+// Driver Code
+int main()
+{
+    int nums[] = { 12, 11, 13, 5, 6, 7 };
+    int nums_size = sizeof(nums) / sizeof(nums[0]);
+      
+    mergeSort(nums, 0, nums_size-1);
+      
+    for(int i = 0; i < nums_size; i++)
+    {
+        cout << nums[i] << " ";
+    }
+    return 0;
+}
+
+Output
+5 6 7 11 12 13 
+Time Complexity: O(log n*nlog n)
+
+Missing Number in AP	
+-------------------------------
+Given an array that represents elements of arithmetic progression in order. One element is missing in the progression, find the missing number. 
+
+Examples: 
+
+Input: arr[]  = {2, 4, 8, 10, 12, 14}
+Output: 6
+
+Input: arr[]  = {1, 6, 11, 16, 21, 31};
+Output: 26
+
+A Simple Solution is to linearly traverse the array and find the missing number. Time complexity of this solution is O(n). Below is the implementation
+From Mathematical formulae we know that in an AP,
+Sum of the n elements = (n/2)(a+l)
+n is the number of elements, a is the first element and l is the last element
+
+If we apply this formulae and keep it in a variable s, And take the sum of all elements and keep them in sum. We will get the missing number by s-sum(As sum doesnt includes the missing number)
+
+Implementation:
+
+// C++ program to find the missing number
+// in a given arithmetic progression
+#include<iostream>
+#include<bits/stdc++.h>
+  
+using namespace std;
+  
+int findMissing(int arr[], int n)
+{   
+    int a,d,l,s,i,sum=0,missingnumber;
+    a=arr[0];
+    l=arr[n-1];
+  
+  
+    /* Taking the sum of all the elements of the array
+       including the missing element using formulae 
+       S(n) = n/2 (a+l)  where a is the first element 
+       and l is the last element */
+      
+    if((a+l)%2==0) /* ensuring this as n/2(a+l) and (a+l)/2
+                      would give different values programmatically */
+    {
+        s = (a+l)/2;
+        s = s*(n+1);
+    }
+    else
+    {
+        s = (n+1)/2;
+        s = (a+l)*s;
+  
+    }
+    
+    // Taking the sum of all the elements of the
+    // array excluding the missing element
+    
+    for(i=0;i<=n-1;i++)
+    {
+        sum = sum + arr[i];
+    }
+  
+    missingnumber=s-sum;
+  
+    return missingnumber;
+  
+}
+   
+// Driver Code
+int main()
+{
+    int arr[] = {2, 4, 8, 10, 12, 14};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    cout << "The missing element is "
+        << findMissing(arr, n);
+    return 0;
+}
+   
+Output
+The missing element is 6
+The Time Complexity is O(n) as we are iterating the array once and the Space Complexity is O(1)
+
+We can also solve this problem in O(Logn) time using Binary Search. The idea is to go to the middle element. Check if the difference between middle and next to middle is equal to diff or not, if not then the missing element lies between mid and mid+1. If the middle element is equal to n/2th term in Arithmetic Series (Let n be the number of elements in input array), then missing element lies in right half. Else element lies in left half.
+
+Following is implementation of above idea. 
+
+// C++ program to find the missing number
+// in a given arithmetic progression
+#include<iostream>
+using namespace std;
+#define INT_MAX 2147483647;
+class GFG
+{
+      
+// A binary search based recursive function that returns
+// the missing element in arithmetic progression
+public:int findMissingUtil(int arr[], int low,
+                        int high, int diff)
+{
+    // There must be two elements to find the missing
+    if (high <= low)
+        return INT_MAX;
+  
+    // Find index of middle element
+    int mid = low + (high - low) / 2;
+  
+    // The element just after the middle element is missing.
+    // The arr[mid+1] must exist, because we return when
+    // (low == high) and take floor of (high-low)/2
+    if (arr[mid + 1] - arr[mid] != diff)
+        return (arr[mid] + diff);
+  
+    // The element just before mid is missing
+    if (mid > 0 && arr[mid] - arr[mid - 1] != diff)
+        return (arr[mid - 1] + diff);
+  
+    // If the elements till mid follow AP, then recur
+    // for right half
+    if (arr[mid] == arr[0] + mid * diff)
+        return findMissingUtil(arr, mid + 1,
+                            high, diff);
+  
+    // Else recur for left half
+    return findMissingUtil(arr, low, mid - 1, diff);
+}
+  
+// The function uses findMissingUtil() to
+// find the missing element in AP.
+// It assumes that there is exactly one
+// missing element and may give incorrect result
+// when there is no missing element or
+// more than one missing elements. This function
+// also assumes that the difference in AP is an
+// integer.
+int findMissing(int arr[], int n)
+{
+    // If exactly one element is missing, then we can find
+    // difference of arithmetic progression using following
+    // formula. Example, 2, 4, 6, 10, diff = (10-2)/4 = 2.
+    // The assumption in formula is that the difference is
+    // an integer.
+    int diff = (arr[n - 1] - arr[0]) / n;
+  
+    // Binary search for the missing
+    // number using above calculated diff
+    return findMissingUtil(arr, 0, n - 1, diff);
+}
+};
+  
+// Driver Code
+int main()
+{
+    GFG g;
+    int arr[] = {2, 4, 8, 10, 12, 14};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    cout << "The missing element is "
+        << g.findMissing(arr, n);
+    return 0;
+}
+  
+Output
+The missing element is 6
+Time Complexity: O(log n)
+Auxiliary Space: O(1)
+
+Iterative: The idea is to go to the middle element. Check if the index of middle element is equal to (nth position of middle element in AP) – 1 then the missing element lies at right half if not then the missing element lies at left half (this idea is similar to Find the only repeating element in a sorted array of size n ).  After breaking out of binary search loop the missing element will lie between high and low. We can find the missing element by adding a common difference with element at index high or by subtracting a common difference with element at index low.
+
+
+// C++ program to find the missing number 
+// in a given arithmetic progression
+#include<iostream>
+using namespace std;
+#define INT_MAX 2147483647;
+class GFG
+{
+      
+// A binary search based function that returns
+// the missing element in arithmetic progression
+public:int findMissingUtil(int arr[], int low, 
+                           int high, int diff)
+{    
+    // Find index of middle element
+    int mid;
+    while (low <= high)
+    {    
+          // find index of middle element 
+        mid = (low + high) / 2;
+          // if mid == (nth position of element in AP)-1
+          // the missing element will exist in right half 
+        if ((arr[mid] - arr[0]) / diff == mid)
+            low = mid + 1;
+        else
+        // the missing element will exist in left half
+            high = mid - 1;
+    }
+      // after breaking out of binary search loop
+      // our missing element will exist between high and low
+      // our missing element will be a[high] + common difference
+      // or a[low] - common difference
+    return arr[high] + diff;
+}
+  
+// The function uses findMissingUtil() to 
+// find the missing element in AP. 
+// It assumes that there is exactly one 
+// missing element and may give incorrect result 
+// when there is no missing element or 
+// more than one missing elements. This function 
+// also assumes that the difference in AP is an
+// integer.
+int findMissing(int arr[], int n) 
+{
+    // If exactly one element is missing, then we can find
+    // difference of arithmetic progression using following
+    // formula. Example, 2, 4, 6, 10, diff = (10-2)/4 = 2.
+    // The assumption in formula is that the difference is
+    // an integer.
+    int diff = (arr[n - 1] - arr[0]) / n;
+  
+    // Binary search for the missing 
+    // number using above calculated diff
+    return findMissingUtil(arr, 0, n - 1, diff);
+}
+};
+  
+// Driver Code
+int main()
+{
+    GFG g;
+    int arr[] = {2, 4, 8, 10, 12, 14};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    cout << "The missing element is " 
+         << g.findMissing(arr, n);
+    return 0;
+} 
+  
+Output
+The missing element is 6
+Time Complexity: O(log n)
+Auxiliary Space: O(1)
+
+Smallest number with atleast n trailing zeroes in factorial	
+----------------------------------------------------------------
+Given a number n. The task is to find the smallest number whose factorial contains at least n trailing zeroes.
+Examples : 
+ 
+ Input : n = 1
+Output : 5 
+1!, 2!, 3!, 4! does not contain trailing zero.
+5! = 120, which contains one trailing zero.
+
+Input : n = 6
+Output : 25
+
+we have discussed number of zeroes is equal to number of 5’s in prime factors of x!. We have discussed below formula to count number of 5’s.
+ 
+
+Trailing 0s in x! = Count of 5s in prime factors of x!
+                  = floor(x/5) + floor(x/25) + floor(x/125) + ....
+
+Let us take few examples to observe pattern :
+5!  has 1 trailing zeroes 
+[All numbers from 6 to 9
+ have 1 trailing zero]
+
+10! has 2 trailing zeroes
+[All numbers from 11 to 14
+ have 2 trailing zeroes]
+
+15! to 19! have 3 trailing zeroes
+
+20! to 24! have 4 trailing zeroes
+
+25! to 29! have 6 trailing zeroes
+We can notice that, the maximum value whose factorial contain n trailing zeroes is 5*n.
+So, to find minimum value whose factorial contains n trailing zeroes, use binary search on range from 0 to 5*n. And, find the smallest number whose factorial contains n trailing zeroes. 
+ 
+// C++ program to find smallest number whose
+// factorial contains at least n trailing
+// zeroes.
+#include<bits/stdc++.h>
+using namespace std;
+ 
+// Return true if number's factorial contains
+// at least n trailing zero else false.
+bool check(int p, int n)
+{
+    int temp = p, count = 0, f = 5;
+    while (f <= temp)
+    {
+        count += temp/f;
+        f = f*5;
+    }
+    return (count >= n);
+}
+ 
+// Return smallest number whose factorial
+// contains at least n trailing zeroes
+int findNum(int n)
+{
+    // If n equal to 1, return 5.
+    // since 5! = 120.
+    if (n==1)
+        return 5;
+ 
+    // Initialising low and high for binary
+    // search.
+    int low = 0;
+    int high = 5*n;
+ 
+    // Binary Search.
+    while (low <high)
+    {
+        int mid = (low + high) >> 1;
+ 
+        // Checking if mid's factorial contains
+        // n trailing zeroes.
+        if (check(mid, n))
+            high = mid;
+        else
+            low = mid+1;
+    }
+ 
+    return low;
+}
+ 
+// driver code
+int main()
+{
+    int n = 6;
+    cout << findNum(n) << endl;
+    return 0;
+}
+Output : 
+25
+Time Complexity: O(log2N)
+We take log2N in binary search and our check() function takes log5N time so the overall time complexity becomes log2N * log5N which in a more general sense can be written as (logN)2 which can also be written as log2N.
+Auxiliary Space: O(1)
+As constant extra space is used.                 
+
+//BY SHIBAM NATH
