@@ -1,0 +1,6400 @@
+-------------------------------------------------------------------------
+                               LinkedList
+-------------------------------------------------------------------------
+
+Reverse a Linked List in group of Given Size. [Very Imp]	
+-----------------------------------------------------------------------------
+Given a linked list, write a function to reverse every k nodes (where k is an input to the function). 
+
+Example: 
+
+Input: 1->2->3->4->5->6->7->8->NULL, K = 3 
+Output: 3->2->1->6->5->4->8->7->NULL 
+Input: 1->2->3->4->5->6->7->8->NULL, K = 5 
+Output: 5->4->3->2->1->8->7->6->NULL 
+
+Algorithm: reverse(head, k) 
+
+Reverse the first sub-list of size k. While reversing keep track of the next node and previous node. Let the pointer to the next node be next and pointer to the previous node be prev. See this post for reversing a linked list.
+head->next = reverse(next, k) ( Recursively call for rest of the list and link the two sub-lists )
+Return prev
+
+// CPP program to reverse a linked list
+// in groups of given size
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* Link list node */
+class Node {
+public:
+    int data;
+    Node* next;
+};
+
+/* Reverses the linked list in groups
+of size k and returns the pointer
+to the new head node. */
+Node* reverse(Node* head, int k)
+{
+    // base case
+    if (!head)
+        return NULL;
+    Node* current = head;
+    Node* next = NULL;
+    Node* prev = NULL;
+    int count = 0;
+ 
+    /*reverse first k nodes of the linked list */
+    while (current != NULL && count < k) {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+        count++;
+    }
+ 
+    /* next is now a pointer to (k+1)th node
+    Recursively call for the list starting from current.
+    And make rest of the list as next of first node */
+    if (next != NULL)
+        head->next = reverse(next, k);
+ 
+    /* prev is new head of the input list */
+    return prev;
+}
+ 
+/* UTILITY FUNCTIONS */
+/* Function to push a node */
+void push(Node** head_ref, int new_data)
+{
+    /* allocate node */
+    Node* new_node = new Node();
+ 
+    /* put in the data */
+    new_node->data = new_data;
+ 
+    /* link the old list of the new node */
+    new_node->next = (*head_ref);
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+/* Function to print linked list */
+void printList(Node* node)
+{
+    while (node != NULL) {
+        cout << node->data << " ";
+        node = node->next;
+    }
+}
+ 
+/* Driver code*/
+int main()
+{
+    /* Start with the empty list */
+    Node* head = NULL;
+ 
+    /* Created Linked list
+       is 1->2->3->4->5->6->7->8->9 */
+    push(&head, 9);
+    push(&head, 8);
+    push(&head, 7);
+    push(&head, 6);
+    push(&head, 5);
+    push(&head, 4);
+    push(&head, 3);
+    push(&head, 2);
+    push(&head, 1);
+ 
+    cout << "Given linked list \n";
+    printList(head);
+    head = reverse(head, 3);
+ 
+    cout << "\nReversed Linked list \n";
+    printList(head);
+ 
+    return (0);
+}
+ 
+Output
+Given linked list 
+1 2 3 4 5 6 7 8 9 
+Reversed Linked list 
+3 2 1 6 5 4 9 8 7 
+Complexity Analysis: 
+
+Time Complexity: O(n). 
+Traversal of list is done only once and it has ‘n’ elements.
+Auxiliary Space: O(n/k). 
+For each Linked List of size n, n/k or (n/k)+1 calls will be made during the recursion.
+We can solve this question in O(1) Space Complexity.
+
+Approach – 2 Space Optimized – Iterative 
+The following steps are required for this Algorithm:
+
+Create a dummy node and point it to the head of input i.e dummy->next = head.
+ Calculate the length of the linked list which takes O(N) time, where N is the length of the linked list.
+ Initialize three-pointers prev, curr, next to reverse k elements for every group.
+Iterate over the linked lists till next!=NULL.
+Points curr to the prev->next and next to the curr next.
+Then, Using the inner for loop reverse the particular group using these four steps:
+curr->next = next->next
+next->next = prev->next
+prev->next = next
+next = curr->next
+Complete Interview Preparation - GFG
+
+       7. This for loop runs for k-1 times for all groups except the last remaining element, for the last remaining element it runs              for the remaining length of the linked list – 1.
+
+
+       8. Decrement count after for loop by k count -= k, to determine the length of the remaining linked list.
+
+       9. Change prev position to curr, prev = curr.
+
+Here is the code for the above algorithm.
+
+// CPP program to reverse a linked list
+// in groups of given size
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* Link list node */
+class Node {
+public:
+    int data;
+    Node* next;
+};
+ 
+/* Reverses the linked list in groups
+of size k and returns the pointer
+to the new head node. */
+Node* reverse(Node* head, int k)
+{
+    // If head is NULL or K is 1 then return head
+    if (!head || k == 1)
+        return head;
+ 
+    Node* dummy = new Node(); // creating dummy node
+    dummy->data = -1;
+    dummy->next = head;
+ 
+    // Initializing three points prev, curr, next
+    Node *prev = dummy, *curr = dummy, *next = dummy;
+ 
+    // Calculating the length of linked list
+    int count = 0;
+    while (curr) {
+        curr = curr->next;
+        count++;
+    }
+ 
+    // Iterating till next is not NULL
+    while (next) {
+        // Curr position after every reverse group
+        curr = prev->next;
+        // Next will always next to curr
+        next = curr->next;
+        // toLoop will set to count - 1 in case of remaining
+        // element
+        int toLoop = count > k ? k : count - 1;
+        for (int i = 1; i < toLoop; i++) {
+            // 4 steps as discussed above
+            curr->next = next->next;
+            next->next = prev->next;
+            prev->next = next;
+            next = curr->next;
+        }
+        // Setting prev to curr
+        prev = curr;
+        // Update count
+        count -= k;
+    }
+    // dummy -> next will be our new head for output linked
+    // list
+    return dummy->next;
+}
+ 
+/* UTILITY FUNCTIONS */
+/* Function to push a node */
+void push(Node** head_ref, int new_data)
+{
+    /* allocate node */
+    Node* new_node = new Node();
+ 
+    /* put in the data */
+    new_node->data = new_data;
+ 
+    /* link the old list off the new node */
+    new_node->next = (*head_ref);
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+/* Function to print linked list */
+void printList(Node* node)
+{
+    while (node != NULL) {
+        cout << node->data << " ";
+        node = node->next;
+    }
+}
+ 
+/* Driver code*/
+int main()
+{
+    /* Start with the empty list */
+    Node* head = NULL;
+ 
+    /* Created Linked list
+    is 1->2->3->4->5->6->7->8->9 */
+    push(&head, 9);
+    push(&head, 8);
+    push(&head, 7);
+    push(&head, 6);
+    push(&head, 5);
+    push(&head, 4);
+    push(&head, 3);
+    push(&head, 2);
+    push(&head, 1);
+ 
+    cout << "Given linked list \n";
+    printList(head);
+    head = reverse(head, 3);
+ 
+    cout << "\nReversed Linked list \n";
+    printList(head);
+ 
+    return (0);
+}
+
+Output
+Given linked list 
+1 2 3 4 5 6 7 8 9 
+Reversed Linked list 
+3 2 1 6 5 4 9 8 7 
+Complexity Analysis 
+Time Complexity: O(N) : While loop takes O(N/K) time and inner for loop takes O(K) time. So N/K * K = N. Therefore TC O(N)
+Space Complexity: O(1) : No extra space is used.
+
+Write a program to Detect loop in a linked list
+------------------------------------------------------
+Given a linked list, check if the linked list has a loop or not. The below diagram shows a linked list with a loop. 
+
+Using Hashing:
+The idea is to insert the nodes in the hashmap and whenever a node is encountered that is already present in the hashmap then return true.
+
+Follow the steps below to solve the problem:
+
+Traverse the list individually and keep putting the node addresses in a Hash Table. 
+At any point, if NULL is reached then return false 
+If the next of the current nodes points to any of the previously stored nodes in  Hash then return true.
+
+// C++ program to detect loop in a linked list
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* Link list node */
+struct Node {
+    int data;
+    struct Node* next;
+};
+ 
+void push(struct Node** head_ref, int new_data)
+{
+    /* allocate node */
+    struct Node* new_node = new Node;
+ 
+    /* put in the data  */
+    new_node->data = new_data;
+ 
+    /* link the old list off the new node */
+    new_node->next = (*head_ref);
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+// Returns true if there is a loop in linked list
+// else returns false.
+bool detectLoop(struct Node* h)
+{
+    unordered_set<Node*> s;
+    while (h != NULL) {
+        // If this node is already present
+        // in hashmap it means there is a cycle
+        // (Because you will be encountering the
+        // node for the second time).
+        if (s.find(h) != s.end())
+            return true;
+ 
+        // If we are seeing the node for
+        // the first time, insert it in hash
+        s.insert(h);
+ 
+        h = h->next;
+    }
+ 
+    return false;
+}
+ 
+/* Driver program to test above function*/
+int main()
+{
+    /* Start with the empty list */
+    struct Node* head = NULL;
+ 
+    push(&head, 20);
+    push(&head, 4);
+    push(&head, 15);
+    push(&head, 10);
+ 
+    /* Create a loop for testing */
+    head->next->next->next->next = head;
+ 
+    if (detectLoop(head))
+        cout << "Loop Found";
+    else
+        cout << "No Loop";
+ 
+    return 0;
+}
+Output
+Loop Found
+Time complexity: O(N), Only one traversal of the loop is needed.
+Auxiliary Space: O(N), N is the space required to store the value in the hashmap.
+
+By Modification In Node Structure:
+
+The idea is to modify the node structure by adding flag in it and mark the flag whenever visit the node.
+
+Follow the steps below to solve the problem:
+
+Have a visited flag with each node.
+Traverse the linked list and keep marking visited nodes.
+If you see a visited node again then there is a loop.
+
+// C++ program to detect loop in a linked list
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* Link list node */
+struct Node {
+    int data;
+    struct Node* next;
+    int flag;
+};
+ 
+void push(struct Node** head_ref, int new_data)
+{
+    /* allocate node */
+    struct Node* new_node = new Node;
+ 
+    /* put in the data */
+    new_node->data = new_data;
+ 
+    new_node->flag = 0;
+ 
+    /* link the old list off the new node */
+    new_node->next = (*head_ref);
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+// Returns true if there is a loop in linked list
+// else returns false.
+bool detectLoop(struct Node* h)
+{
+    while (h != NULL) {
+        // If this node is already traverse
+        // it means there is a cycle
+        // (Because you we encountering the
+        // node for the second time).
+        if (h->flag == 1)
+            return true;
+ 
+        // If we are seeing the node for
+        // the first time, mark its flag as 1
+        h->flag = 1;
+ 
+        h = h->next;
+    }
+ 
+    return false;
+}
+ 
+/* Driver program to test above function*/
+int main()
+{
+    /* Start with the empty list */
+    struct Node* head = NULL;
+ 
+    push(&head, 20);
+    push(&head, 4);
+    push(&head, 15);
+    push(&head, 10);
+ 
+    /* Create a loop for testing */
+    head->next->next->next->next = head;
+ 
+    if (detectLoop(head))
+        cout << "Loop Found";
+    else
+        cout << "No Loop";
+ 
+    return 0;
+}
+
+Output
+Loop Found
+Time complexity: O(N), Only one traversal of the loop is needed.
+Auxiliary Space: O(1)
+
+by Marking visited nodes without modifying Node structure:
+The idea is to point the current node of the linked list to a node which is created. Whenever a node’s next is pointing to that node it means loop is there.
+
+Follow the steps below to solve the problem:
+
+A temporary node is created. 
+The next pointer of each node that is traversed is made to point to this temporary node. 
+This way we are using the next pointer of a node as a flag to indicate whether the node has been traversed or not. 
+Every node is checked to see if the next is pointing to a temporary node or not.
+In the case of the first node of the loop, the second time we traverse it this condition will be true, hence we find that loop exists. 
+If we come across a node that points to null then the loop doesn’t exist.
+
+// C++ program to return first node of loop
+#include <bits/stdc++.h>
+using namespace std;
+ 
+struct Node {
+    int key;
+    struct Node* next;
+};
+ 
+Node* newNode(int key)
+{
+    Node* temp = new Node;
+    temp->key = key;
+    temp->next = NULL;
+    return temp;
+}
+ 
+// A utility function to print a linked list
+void printList(Node* head)
+{
+    while (head != NULL) {
+        cout << head->key << " ";
+        head = head->next;
+    }
+    cout << endl;
+}
+ 
+// Function to detect first node of loop
+// in a linked list that may contain loop
+bool detectLoop(Node* head)
+{
+    // Create a temporary node
+    Node* temp = new Node;
+    while (head != NULL) {
+        // This condition is for the case when there is no
+        // loop
+        if (head->next == NULL)
+            return false;
+        // Check if next is already pointing to temp
+        if (head->next == temp)
+            return true;
+        // Store the pointer to the next node
+        // in order to get to it in the next step
+        Node* next = head->next;
+        // Make next point to temp
+        head->next = temp;
+        // Get to the next node in the list
+        head = next;
+    }
+    return false;
+}
+ 
+/* Driver program to test above function*/
+int main()
+{
+    Node* head = newNode(1);
+    head->next = newNode(2);
+    head->next->next = newNode(3);
+    head->next->next->next = newNode(4);
+    head->next->next->next->next = newNode(5);
+    /* Create a loop for testing(5 is pointing to 3) */
+    head->next->next->next->next->next = head->next->next;
+    bool found = detectLoop(head);
+    if (found)
+        cout << "Loop Found";
+    else
+        cout << "No Loop";
+    return 0;
+}
+ 
+Output
+Loop Found
+Time complexity: O(N). Only one traversal of the loop is needed.
+Auxiliary Space: O(1) 
+
+Write a program to Delete loop in a linked list
+--------------------------------------------------
+Write a function detectAndRemoveLoop() that checks whether a given Linked List contains a loop and if the loop is present then removes the loop and returns true. If the list doesn’t contain a loop then it returns false. The below diagram shows a linked list with a loop. detectAndRemoveLoop() must change the below list to 1->2->3->4->5->NULL.
+
+Method 1 (Check one by one) We know that Floyd’s Cycle detection algorithm terminates when fast and slow pointers meet at a common point. We also know that this common point is one of the loop nodes (2 or 3 or 4 or 5 in the above diagram). Store the address of this in a pointer variable say ptr2. After that start from the head of the Linked List and check for nodes one by one if they are reachable from ptr2. Whenever we find a node that is reachable, we know that this node is the starting node of the loop in the Linked List and we can get the pointer to the previous of this node.
+
+Output:
+Linked List after removing loop 
+50 20 15 4 10 
+Method 2 (Better Solution)  
+
+This method is also dependent on Floyd’s Cycle detection algorithm.
+Detect Loop using Floyd’s Cycle detection algorithm and get the pointer to a loop node.
+Count the number of nodes in the loop. Let the count be k.
+Fix one pointer to the head and another to a kth node from the head.
+Move both pointers at the same pace, they will meet at the loop starting node.
+Get a pointer to the last node of the loop and make the next of it NULL.
+
+#include <bits/stdc++.h>
+using namespace std;
+  
+/* Link list node */
+struct Node {
+    int data;
+    struct Node* next;
+};
+  
+/* Function to remove loop. */
+void removeLoop(struct Node*, struct Node*);
+  
+/* This function detects and removes loop in the list
+  If loop was there in the list then it returns 1,
+  otherwise returns 0 */
+int detectAndRemoveLoop(struct Node* list)
+{
+    struct Node *slow_p = list, *fast_p = list;
+  
+    // Iterate and find if loop exists or not
+    while (slow_p && fast_p && fast_p->next) {
+        slow_p = slow_p->next;
+        fast_p = fast_p->next->next;
+  
+        /* If slow_p and fast_p meet at some point then there
+           is a loop */
+        if (slow_p == fast_p) {
+            removeLoop(slow_p, list);
+  
+            /* Return 1 to indicate that loop is found */
+            return 1;
+        }
+    }
+  
+    /* Return 0 to indicate that there is no loop*/
+    return 0;
+}
+  
+/* Function to remove loop.
+ loop_node --> Pointer to one of the loop nodes
+ head -->  Pointer to the start node of the linked list */
+void removeLoop(struct Node* loop_node, struct Node* head)
+{
+    struct Node* ptr1 = loop_node;
+    struct Node* ptr2 = loop_node;
+  
+    // Count the number of nodes in loop
+    unsigned int k = 1, i;
+    while (ptr1->next != ptr2) {
+        ptr1 = ptr1->next;
+        k++;
+    }
+  
+    // Fix one pointer to head
+    ptr1 = head;
+  
+    // And the other pointer to k nodes after head
+    ptr2 = head;
+    for (i = 0; i < k; i++)
+        ptr2 = ptr2->next;
+  
+    /*  Move both pointers at the same pace,
+      they will meet at loop starting node */
+    while (ptr2 != ptr1) {
+        ptr1 = ptr1->next;
+        ptr2 = ptr2->next;
+    }
+  
+    // Get pointer to the last node
+    while (ptr2->next != ptr1)
+        ptr2 = ptr2->next;
+  
+    /* Set the next node of the loop ending node
+      to fix the loop */
+    ptr2->next = NULL;
+}
+  
+/* Function to print linked list */
+void printList(struct Node* node)
+{
+    // Print the list after loop removal
+    while (node != NULL) {
+        cout << node->data << " ";
+        node = node->next;
+    }
+}
+  
+struct Node* newNode(int key)
+{
+    struct Node* temp = new Node();
+    temp->data = key;
+    temp->next = NULL;
+    return temp;
+}
+  
+// Driver Code
+int main()
+{
+    struct Node* head = newNode(50);
+    head->next = newNode(20);
+    head->next->next = newNode(15);
+    head->next->next->next = newNode(4);
+    head->next->next->next->next = newNode(10);
+  
+    /* Create a loop for testing */
+    head->next->next->next->next->next = head->next->next;
+  
+    detectAndRemoveLoop(head);
+  
+    cout << "Linked List after removing loop \n";
+    printList(head);
+    return 0;
+}
+  
+// This code has been contributed by Striver
+Output
+Linked List after removing loop 
+50 20 15 4 10 
+Method 3 (Optimized Method 2: Without Counting Nodes in Loop) 
+We do not need to count the number of nodes in Loop. After detecting the loop, if we start the slow pointer from the head and move both slow and fast pointers at the same speed until fast don’t meet, they would meet at the beginning of the loop.
+
+How does this work? 
+Let slow and fast meet at some point after Floyd’s Cycle finding algorithm. The below diagram shows the situation when the cycle is found.
+
+We can conclude below from the above diagram 
+
+
+
+
+Distance traveled by fast pointer = 2 * (Distance traveled 
+                                         by slow pointer)
+
+(m + n*x + k) = 2*(m + n*y + k)
+
+Note that before meeting the point shown above, fast
+was moving at twice speed.
+
+x -->  Number of complete cyclic rounds made by 
+       fast pointer before they meet first time
+
+y -->  Number of complete cyclic rounds made by 
+       slow pointer before they meet first time
+From the above equation, we can conclude below 
+
+    m + k = (x-2y)*n
+
+Which means m+k is a multiple of n. 
+Thus we can write, m + k = i*n or m = i*n - k.
+Hence, distance moved by slow pointer: m, is equal to distance moved by fast pointer:
+i*n - k or (i-1)*n + n - k (cover the loop completely i-1 times and start from n-k).
+So if we start moving both pointers again at same speed such that one pointer (say slow) begins from head node of linked list and other pointer (say fast) begins from meeting point. When the slow pointer reaches the beginning of the loop (has made m steps), the fast pointer would have made also moved m steps as they are now moving at the same pace. Since m+k is a multiple of n and fast starts from k, they would meet at the beginning. Can they meet before also? No because slow pointer enters the cycle first time after m steps. 
+
+// C++ program to detect and remove loop
+#include <bits/stdc++.h>
+using namespace std;
+  
+struct Node {
+    int key;
+    struct Node* next;
+};
+  
+Node* newNode(int key)
+{
+    Node* temp = new Node;
+    temp->key = key;
+    temp->next = NULL;
+    return temp;
+}
+  
+// A utility function to print a linked list
+void printList(Node* head)
+{
+    while (head != NULL) {
+        cout << head->key << " ";
+        head = head->next;
+    }
+    cout << endl;
+}
+  
+// Function to detect and remove loop in a linked list that
+// may contain loop
+void detectAndRemoveLoop(Node* head)
+{
+    // If list is empty or has only one node without loop
+    if (head == NULL || head->next == NULL)
+        return;
+  
+    Node *slow = head, *fast = head;
+  
+    // Move slow and fast 1 and 2 steps ahead respectively.
+    slow = slow->next;
+    fast = fast->next->next;
+  
+    // Search for loop using slow and fast pointers
+    while (fast && fast->next) {
+        if (slow == fast)
+            break;
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+  
+    /* If loop exists */
+    if (slow == fast) {
+        slow = head;
+  
+        // this check is needed when slow and fast both meet
+        // at the head of the LL eg: 1->2->3->4->5 and then
+        // 5->next = 1 i.e the head of the LL
+        if (slow == fast)
+            while (fast->next != slow)
+                fast = fast->next;
+        else {
+            while (slow->next != fast->next) {
+                slow = slow->next;
+                fast = fast->next;
+            }
+        }
+  
+        /* since fast->next is the looping point */
+        fast->next = NULL; /* remove loop */
+    }
+}
+  
+/* Driver program to test above function*/
+int main()
+{
+    Node* head = newNode(50);
+    head->next = head;
+    head->next = newNode(20);
+    head->next->next = newNode(15);
+    head->next->next->next = newNode(4);
+    head->next->next->next->next = newNode(10);
+  
+    /* Create a loop for testing */
+    head->next->next->next->next->next = head;
+  
+    detectAndRemoveLoop(head);
+  
+    printf("Linked List after removing loop \n");
+    printList(head);
+  
+    return 0;
+}
+
+Output
+Linked List after removing loop 
+50 20 15 4 10 
+Method 4 Hashing: Hash the address of the linked list nodes 
+We can hash the addresses of the linked list nodes in an unordered map and just check if the element already exists in the map. If it exists, we have reached a node that already exists by a cycle, hence we need to make the last node’s next pointer NULL.
+
+// C++ program to detect and remove loop
+#include <bits/stdc++.h>
+using namespace std;
+  
+struct Node {
+    int key;
+    struct Node* next;
+};
+  
+Node* newNode(int key)
+{
+    Node* temp = new Node;
+    temp->key = key;
+    temp->next = NULL;
+    return temp;
+}
+  
+// A utility function to print a linked list
+void printList(Node* head)
+{
+    while (head != NULL) {
+        cout << head->key << " ";
+        head = head->next;
+    }
+    cout << endl;
+}
+  
+// Function to detect and remove loop
+// in a linked list that may contain loop
+void hashAndRemove(Node* head)
+{
+    // hash map to hash addresses of the linked list nodes
+    unordered_map<Node*, int> node_map;
+    // pointer to last node
+    Node* last = NULL;
+    while (head != NULL) {
+        // if node not present in the map, insert it in the map
+        if (node_map.find(head) == node_map.end()) {
+            node_map[head]++;
+            last = head;
+            head = head->next;
+        }
+        // if present, it is a cycle, make the last node's next pointer NULL
+        else {
+            last->next = NULL;
+            break;
+        }
+    }
+}
+/* Driver program to test above function*/
+int main()
+{
+    Node* head = newNode(50);
+    head->next = head;
+    head->next = newNode(20);
+    head->next->next = newNode(15);
+    head->next->next->next = newNode(4);
+    head->next->next->next->next = newNode(10);
+  
+    /* Create a loop for testing */
+    head->next->next->next->next->next = head->next->next;
+  
+    // printList(head);
+    hashAndRemove(head);
+  
+    printf("Linked List after removing loop \n");
+    printList(head);
+  
+    return 0;
+}
+Output
+Linked List after removing loop 
+50 20 15 4 10 
+
+Find the starting point of the loop.	
+-----------------------------------------
+Write a function findFirstLoopNode() that checks whether a given Linked List contains a loop. If the loop is present then it returns point to the first node of the loop. Else it returns NULL.
+
+Example : 
+
+Input : Head of below linked list
+Output : Pointer to node 2
+
+We have discussed Floyd’s loop detection algorithm. Below are steps to find the first node of the loop.
+1. If a loop is found, initialize a slow pointer to head, let fast pointer be at its position. 
+2. Move both slow and fast pointers one node at a time. 
+3. The point at which they meet is the start of the loop.
+
+// C++ program to return first node of loop.
+#include <bits/stdc++.h>
+using namespace std;
+ 
+struct Node {
+    int key;
+    struct Node* next;
+};
+ 
+Node* newNode(int key)
+{
+    Node* temp = new Node;
+    temp->key = key;
+    temp->next = NULL;
+    return temp;
+}
+ 
+// A utility function to print a linked list
+void printList(Node* head)
+{
+    while (head != NULL) {
+        cout << head->key << " ";
+        head = head->next;
+    }
+    cout << endl;
+}
+ 
+// Function to detect and remove loop
+// in a linked list that may contain loop
+Node* detectAndRemoveLoop(Node* head)
+{
+    // If list is empty or has only one node
+    // without loop
+    if (head == NULL || head->next == NULL)
+        return NULL;
+ 
+    Node *slow = head, *fast = head;
+    // Move slow and fast 1 and 2 steps
+    // ahead respectively.
+    slow = slow->next;
+    fast = fast->next->next;
+    // Search for loop using slow and
+    // fast pointers
+    while (fast && fast->next) {
+        if (slow == fast)
+            break;
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    // If loop does not exist
+    if (slow != fast)
+        return NULL;
+    // If loop exists. Start slow from
+    // head and fast from meeting point.
+    slow = head;
+    while (slow != fast) {
+        slow = slow->next;
+        fast = fast->next;
+    }
+    return slow;
+}
+ 
+/* Driver program to test above function*/
+int main()
+{
+    Node* head = newNode(50);
+    head->next = newNode(20);
+    head->next->next = newNode(15);
+    head->next->next->next = newNode(4);
+    head->next->next->next->next = newNode(10);
+ 
+    /* Create a loop for testing */
+    head->next->next->next->next->next = head->next->next;
+ 
+    Node* res = detectAndRemoveLoop(head);
+    if (res == NULL)
+        cout << "Loop does not exist";
+    else
+        cout << "Loop starting node is " << res->key;
+    return 0;
+}
+
+Output: 
+Loop starting node is 15
+ 
+
+How does this approach work? 
+Let slow and fast meet at some point after Floyd’s Cycle finding algorithm. The below diagram shows the situation when the cycle is found.
+ 
+
+
+We can conclude below from the above diagram 
+
+Distance traveled by fast pointer = 2 * (Distance traveled 
+                                         by slow pointer)
+
+(m + n*x + k) = 2*(m + n*y + k)
+
+Note that before meeting the point shown above, fast
+was moving at twice speed.
+
+x -->  Number of complete cyclic rounds made by 
+       fast pointer before they meet first time
+
+y -->  Number of complete cyclic rounds made by 
+       slow pointer before they meet first time
+From the above equation, we can conclude below 
+
+    m + k = (x-2y)*n
+
+Which means m+k is a multiple of n.
+So if we start moving both pointers again at the same speed such that one pointer (say slow) begins from the head node of the linked list and other pointers (say fast) begins from the meeting point. When the slow pointer reaches the beginning of the loop (has made m steps), the fast pointer would have made also moved m steps as they are now moving the same pace. Since m+k is a multiple of n and fast starts from k, they would meet at the beginning. Can they meet before also? No, because the slow pointer enters the cycle first time after m steps.
+
+Method 2: 
+In this method, a temporary node is created. The next pointer of each node that is traversed is made to point to this temporary node. This way we are using the next pointer of a node as a flag to indicate whether the node has been traversed or not. Every node is checked to see if the next is pointing to a temporary node or not. In the case of the first node of the loop, the second time we traverse it this condition will be true, hence we return that node. 
+The code runs in O(n) time complexity and uses constant memory space.
+
+// C++ program to return first node of loop
+#include <bits/stdc++.h>
+using namespace std;
+ 
+struct Node {
+    int key;
+    struct Node* next;
+};
+ 
+Node* newNode(int key)
+{
+    Node* temp = new Node;
+    temp->key = key;
+    temp->next = NULL;
+    return temp;
+}
+ 
+// A utility function to print a linked list
+void printList(Node* head)
+{
+    while (head != NULL) {
+        cout << head->key << " ";
+        head = head->next;
+    }
+    cout << endl;
+}
+ 
+// Function to detect first node of loop
+// in a linked list that may contain loop
+Node* detectLoop(Node* head)
+{
+ 
+    // Create a temporary node
+    Node* temp = new Node;
+    while (head != NULL) {
+ 
+        // This condition is for the case
+        // when there is no loop
+        if (head->next == NULL) {
+            return NULL;
+        }
+ 
+        // Check if next is already
+        // pointing to temp
+        if (head->next == temp) {
+            break;
+        }
+ 
+        // Store the pointer to the next node
+        // in order to get to it in the next step
+        Node* nex = head->next;
+ 
+        // Make next point to temp
+        head->next = temp;
+ 
+        // Get to the next node in the list
+        head = nex;
+    }
+ 
+    return head;
+}
+ 
+/* Driver program to test above function*/
+int main()
+{
+    Node* head = newNode(50);
+    head->next = newNode(20);
+    head->next->next = newNode(15);
+    head->next->next->next = newNode(4);
+    head->next->next->next->next = newNode(10);
+ 
+    /* Create a loop for testing */
+    head->next->next->next->next->next = head->next->next;
+ 
+    Node* res = detectLoop(head);
+    if (res == NULL)
+        cout << "Loop does not exist";
+    else
+        cout << "Loop starting node is " << res->key;
+ 
+    return 0;
+}
+ 
+Output: 
+Loop starting node is 15
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+Remove Duplicates in a sorted Linked List
+----------------------------------------------
+Write a function that takes a list sorted in non-decreasing order and deletes any duplicate nodes from the list. The list should only be traversed once. 
+For example if the linked list is 11->11->11->21->43->43->60 then removeDuplicates() should convert the list to 11->21->43->60. 
+
+Algorithm: Traverse the list from the head (or start) node. While traversing, compare each node with its next node. If the data of the next node is the same as the current node then delete the next node. Before we delete a node, we need to store the next pointer of the node 
+
+Implementation: Functions other than removeDuplicates() are just to create a linked list and test removeDuplicates(). 
+
+/* C++ Program to remove duplicates from a sorted linked list */
+#include <bits/stdc++.h>
+using namespace std;
+  
+/* Link list node */
+class Node 
+{ 
+    public:
+    int data; 
+    Node* next; 
+}; 
+  
+/* The function removes duplicates from a sorted list */
+void removeDuplicates(Node* head) 
+{ 
+    /* Pointer to traverse the linked list */
+    Node* current = head; 
+  
+    /* Pointer to store the next pointer of a node to be deleted*/
+    Node* next_next; 
+      
+    /* do nothing if the list is empty */
+    if (current == NULL) 
+    return; 
+  
+    /* Traverse the list till last node */
+    while (current->next != NULL) 
+    { 
+    /* Compare current node with next node */
+    if (current->data == current->next->data) 
+    { 
+        /* The sequence of steps is important*/        
+        next_next = current->next->next; 
+        free(current->next); 
+        current->next = next_next; 
+    } 
+    else /* This is tricky: only advance if no deletion */
+    { 
+        current = current->next; 
+    } 
+    } 
+} 
+  
+/* UTILITY FUNCTIONS */
+/* Function to insert a node at the beginning of the linked list */
+void push(Node** head_ref, int new_data) 
+{ 
+    /* allocate node */
+    Node* new_node = new Node();
+              
+    /* put in the data */
+    new_node->data = new_data; 
+                  
+    /* link the old list off the new node */
+    new_node->next = (*head_ref);     
+          
+    /* move the head to point to the new node */
+    (*head_ref) = new_node; 
+} 
+  
+/* Function to print nodes in a given linked list */
+void printList(Node *node) 
+{ 
+    while (node!=NULL) 
+    { 
+        cout<<" "<<node->data; 
+        node = node->next; 
+    } 
+} 
+  
+/* Driver program to test above functions*/
+int main() 
+{ 
+    /* Start with the empty list */
+    Node* head = NULL; 
+      
+    /* Let us create a sorted linked list to test the functions 
+    Created linked list will be 11->11->11->13->13->20 */
+    push(&head, 20); 
+    push(&head, 13); 
+    push(&head, 13); 
+    push(&head, 11); 
+    push(&head, 11); 
+    push(&head, 11);                                     
+  
+    cout<<"Linked list before duplicate removal "; 
+    printList(head); 
+  
+    /* Remove duplicates from linked list */
+    removeDuplicates(head); 
+  
+    cout<<"\nLinked list after duplicate removal ";     
+    printList(head);             
+      
+    return 0; 
+} 
+  
+Output
+Linked list before duplicate removal  11 11 11 13 13 20
+Linked list after duplicate removal  11 13 20
+Time Complexity: O(n) where n is the number of nodes in the given linked list.
+Space Complexity: O(1) , as there is no extra space used.
+
+Recursive Approach :  
+
+/* C++ Program to remove duplicates
+from a sorted linked list */
+#include <bits/stdc++.h>
+using namespace std;
+  
+/* Link list node */
+class Node 
+{ 
+    public:
+    int data; 
+    Node* next; 
+}; 
+  
+/* The function removes duplicates 
+from a sorted list */
+void removeDuplicates(Node* head) 
+{ 
+    /* Pointer to store the pointer of a node to be deleted*/
+    Node* to_free; 
+      
+    /* do nothing if the list is empty */
+    if (head == NULL) 
+        return; 
+  
+    /* Traverse the list till last node */
+    if (head->next != NULL) 
+    { 
+          
+        /* Compare head node with next node */
+        if (head->data == head->next->data) 
+        { 
+            /* The sequence of steps is important.
+              to_free pointer stores the next of head
+             pointer which is to be deleted.*/    
+            to_free = head->next; 
+        head->next = head->next->next;
+        free(to_free);
+        removeDuplicates(head);
+        } 
+        else /* This is tricky: only 
+        advance if no deletion */
+        { 
+            removeDuplicates(head->next);
+        } 
+    } 
+} 
+  
+/* UTILITY FUNCTIONS */
+/* Function to insert a node at the
+beginning of the linked list */
+void push(Node** head_ref, int new_data) 
+{ 
+    /* allocate node */
+    Node* new_node = new Node();
+              
+    /* put in the data */
+    new_node->data = new_data; 
+                  
+    /* link the old list off the new node */
+    new_node->next = (*head_ref);     
+          
+    /* move the head to point to the new node */
+    (*head_ref) = new_node; 
+} 
+  
+/* Function to print nodes 
+in a given linked list */
+void printList(Node *node) 
+{ 
+    while (node!=NULL) 
+    { 
+        cout<<" "<<node->data; 
+        node = node->next; 
+    } 
+} 
+  
+/* Driver code*/
+int main() 
+{ 
+    /* Start with the empty list */
+    Node* head = NULL; 
+      
+    /* Let us create a sorted linked
+    list to test the functions 
+    Created linked list will be 
+    11->11->11->13->13->20 */
+    push(&head, 20); 
+    push(&head, 13); 
+    push(&head, 13); 
+    push(&head, 11); 
+    push(&head, 11); 
+    push(&head, 11);                                     
+  
+    cout<<"Linked list before duplicate removal "; 
+    printList(head); 
+  
+    /* Remove duplicates from linked list */
+    removeDuplicates(head); 
+  
+    cout<<"\nLinked list after duplicate removal ";     
+    printList(head);             
+      
+    return 0; 
+} 
+Output
+Linked list before duplicate removal  11 11 11 13 13 20
+Linked list after duplicate removal  11 13 20
+
+Time Complexity: O(n) where n is the number of nodes in the given linked list.
+Auxiliary Space: O(n)
+
+Remove Duplicates in a Un-sorted Linked List
+--------------------------------------------------
+Given an unsorted list of nodes. The task is to remove duplicates from the list. 
+
+Examples:
+
+Input: linked list = 12->11->12->21->41->43->21 
+Output: 12->11->21->41->43. 
+Explanation: Second occurrence o 12 and 21 is removed
+
+Input: linked list = 12->11->12->21->41->43->21 
+Output: 12->11->21->41->43. 
+
+Naive Approach: 
+
+Use two loops, Outer loop is used to pick the elements one by one and the Inner loop compares the picked element with the rest of the elements. 
+
+/* C++ Program to remove duplicates in an unsorted
+   linked list */
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* A linked list node */
+struct Node {
+    int data;
+    struct Node* next;
+};
+ 
+// Utility function to create a new Node
+struct Node* newNode(int data)
+{
+    Node* temp = new Node;
+    temp->data = data;
+    temp->next = NULL;
+    return temp;
+}
+ 
+/* Function to remove duplicates from a
+   unsorted linked list */
+void removeDuplicates(struct Node* start)
+{
+    struct Node *ptr1, *ptr2, *dup;
+    ptr1 = start;
+ 
+    /* Pick elements one by one */
+    while (ptr1 != NULL && ptr1->next != NULL) {
+        ptr2 = ptr1;
+ 
+        /* Compare the picked element with rest
+           of the elements */
+        while (ptr2->next != NULL) {
+            /* If duplicate then delete it */
+            if (ptr1->data == ptr2->next->data) {
+                /* sequence of steps is important here */
+                dup = ptr2->next;
+                ptr2->next = ptr2->next->next;
+                delete (dup);
+            }
+            else /* This is tricky */
+                ptr2 = ptr2->next;
+        }
+        ptr1 = ptr1->next;
+    }
+}
+ 
+/* Function to print nodes in a given linked list */
+void printList(struct Node* node)
+{
+    while (node != NULL) {
+        printf("%d ", node->data);
+        node = node->next;
+    }
+}
+ 
+// Driver code
+int main()
+{
+    /* The constructed linked list is:
+     10->12->11->11->12->11->10*/
+    struct Node* start = newNode(10);
+    start->next = newNode(12);
+    start->next->next = newNode(11);
+    start->next->next->next = newNode(11);
+    start->next->next->next->next = newNode(12);
+    start->next->next->next->next->next = newNode(11);
+    start->next->next->next->next->next->next = newNode(10);
+ 
+    printf("Linked list before removing duplicates ");
+    printList(start);
+ 
+    removeDuplicates(start);
+ 
+    printf("\nLinked list after removing duplicates ");
+    printList(start);
+    return 0;
+}
+Output
+Linked list before removing duplicates 10 12 11 11 12 11 10 
+Linked list after removing duplicates 10 12 11 
+Time Complexity: O(N2)
+Auxiliary Space: O(1)
+
+Remove duplicates from an unsorted linked list using sorting:
+Follow the below steps to Implement the idea:
+
+Sort the elements using Merge Sort for Linked Lists.
+Remove duplicates in linear time using the algorithm for removing duplicates in sorted Linked List.
+Note: that this method doesn’t preserve the original order of elements.
+
+Time Complexity: O(N logN)
+Auxiliary Space: O(1)
+
+
+Using Hashing:
+Traverse the link list from head to end. For every newly encountered element, check whether if it is in the hash table: if yes, we remove it; otherwise put it in the hash table.
+
+Follow the below steps to Implement the idea:
+
+Create a Unordered set to keep a track of the visited elements.
+Traverse the linked list from head to end node 
+If current node is already present in the Hashset. Then delete the current node. 
+Else move insert the node in the Hashset and move to the next node.
+Return 
+
+/* C++ Program to remove duplicates in an unsorted
+   linked list */
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* A linked list node */
+struct Node {
+    int data;
+    struct Node* next;
+};
+ 
+// Utility function to create a new Node
+struct Node* newNode(int data)
+{
+    Node* temp = new Node;
+    temp->data = data;
+    temp->next = NULL;
+    return temp;
+}
+ 
+/* Function to remove duplicates from a
+   unsorted linked list */
+void removeDuplicates(struct Node* start)
+{
+    // Hash to store seen values
+    unordered_set<int> seen;
+ 
+    /* Pick elements one by one */
+    struct Node* curr = start;
+    struct Node* prev = NULL;
+    while (curr != NULL) {
+        // If current value is seen before
+        if (seen.find(curr->data) != seen.end()) {
+            prev->next = curr->next;
+            delete (curr);
+        }
+        else {
+            seen.insert(curr->data);
+            prev = curr;
+        }
+        curr = prev->next;
+    }
+}
+ 
+/* Function to print nodes in a given linked list */
+void printList(struct Node* node)
+{
+    while (node != NULL) {
+        printf("%d ", node->data);
+        node = node->next;
+    }
+}
+ 
+/* Driver program to test above function */
+int main()
+{
+    /* The constructed linked list is:
+     10->12->11->11->12->11->10*/
+    struct Node* start = newNode(10);
+    start->next = newNode(12);
+    start->next->next = newNode(11);
+    start->next->next->next = newNode(11);
+    start->next->next->next->next = newNode(12);
+    start->next->next->next->next->next = newNode(11);
+    start->next->next->next->next->next->next = newNode(10);
+ 
+    printf("Linked list before removing duplicates : \n");
+    printList(start);
+ 
+    removeDuplicates(start);
+ 
+    printf("\nLinked list after removing duplicates : \n");
+    printList(start);
+ 
+    return 0;
+}
+Output
+Linked list before removing duplicates : 
+10 12 11 11 12 11 10 
+Linked list after removing duplicates : 
+10 12 11 
+
+Time Complexity: O(N), on average (assuming that hash table access time is O(1) on average).  
+Auxiliary Space : O(N), As extra space is used to store the elements in the stack.
+
+Write a Program to Move the last element to Front in a Linked List
+--------------------------------------------------------------------
+Write a function that moves the last node to the front in a given Singly Linked List.
+
+Examples:
+
+Input: 1->2->3->4->5
+Output: 5->1->2->3->4
+
+Input: 3->8->1->5->7->12
+Output: 12->3->8->1->5->7  
+
+Approach: To solve the problem follow the below idea:
+
+Traverse the list till the last node. Use two pointers: one to store the address of the last node and other for the address of the second last node. After the end of loop, make the second last node as the last node and the last node as the head node
+
+Follow the given steps to solve the problem using the above approach:
+
+Traverse the linked list till the last node and Initialize two pointers to store the address of the last and the second last node
+Then follow these three steps to move the last node to the front
+   Make second last as last (secLast->next = NULL). 
+   Set next of last as head (last->next = *head_ref). 
+   Make last as head ( *head_ref = last)
+
+/* CPP Program to move last element
+to front in a given linked list */
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* A linked list node */
+class Node {
+public:
+    int data;
+    Node* next;
+};
+ 
+/* We are using a double pointer
+head_ref here because we change
+head of the linked list inside
+this function.*/
+void moveToFront(Node** head_ref)
+{
+    /* If linked list is empty, or
+    it contains only one node,
+    then nothing needs to be done,
+    simply return */
+    if (*head_ref == NULL || (*head_ref)->next == NULL)
+        return;
+ 
+    /* Initialize second last
+    and last pointers */
+    Node* secLast = NULL;
+    Node* last = *head_ref;
+ 
+    /*After this loop secLast contains
+    address of second last node and
+    last contains address of last node in Linked List */
+    while (last->next != NULL) {
+        secLast = last;
+        last = last->next;
+    }
+ 
+    /* Set the next of second last as NULL */
+    secLast->next = NULL;
+ 
+    /* Set next of last as head node */
+    last->next = *head_ref;
+ 
+    /* Change the head pointer
+    to point to last node now */
+    *head_ref = last;
+}
+ 
+/* UTILITY FUNCTIONS */
+/* Function to add a node
+at the beginning of Linked List */
+void push(Node** head_ref, int new_data)
+{
+    /* allocate node */
+    Node* new_node = new Node();
+ 
+    /* put in the data */
+    new_node->data = new_data;
+ 
+    /* link the old list off the new node */
+    new_node->next = (*head_ref);
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+/* Function to print nodes in a given linked list */
+void printList(Node* node)
+{
+    while (node != NULL) {
+        cout << node->data << " ";
+        node = node->next;
+    }
+}
+ 
+// Driver's code
+int main()
+{
+    Node* start = NULL;
+ 
+    /* The constructed linked list is:
+    1->2->3->4->5 */
+    push(&start, 5);
+    push(&start, 4);
+    push(&start, 3);
+    push(&start, 2);
+    push(&start, 1);
+ 
+    cout << "Linked list before moving last to front\n";
+    printList(start);
+ 
+      // Function call
+    moveToFront(&start);
+ 
+    cout << "\nLinked list after removing last to front\n";
+    printList(start);
+ 
+    return 0;
+}
+ 
+Output
+Linked list before moving last to front
+1 2 3 4 5 
+Linked list after removing last to front
+5 1 2 3 4 
+Time Complexity: O(N), As we need to traverse the list once.
+Auxiliary Space: O(1), As constant extra space is used.
+
+Add “1” to a number represented as a Linked List
+--------------------------------------------------
+Number is represented in linked list such that each digit corresponds to a node in linked list. Add 1 to it. For example 1999 is represented as (1-> 9-> 9 -> 9) and adding 1 to it should change it to (2->0->0->0) 
+
+Below are the steps : 
+
+Reverse given linked list. For example, 1-> 9-> 9 -> 9 is converted to 9-> 9 -> 9 ->1.
+Start traversing linked list from leftmost node and add 1 to it. If there is a carry, move to the next node. Keep moving to the next node while there is a carry.
+Reverse modified linked list and return head.
+
+// C++ program to add 1 to a linked list 
+#include <bits/stdc++.h>
+using namespace std;
+  
+/* Linked list node */
+class Node 
+{ 
+    public:
+    int data; 
+    Node* next; 
+}; 
+  
+/* Function to create a new node with given data */
+Node *newNode(int data) 
+{ 
+    Node *new_node = new Node; 
+    new_node->data = data; 
+    new_node->next = NULL; 
+    return new_node; 
+} 
+  
+/* Function to reverse the linked list */
+Node *reverse(Node *head) 
+{ 
+    Node * prev = NULL; 
+    Node * current = head; 
+    Node * next; 
+    while (current != NULL) 
+    { 
+        next = current->next; 
+        current->next = prev; 
+        prev = current; 
+        current = next; 
+    } 
+    return prev; 
+} 
+  
+/* Adds one to a linked lists and return the head 
+node of resultant list */
+Node *addOneUtil(Node *head) 
+{ 
+    // res is head node of the resultant list 
+    Node* res = head; 
+    Node *temp; 
+  
+    int carry = 1, sum; 
+  
+    while (head != NULL) //while both lists exist 
+    { 
+        // Calculate value of next digit in resultant list. 
+        // The next digit is sum of following things 
+        // (i) Carry 
+        // (ii) Next digit of head list (if there is a 
+        // next digit) 
+        sum = carry + head->data; 
+  
+        // update carry for next calculation 
+        carry = (sum >= 10)? 1 : 0; 
+  
+        // update sum if it is greater than 10 
+        sum = sum % 10; 
+  
+        // Create a new node with sum as data 
+        head->data = sum; 
+  
+        // Move head and second pointers to next nodes 
+        temp = head; 
+        head = head->next; 
+    } 
+  
+    // if some carry is still there, add a new node to 
+    // result list. 
+    if (carry > 0) 
+        temp->next = newNode(carry); 
+  
+    // return head of the resultant list 
+    return res; 
+} 
+  
+// This function mainly uses addOneUtil(). 
+Node* addOne(Node *head) 
+{ 
+    // Reverse linked list 
+    head = reverse(head); 
+  
+    // Add one from left to right of reversed 
+    // list 
+    head = addOneUtil(head); 
+  
+    // Reverse the modified list 
+    return reverse(head); 
+} 
+  
+// A utility function to print a linked list 
+void printList(Node *node) 
+{ 
+    while (node != NULL) 
+    { 
+        cout << node->data; 
+        node = node->next; 
+    } 
+    cout<<endl;
+} 
+  
+/* Driver program to test above function */
+int main(void) 
+{ 
+    Node *head = newNode(1); 
+    head->next = newNode(9); 
+    head->next->next = newNode(9); 
+    head->next->next->next = newNode(9); 
+  
+    cout << "List is "; 
+    printList(head); 
+  
+    head = addOne(head); 
+  
+    cout << "\nResultant list is "; 
+    printList(head); 
+  
+    return 0; 
+} 
+  
+Output
+List is 1999
+Resultant list is 2000
+Time Complexity: O(n)
+Here n is the number of nodes in the linked list.
+Auxiliary Space: O(1)
+As constant extra space is used.
+
+Recursive Implementation: 
+
+We can recursively reach the last node and forward carry to previous nodes. Recursive solution doesn’t require reversing of linked list. We can also use a stack in place of recursion to temporarily hold nodes.
+
+// Recursive C++ program to add 1 to a linked list
+#include <bits/stdc++.h>
+  
+/* Linked list node */
+struct Node {
+    int data;
+    Node* next;
+};
+  
+/* Function to create a new node with given data */
+Node* newNode(int data)
+{
+    Node* new_node = new Node;
+    new_node->data = data;
+    new_node->next = NULL;
+    return new_node;
+}
+  
+// Recursively add 1 from end to beginning and returns
+// carry after all nodes are processed.
+int addWithCarry(Node* head)
+{
+    // If linked list is empty, then
+    // return carry
+    if (head == NULL)
+        return 1;
+  
+    // Add carry returned be next node call
+    int res = head->data + addWithCarry(head->next);
+  
+    // Update data and return new carry
+    head->data = (res) % 10;
+    return (res) / 10;
+}
+  
+// This function mainly uses addWithCarry().
+Node* addOne(Node* head)
+{
+    // Add 1 to linked list from end to beginning
+    int carry = addWithCarry(head);
+  
+    // If there is carry after processing all nodes,
+    // then we need to add a new node to linked list
+    if (carry) {
+        Node* newNode = new Node;
+        newNode->data = carry;
+        newNode->next = head;
+        return newNode; // New node becomes head now
+    }
+  
+    return head;
+}
+  
+// A utility function to print a linked list
+void printList(Node* node)
+{
+    while (node != NULL) {
+        printf("%d", node->data);
+        node = node->next;
+    }
+    printf("\n");
+}
+  
+/* Driver code */
+int main(void)
+{
+    Node* head = newNode(1);
+    head->next = newNode(9);
+    head->next->next = newNode(9);
+    head->next->next->next = newNode(9);
+  
+    printf("List is ");
+    printList(head);
+  
+    head = addOne(head);
+  
+    printf("\nResultant list is ");
+    printList(head);
+  
+    return 0;
+}
+Output
+List is 1999
+Resultant list is 2000
+Time Complexity: O(n)
+Here n is the number of nodes in the linked list.
+Auxiliary Space: O(n)
+The extra space is used in recursion call stack.
+
+Simple approach and easy implementation: The idea is to store the last non 9 digit pointer so that if the last pointer is zero we can replace all the nodes after stored node(which contains the location of last digit before 9) to 0 and add the value of the stored node by 1
+
+// Recursive C++ program to add 1 to a linked list
+#include <bits/stdc++.h>
+  
+/* Linked list node */
+struct Node {
+    int data;
+    Node* next;
+};
+  
+/* Function to create a new node with given data */
+Node* newNode(int data)
+{
+    Node* new_node = new Node;
+    new_node->data = data;
+    new_node->next = NULL;
+    return new_node;
+}
+  
+Node* addOne(Node* head)
+{
+    // Your Code here
+    // return head of list after adding one
+    Node* ln = head;
+    if (head->next == NULL) {
+        head->data += 1;
+        return head;
+    }
+    Node* t = head;
+    int prev;
+    while (t->next) {
+        if (t->data != 9) {
+            ln = t;
+        }
+        t = t->next;
+    }
+    if (t->data == 9 && ln != NULL) {
+        if (ln->data == 9 && ln == head) {
+            Node* temp = newNode(1);
+            temp->next = head;
+            head = temp;
+            t = ln;
+        }
+        else {
+            t = ln;
+            t->data += 1;
+            t = t->next;
+        }
+        while (t) {
+            t->data = 0;
+            t = t->next;
+        }
+    }
+    else {
+        t->data += 1;
+    }
+    return head;
+}
+  
+// A utility function to print a linked list
+void printList(Node* node)
+{
+    while (node != NULL) {
+        printf("%d->", node->data);
+        node = node->next;
+    }
+    printf("NULL");
+    printf("\n");
+}
+  
+/* Driver code */
+int main(void)
+{
+    Node* head = newNode(1);
+    head->next = newNode(9);
+    head->next->next = newNode(9);
+    head->next->next->next = newNode(9);
+  
+    printf("List is ");
+    printList(head);
+  
+    head = addOne(head);
+  
+    printf("\nResultant list is ");
+    printList(head);
+  
+    return 0;
+}
+
+Output
+List is 1999
+Resultant list is 2000
+Time Complexity: O(n)
+Here n is the number of nodes in the linked list.
+Auxiliary Space: O(1)
+As constant extra space is used.
+
+Intersection of two Sorted Linked List
+--------------------------------------------
+Given two lists sorted in increasing order, create and return a new list representing the intersection of the two lists. The new list should be made with its own memory — the original lists should not be changed. 
+
+Example: 
+
+Input: 
+First linked list: 1->2->3->4->6
+Second linked list be 2->4->6->8, 
+Output: 2->4->6.
+The elements 2, 4, 6 are common in 
+both the list so they appear in the 
+intersection list. 
+
+Input: 
+First linked list: 1->2->3->4->5
+Second linked list be 2->3->4, 
+Output: 2->3->4
+The elements 2, 3, 4 are common in 
+both the list so they appear in the 
+intersection list.
+
+Method 1: Using Dummy Node. 
+Approach: 
+The idea is to use a temporary dummy node at the start of the result list. The pointer tail always points to the last node in the result list, so new nodes can be added easily. The dummy node initially gives the tail a memory space to point to. This dummy node is efficient, since it is only temporary, and it is allocated in the stack. The loop proceeds, removing one node from either ‘a’ or ‘b’ and adding it to the tail. When the given lists are traversed the result is in dummy. next, as the values are allocated from next node of the dummy. If both the elements are equal then remove both and insert the element to the tail. Else remove the smaller element among both the lists. 
+
+Below is the implementation of the above approach:
+
+
+#include<bits/stdc++.h>
+using namespace std;
+ 
+/* Link list node */
+struct Node {
+    int data;
+    Node* next;
+};
+ 
+void push(Node** head_ref, int new_data);
+ 
+/*This solution uses the temporary
+ dummy to build up the result list */
+Node* sortedIntersect(Node* a, Node* b)
+{
+    Node dummy;
+    Node* tail = &dummy;
+    dummy.next = NULL;
+ 
+    /* Once one or the other
+    list runs out -- we're done */
+    while (a != NULL && b != NULL) {
+        if (a->data == b->data) {
+            push((&tail->next), a->data);
+            tail = tail->next;
+            a = a->next;
+            b = b->next;
+        }
+        /* advance the smaller list */
+        else if (a->data < b->data)
+            a = a->next;
+        else
+            b = b->next;
+    }
+    return (dummy.next);
+}
+ 
+/* UTILITY FUNCTIONS */
+/* Function to insert a node at
+the beginning of the linked list */
+void push(Node** head_ref, int new_data)
+{
+    /* allocate node */
+    Node* new_node = (Node*)malloc(
+        sizeof(Node));
+ 
+    /* put in the data  */
+    new_node->data = new_data;
+ 
+    /* link the old list of the new node */
+    new_node->next = (*head_ref);
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+/* Function to print nodes in
+   a given linked list */
+void printList(Node* node)
+{
+    while (node != NULL) {
+        cout << node->data <<" ";
+        node = node->next;
+    }
+}
+ 
+/* Driver program to test above functions*/
+int main()
+{
+    /* Start with the empty lists */
+    Node* a = NULL;
+    Node* b = NULL;
+    Node* intersect = NULL;
+ 
+    /* Let us create the first sorted
+     linked list to test the functions
+     Created linked list will be
+     1->2->3->4->5->6 */
+    push(&a, 6);
+    push(&a, 5);
+    push(&a, 4);
+    push(&a, 3);
+    push(&a, 2);
+    push(&a, 1);
+ 
+    /* Let us create the second sorted linked list
+   Created linked list will be 2->4->6->8 */
+    push(&b, 8);
+    push(&b, 6);
+    push(&b, 4);
+    push(&b, 2);
+ 
+    /* Find the intersection two linked lists */
+    intersect = sortedIntersect(a, b);
+ 
+    cout<<"Linked list containing common items of a & b \n";
+    printList(intersect);
+}
+Output
+Linked list containing common items of a & b 
+2 4 6 
+Complexity Analysis: 
+
+Time Complexity: O(m+n) where m and n are number of nodes in first and second linked lists respectively. 
+Only one traversal of the lists are needed.
+Auxiliary Space: O(min(m, n)). 
+The output list can store at most min(m,n) nodes .
+Method 2: Using Local References. 
+Approach: This solution is structurally very similar to the above, but it avoids using a dummy node Instead, it maintains a struct node** pointer, lastPtrRef, that always points to the last pointer of the result list. This solves the same case that the dummy node did — dealing with the result list when it is empty. If the list is built at its tail, either the dummy node or the struct node** “reference” strategy can be used. 
+
+Below is the implementation of the above approach:
+
+
+// C++ program to implement above approach
+#include <bits/stdc++.h>
+ 
+/* Link list node */
+struct Node {
+    int data;
+    struct Node* next;
+};
+ 
+void push(struct Node** head_ref,
+          int new_data);
+ 
+/* This solution uses the local reference */
+struct Node* sortedIntersect(
+    struct Node* a,
+    struct Node* b)
+{
+    struct Node* result = NULL;
+    struct Node** lastPtrRef = &result;
+ 
+    /* Advance comparing the first
+     nodes in both lists.
+    When one or the other list runs
+     out, we're done. */
+    while (a != NULL && b != NULL) {
+        if (a->data == b->data) {
+            /* found a node for the intersection */
+            push(lastPtrRef, a->data);
+            lastPtrRef = &((*lastPtrRef)->next);
+            a = a->next;
+            b = b->next;
+        }
+        else if (a->data < b->data)
+            a = a->next; /* advance the smaller list */
+        else
+            b = b->next;
+    }
+    return (result);
+}
+ 
+/* UTILITY FUNCTIONS */
+/* Function to insert a node at the
+   beginning of the linked list */
+void push(struct Node** head_ref,
+          int new_data)
+{
+    /* allocate node */
+    struct Node* new_node = (struct Node*)malloc(
+        sizeof(struct Node));
+ 
+    /* put in the data  */
+    new_node->data = new_data;
+ 
+    /* link the old list of the new node */
+    new_node->next = (*head_ref);
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+/* Function to print nodes in a given linked list */
+void printList(struct Node* node)
+{
+    while (node != NULL) {
+        printf("%d ", node->data);
+        node = node->next;
+    }
+}
+ 
+/* Driver program to test above functions*/
+int main()
+{
+    /* Start with the empty lists */
+    struct Node* a = NULL;
+    struct Node* b = NULL;
+    struct Node* intersect = NULL;
+ 
+    /* Let us create the first sorted
+     linked list to test the functions
+   Created linked list will be
+   1->2->3->4->5->6 */
+    push(&a, 6);
+    push(&a, 5);
+    push(&a, 4);
+    push(&a, 3);
+    push(&a, 2);
+    push(&a, 1);
+ 
+    /* Let us create the second sorted linked list
+   Created linked list will be 2->4->6->8 */
+    push(&b, 8);
+    push(&b, 6);
+    push(&b, 4);
+    push(&b, 2);
+ 
+    /* Find the intersection two linked lists */
+    intersect = sortedIntersect(a, b);
+ 
+    printf("\n Linked list containing common items of a & b \n ");
+    printList(intersect);
+ 
+    return 0;
+}
+ 
+Output
+Linked list containing common items of a & b 
+2 4 6 
+Complexity Analysis: 
+Time Complexity: O(m+n) where m and n are number of nodes in first and second linked lists respectively. 
+Only one traversal of the lists are needed.
+Auxiliary Space: O(max(m, n)). 
+The output list can store at most m+n nodes.
+
+Intersection Point of two Linked Lists
+---------------------------------------------
+There are two singly linked lists in a system. By some programming error, the end node of one of the linked lists got linked to the second list, forming an inverted Y-shaped list. Write a program to get the point where two linked lists merge. 
+
+Method 1(Simply use two loops):
+Use 2 nested for loops. The outer loop will be for each node of the 1st list and the inner loop will be for the 2nd list. In the inner loop, check if any of the nodes of the 2nd list is the same as the current node of the first linked list. The time complexity of this method will be O(M * N) where m and n are the numbers of nodes in two lists.
+
+// C++ program to get intersection point of two linked list
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* Link list node */
+class Node {
+public:
+    int data;
+    Node* next;
+};
+ 
+/* function to get the intersection point of two linked
+lists head1 and head2 */
+Node* getIntesectionNode(Node* head1, Node* head2)
+{
+    while (head2) {
+        Node* temp = head1;
+        while (temp) {
+            // if both Nodes are same
+            if (temp == head2)
+                return head2;
+            temp = temp->next;
+        }
+        head2 = head2->next;
+    }
+    // intersection is not present between the lists
+    return NULL;
+}
+ 
+// Driver Code
+int main()
+{
+    /*
+        Create two linked lists
+ 
+        1st 3->6->9->15->30
+        2nd 10->15->30
+ 
+        15 is the intersection point
+    */
+ 
+    Node* newNode;
+ 
+    // Addition of new nodes
+    Node* head1 = new Node();
+    head1->data = 10;
+ 
+    Node* head2 = new Node();
+    head2->data = 3;
+ 
+    newNode = new Node();
+    newNode->data = 6;
+    head2->next = newNode;
+ 
+    newNode = new Node();
+    newNode->data = 9;
+    head2->next->next = newNode;
+ 
+    newNode = new Node();
+    newNode->data = 15;
+    head1->next = newNode;
+    head2->next->next->next = newNode;
+ 
+    newNode = new Node();
+    newNode->data = 30;
+    head1->next->next = newNode;
+ 
+    head1->next->next->next = NULL;
+ 
+    Node* intersectionPoint
+        = getIntesectionNode(head1, head2);
+ 
+    if (!intersectionPoint)
+        cout << " No Intersection Point \n";
+    else
+        cout << "Intersection Point: "
+             << intersectionPoint->data << endl;
+}
+ 
+Output
+Intersection Point: 15
+Time Complexity: O(m*n), where m and n are number of nodes in two linked list.
+Space Complexity: O(1), Constant Space is used.
+
+Method 2 (Mark Visited Nodes):
+This solution requires modifications to the basic linked list data structure. Have a visited flag with each node. Traverse the first linked list and keep marking visited nodes. Now traverse the second linked list, If you see a visited node again then there is an intersection point, return the intersecting node. This solution works in O(m+n) but requires additional information with each node. A variation of this solution that doesn’t require modification to the basic data structure can be implemented using a hash. Traverse the first linked list and store the addresses of visited nodes in a hash. Now traverse the second linked list and if you see an address that already exists in the hash then return the intersecting node.
+
+Method 3(Using the difference in node counts) 
+
+Get the count of the nodes in the first list, let the count be c1.
+Get the count of the nodes in the second list, let the count be c2.
+Get the difference of counts d = abs(c1 – c2)
+Now traverse the bigger list from the first node to d nodes so that from here onwards both the lists have an equal no of nodes
+Then we can traverse both lists in parallel till we come across a common node. (Note that getting a common node is done by comparing the address of the nodes)
+Below image is a dry run of the above approach:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// C++ program to get intersection point of two linked list
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* Link list node */
+class Node {
+public:
+    int data;
+    Node* next;
+};
+ 
+/* Function to get the counts of node in a linked list */
+int getCount(Node* head);
+ 
+/* function to get the intersection point of two linked
+lists head1 and head2 where head1 has d more nodes than
+head2 */
+int _getIntesectionNode(int d, Node* head1, Node* head2);
+ 
+/* function to get the intersection point of two linked
+lists head1 and head2 */
+int getIntesectionNode(Node* head1, Node* head2)
+{
+ 
+    // Count the number of nodes in
+    // both the linked list
+    int c1 = getCount(head1);
+    int c2 = getCount(head2);
+    int d;
+ 
+    // If first is greater
+    if (c1 > c2) {
+        d = c1 - c2;
+        return _getIntesectionNode(d, head1, head2);
+    }
+    else {
+        d = c2 - c1;
+        return _getIntesectionNode(d, head2, head1);
+    }
+}
+ 
+/* function to get the intersection point of two linked
+lists head1 and head2 where head1 has d more nodes than
+head2 */
+int _getIntesectionNode(int d, Node* head1, Node* head2)
+{
+    // Stand at the starting of the bigger list
+    Node* current1 = head1;
+    Node* current2 = head2;
+ 
+    // Move the pointer forward
+    for (int i = 0; i < d; i++) {
+        if (current1 == NULL) {
+            return -1;
+        }
+        current1 = current1->next;
+    }
+ 
+    // Move both pointers of both list till they
+    // intersect with each other
+    while (current1 != NULL && current2 != NULL) {
+        if (current1 == current2)
+            return current1->data;
+ 
+        // Move both the pointers forward
+        current1 = current1->next;
+        current2 = current2->next;
+    }
+ 
+    return -1;
+}
+ 
+/* Takes head pointer of the linked list and
+returns the count of nodes in the list */
+int getCount(Node* head)
+{
+    Node* current = head;
+ 
+    // Counter to store count of nodes
+    int count = 0;
+ 
+    // Iterate till NULL
+    while (current != NULL) {
+ 
+        // Increase the counter
+        count++;
+ 
+        // Move the Node ahead
+        current = current->next;
+    }
+ 
+    return count;
+}
+ 
+// Driver Code
+int main()
+{
+    /*
+        Create two linked lists
+     
+        1st 3->6->9->15->30
+        2nd 10->15->30
+     
+        15 is the intersection point
+    */
+ 
+    Node* newNode;
+ 
+    // Addition of new nodes
+    Node* head1 = new Node();
+    head1->data = 10;
+ 
+    Node* head2 = new Node();
+    head2->data = 3;
+ 
+    newNode = new Node();
+    newNode->data = 6;
+    head2->next = newNode;
+ 
+    newNode = new Node();
+    newNode->data = 9;
+    head2->next->next = newNode;
+ 
+    newNode = new Node();
+    newNode->data = 15;
+    head1->next = newNode;
+    head2->next->next->next = newNode;
+ 
+    newNode = new Node();
+    newNode->data = 30;
+    head1->next->next = newNode;
+ 
+    head1->next->next->next = NULL;
+ 
+    cout << "The node of intersection is " << getIntesectionNode(head1, head2);
+}
+
+Output
+The node of intersection is 15
+Time Complexity: O(m+n) 
+Auxiliary Space: O(1)
+
+Merge Sort For Linked lists.[Very Important]	
+-----------------------------------------------------
+Approach : This approach is simpler and uses log n space.
+
+If the size of the linked list is 1 then return the head
+Find mid using The Tortoise and The Hare Approach
+Store the next of mid in head2 i.e. the right sub-linked list.
+Now Make the next midpoint null.
+Recursively call mergeSort() on both left and right sub-linked list and store the new head of the left and right linked list.
+Call merge() given the arguments new heads of left and right sub-linked lists and store the final head returned after merging.
+Return the final head of the merged linkedlist.
+merge(head1, head2):
+
+Take a pointer say merged to store the merged list in it and store a dummy node in it.
+Take a pointer temp and assign merge to it.
+If the data of head1 is less than the data of head2, then, store head1 in next of temp & move head1 to the next of head1.
+Else store head2 in next of temp & move head2 to the next of head2.
+Move temp to the next of temp.
+Repeat steps 3, 4 & 5 until head1 is not equal to null and head2 is not equal to null.
+Now add any remaining nodes of the first or the second linked list to the merged linked list.
+Return the next of merged(that will ignore the dummy and return the head of the final merged linked list)
+
+#include <iostream>
+using namespace std;
+ 
+// Node structure
+struct Node {
+    int data;
+    Node* next;
+};
+ 
+// function to insert in list
+void insert(int x, Node** head)
+{
+    if (*head == NULL) {
+        *head = new Node;
+        (*head)->data = x;
+        (*head)->next = NULL;
+        return;
+    }
+    Node* temp = new Node;
+    temp->data = (*head)->data;
+    temp->next = (*head)->next;
+    (*head)->data = x;
+    (*head)->next = temp;
+}
+ 
+// function to print the list
+void print(Node* head)
+{
+    Node* temp = head;
+    while (temp != NULL) {
+        cout << temp->data << " ";
+        temp = temp->next;
+    }
+}
+ 
+Node* merge(Node* firstNode, Node* secondNode)
+{
+    Node* merged = new Node;
+    Node* temp = new Node;
+ 
+    // merged is equal to temp so in the end we have the top
+    // Node.
+    merged = temp;
+ 
+    // while either firstNode or secondNode becomes NULL
+    while (firstNode != NULL && secondNode != NULL) {
+ 
+        if (firstNode->data <= secondNode->data) {
+            temp->next = firstNode;
+            firstNode = firstNode->next;
+        }
+ 
+        else {
+            temp->next = secondNode;
+            secondNode = secondNode->next;
+        }
+        temp = temp->next;
+    }
+ 
+    // any remaining Node in firstNode or secondNode gets
+    // inserted in the temp List
+    while (firstNode != NULL) {
+        temp->next = firstNode;
+        firstNode = firstNode->next;
+        temp = temp->next;
+    }
+ 
+    while (secondNode != NULL) {
+        temp->next = secondNode;
+        secondNode = secondNode->next;
+        temp = temp->next;
+    }
+    // return the head of the sorted list
+    return merged->next;
+}
+ 
+// function to calculate the middle Element
+Node* middle(Node* head)
+{
+    Node* slow = head;
+    Node* fast = head->next;
+ 
+    while (!slow->next && (!fast && !fast->next)) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    return slow;
+}
+ 
+// function to sort the given list
+Node* sort(Node* head)
+{
+ 
+    if (head->next == NULL) {
+        return head;
+    }
+ 
+    Node* mid = new Node;
+    Node* head2 = new Node;
+    mid = middle(head);
+    head2 = mid->next;
+    mid->next = NULL;
+    // recursive call to sort() hence diving our problem,
+    // and then merging the solution
+    Node* finalhead = merge(sort(head), sort(head2));
+    return finalhead;
+}
+int main(void)
+{
+    Node* head = NULL;
+    int n[] = { 7, 10, 5, 20, 3, 2 };
+    for (int i = 0; i < 6; i++) {
+        insert(n[i], &head); // inserting in the list
+    }
+    cout << "Sorted Linked List is: \n";
+    print(sort(head)); // printing the sorted list returned
+                       // by sort()
+    return 0;
+}
+ 
+Output
+Sorted Linked List is: 
+2 3 5 7 10 20 
+Time Complexity: O(n*log n)
+Auxiliary Space: O(log n)
+
+Quicksort for Linked Lists.[Very Important]	
+----------------------------------------------------
+Given a linked list, apply the Quick sort algorithm to sort the linked list. The important things about implementation are, that it changes pointers rather than swapping data.
+
+Example:
+
+Follow the given steps to solve the problem:
+
+Call partition function to get a pivot node placed at its correct position
+In the partition function, the last element is considered a pivot
+Then traverse the current list and if a node has a value greater than the pivot, then move it after the tail. If the node has a smaller value, then keep it at its current position. 
+Return pivot node
+Find the tail node of the list which is on the left side of the pivot and recur for the left list
+Similarly, after the left side, recur for the list on the right side of the pivot
+Now return the head of the linked list after joining the left and the right list, as the whole linked list is now sorted
+
+// C++ program for Quick Sort on Singly Linked List
+ 
+#include <cstdio>
+#include <iostream>
+using namespace std;
+ 
+/* a node of the singly linked list */
+struct Node {
+    int data;
+    struct Node* next;
+};
+ 
+/* A utility function to insert a node at the beginning of
+ * linked list */
+void push(struct Node** head_ref, int new_data)
+{
+    /* allocate node */
+    struct Node* new_node = new Node;
+ 
+    /* put in the data */
+    new_node->data = new_data;
+ 
+    /* link the old list of the new node */
+    new_node->next = (*head_ref);
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+/* A utility function to print linked list */
+void printList(struct Node* node)
+{
+    while (node != NULL) {
+        printf("%d ", node->data);
+        node = node->next;
+    }
+    printf("\n");
+}
+ 
+// Returns the last node of the list
+struct Node* getTail(struct Node* cur)
+{
+    while (cur != NULL && cur->next != NULL)
+        cur = cur->next;
+    return cur;
+}
+ 
+// Partitions the list taking the last element as the pivot
+struct Node* partition(struct Node* head, struct Node* end,
+                       struct Node** newHead,
+                       struct Node** newEnd)
+{
+    struct Node* pivot = end;
+    struct Node *prev = NULL, *cur = head, *tail = pivot;
+ 
+    // During partition, both the head and end of the list
+    // might change which is updated in the newHead and
+    // newEnd variables
+    while (cur != pivot) {
+        if (cur->data < pivot->data) {
+            // First node that has a value less than the
+            // pivot - becomes the new head
+            if ((*newHead) == NULL)
+                (*newHead) = cur;
+ 
+            prev = cur;
+            cur = cur->next;
+        }
+        else // If cur node is greater than pivot
+        {
+            // Move cur node to next of tail, and change
+            // tail
+            if (prev)
+                prev->next = cur->next;
+            struct Node* tmp = cur->next;
+            cur->next = NULL;
+            tail->next = cur;
+            tail = cur;
+            cur = tmp;
+        }
+    }
+ 
+    // If the pivot data is the smallest element in the
+    // current list, pivot becomes the head
+    if ((*newHead) == NULL)
+        (*newHead) = pivot;
+ 
+    // Update newEnd to the current last node
+    (*newEnd) = tail;
+ 
+    // Return the pivot node
+    return pivot;
+}
+ 
+// here the sorting happens exclusive of the end node
+struct Node* quickSortRecur(struct Node* head,
+                            struct Node* end)
+{
+    // base condition
+    if (!head || head == end)
+        return head;
+ 
+    Node *newHead = NULL, *newEnd = NULL;
+ 
+    // Partition the list, newHead and newEnd will be
+    // updated by the partition function
+    struct Node* pivot
+        = partition(head, end, &newHead, &newEnd);
+ 
+    // If pivot is the smallest element - no need to recur
+    // for the left part.
+    if (newHead != pivot) {
+        // Set the node before the pivot node as NULL
+        struct Node* tmp = newHead;
+        while (tmp->next != pivot)
+            tmp = tmp->next;
+        tmp->next = NULL;
+ 
+        // Recur for the list before pivot
+        newHead = quickSortRecur(newHead, tmp);
+ 
+        // Change next of last node of the left half to
+        // pivot
+        tmp = getTail(newHead);
+        tmp->next = pivot;
+    }
+ 
+    // Recur for the list after the pivot element
+    pivot->next = quickSortRecur(pivot->next, newEnd);
+ 
+    return newHead;
+}
+ 
+// The main function for quick sort. This is a wrapper over
+// recursive function quickSortRecur()
+void quickSort(struct Node** headRef)
+{
+    (*headRef)
+        = quickSortRecur(*headRef, getTail(*headRef));
+    return;
+}
+ 
+// Driver's code
+int main()
+{
+    struct Node* a = NULL;
+    push(&a, 5);
+    push(&a, 20);
+    push(&a, 4);
+    push(&a, 3);
+    push(&a, 30);
+ 
+    cout << "Linked List before sorting \n";
+    printList(a);
+ 
+    // Function call
+    quickSort(&a);
+ 
+    cout << "Linked List after sorting \n";
+    printList(a);
+ 
+    return 0;
+}
+Output
+Linked List before sorting 
+30 3 4 20 5 
+Linked List after sorting 
+3 4 5 20 30 
+Time Complexity: O(N * log N), It takes O(N2) time in the worst case and O(N log N) in the average or best case.
+Auxiliary Space: O(N), As extra space is used in the recursion call stack.
+
+Find the middle Element of a linked list
+----------------------------------------------
+Given a singly linked list, find the middle of the linked list. For example, if the given linked list is 1->2->3->4->5 then the output should be 3. 
+If there are even nodes, then there would be two middle nodes, we need to print the second middle element. For example, if the given linked list is 1->2->3->4->5->6 then the output should be 4. 
+
+Method 1: Traverse the whole linked list and count the no. of nodes. Now traverse the list again till count/2 and return the node at count/2. 
+
+// C++ program for the above approach
+#include <iostream>
+using namespace std;
+ 
+class Node {
+public:
+    int data;
+    Node* next;
+};
+ 
+class NodeOperation {
+public:
+    // Function to add a new node
+    void pushNode(class Node** head_ref, int data_val)
+    {
+ 
+        // Allocate node
+        class Node* new_node = new Node();
+ 
+        // Put in the data
+        new_node->data = data_val;
+ 
+        // Link the old list off the new node
+        new_node->next = *head_ref;
+ 
+        // move the head to point to the new node
+        *head_ref = new_node;
+    }
+ 
+    // A utility function to print a given linked list
+    void printNode(class Node* head)
+    {
+        while (head != NULL) {
+            cout << head->data << "->";
+            head = head->next;
+        }
+        cout << "NULL" << endl;
+    }
+ 
+    /* Utility Function to find length of linked list */
+    int getLen(class Node* head)
+    {
+        int len = 0;
+        class Node* temp = head;
+        while (temp) {
+            len++;
+            temp = temp->next;
+        }
+        return len;
+    }
+ 
+    void printMiddle(class Node* head)
+    {
+ 
+        if (head) {
+            // find length
+            int len = getLen(head);
+            class Node* temp = head;
+ 
+            // trvaers till we reached half of length
+            int midIdx = len / 2;
+            while (midIdx--) {
+                temp = temp->next;
+            }
+            // temp will be storing middle element
+            cout << "The middle element is [" << temp->data
+                 << "]" << endl;
+        }
+    }
+};
+ 
+// Driver Code
+int main()
+{
+    class Node* head = NULL;
+    class NodeOperation* temp = new NodeOperation();
+    for (int i = 5; i > 0; i--) {
+        temp->pushNode(&head, i);
+        temp->printNode(head);
+        temp->printMiddle(head);
+    }
+    return 0;
+}
+ 
+Output
+5->NULL
+The middle element is [5]
+4->5->NULL
+The middle element is [5]
+3->4->5->NULL
+The middle element is [4]
+2->3->4->5->NULL
+The middle element is [4]
+1->2->3->4->5->NULL
+The middle element is [3]
+Time Complexity: O(n) where n is no of nodes in linked list
+Auxiliary Space: O(1)
+
+Method 2: Traverse linked list using two-pointers. Move one pointer by one and the other pointers by two. When the fast pointer reaches the end, the slow pointer will reach the middle of the linked list.
+
+// C++ program for the above approach
+#include <iostream>
+using namespace std;
+ 
+class Node{
+    public:
+        int data;
+        Node *next;
+};
+ 
+class NodeOperation{
+  public:
+   
+    // Function to add a new node
+    void pushNode(class Node** head_ref,int data_val){
+       
+        // Allocate node
+        class Node *new_node = new Node();
+         
+         // Put in the data
+        new_node->data = data_val;
+         
+        // Link the old list off the new node
+        new_node->next = *head_ref;
+         
+        // move the head to point to the new node
+        *head_ref = new_node;
+    }
+     
+    // A utility function to print a given linked list
+    void printNode(class Node *head){
+        while(head != NULL){
+            cout <<head->data << "->";
+            head = head->next;
+        }
+        cout << "NULL" << endl;
+    }
+     
+    void printMiddle(class Node *head){
+        struct Node *slow_ptr = head;
+        struct Node *fast_ptr = head;
+  
+        if (head!=NULL)
+        {
+            while (fast_ptr != NULL && fast_ptr->next != NULL)
+            {
+                fast_ptr = fast_ptr->next->next;
+                slow_ptr = slow_ptr->next;
+            }
+            cout << "The middle element is [" << slow_ptr->data << "]" << endl;
+        }
+    }
+};
+ 
+// Driver Code
+int main(){
+    class Node *head = NULL;
+    class NodeOperation *temp = new NodeOperation();
+    for(int i=5; i>0; i--){
+        temp->pushNode(&head, i);
+        temp->printNode(head);
+        temp->printMiddle(head);
+    }
+    return 0;
+}
+Output
+5->NULL
+The middle element is [5]
+4->5->NULL
+The middle element is [5]
+3->4->5->NULL
+The middle element is [4]
+2->3->4->5->NULL
+The middle element is [4]
+1->2->3->4->5->NULL
+The middle element is [3]
+Time Complexity: O(N), As we are traversing the list only once.
+Auxiliary Space: O(1), As constant extra space is used.
+
+Check if a linked list is a circular linked list
+----------------------------------------------------
+
+Given a singly linked list, find if the linked list is circular or not. 
+
+A linked list is called circular if it is not NULL-terminated and all nodes are connected in the form of a cycle. Below is an example of a circular linked list.
+
+The idea is to store head of the linked list and traverse it. If iterator reaches NULL, linked list is not circular. else If it reaches head again, then linked list is circular. 
+
+Follow the given steps to solve the problem:
+
+Declare a Node pointer node and initialize it to the head’s next
+Move node pointer to the next node, while the node is not equal to nullptr and node is not equal to the head
+After coming out of the loop, check if the node is equal to head then return true, else return false
+
+// C++ program to check if linked list is circular
+ 
+#include<bits/stdc++.h>
+using namespace std;
+ 
+/* Link list Node */
+struct Node
+{
+    int data;
+    struct Node* next;
+};
+ 
+/* This function returns true if given linked
+   list is circular, else false. */
+bool isCircular(struct Node *head)
+{
+    // An empty linked list is circular
+    if (head == NULL)
+       return true;
+ 
+    // Next of head
+    struct Node *node = head->next;
+ 
+    // This loop would stop in both cases (1) If
+    // Circular (2) Not circular
+    while (node != NULL && node != head)
+       node = node->next;
+ 
+    // If loop stopped because of circular
+    // condition
+    return (node == head);
+}
+ 
+// Utility function to create a new node.
+Node *newNode(int data)
+{
+    struct Node *temp = new Node;
+    temp->data = data;
+    temp->next = NULL;
+    return temp;
+}
+ 
+// Driver's code
+int main()
+{
+    /* Start with the empty list */
+    struct Node* head = newNode(1);
+    head->next = newNode(2);
+    head->next->next = newNode(3);
+    head->next->next->next = newNode(4);
+ 
+    isCircular(head)? cout << "Yes\n" :
+                      cout << "No\n" ;
+ 
+    // Making linked list circular
+    head->next->next->next->next = head;
+ 
+    isCircular(head)? cout << "Yes\n" :
+                      cout << "No\n" ;
+ 
+    return 0;
+}
+Output
+No
+Yes
+Time Complexity: O(N)
+Auxiliary Space: O(1)
+
+Split a Circular linked list into two halves
+------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1) Store the mid and last pointers of the circular linked list using tortoise and hare algorithm. 
+2) Make the second half circular. 
+3) Make the first half circular. 
+4) Set head (or start) pointers of the two linked lists.
+In the below implementation, if there are odd nodes in the given circular linked list then the first result list has 1 more node than the second result list. 
+
+// Program to split a circular linked list
+// into two halves 
+#include <bits/stdc++.h>
+using namespace std;
+  
+/* structure for a node */
+class Node 
+{ 
+    public:
+    int data; 
+    Node *next; 
+}; 
+  
+/* Function to split a list (starting with head) 
+into two lists. head1_ref and head2_ref are 
+references to head nodes of the two resultant 
+linked lists */
+void splitList(Node *head, Node **head1_ref,
+                           Node **head2_ref) 
+{ 
+    Node *slow_ptr = head; 
+    Node *fast_ptr = head; 
+      
+    if(head == NULL) 
+        return; 
+      
+    /* If there are odd nodes in the circular list then 
+       fast_ptr->next becomes head and for even nodes 
+       fast_ptr->next->next becomes head */
+    while(fast_ptr->next != head && 
+          fast_ptr->next->next != head) 
+    { 
+        fast_ptr = fast_ptr->next->next; 
+        slow_ptr = slow_ptr->next; 
+    } 
+      
+    /* If there are even elements in list
+       then move fast_ptr */
+    if(fast_ptr->next->next == head) 
+        fast_ptr = fast_ptr->next; 
+          
+    /* Set the head pointer of first half */
+    *head1_ref = head; 
+          
+    /* Set the head pointer of second half */
+    if(head->next != head) 
+        *head2_ref = slow_ptr->next; 
+          
+    /* Make second half circular */
+    fast_ptr->next = slow_ptr->next; 
+          
+    /* Make first half circular */
+    slow_ptr->next = head; 
+} 
+  
+/* UTILITY FUNCTIONS */
+/* Function to insert a node at  
+the beginning of a Circular linked list */
+void push(Node **head_ref, int data) 
+{ 
+    Node *ptr1 = new Node();
+    Node *temp = *head_ref; 
+    ptr1->data = data; 
+    ptr1->next = *head_ref; 
+          
+    /* If linked list is not NULL then 
+       set the next of last node */
+    if(*head_ref != NULL) 
+    { 
+        while(temp->next != *head_ref) 
+        temp = temp->next;     
+        temp->next = ptr1; 
+    } 
+    else
+        ptr1->next = ptr1; /*For the first node */
+      
+    *head_ref = ptr1; 
+} 
+  
+/* Function to print nodes in 
+a given Circular linked list */
+void printList(Node *head) 
+{ 
+    Node *temp = head; 
+    if(head != NULL) 
+    { 
+        cout << endl; 
+        do { 
+        cout << temp->data << " "; 
+        temp = temp->next; 
+        } while(temp != head); 
+    } 
+} 
+  
+// Driver Code
+int main() 
+{ 
+    int list_size, i; 
+          
+    /* Initialize lists as empty */
+    Node *head = NULL; 
+    Node *head1 = NULL; 
+    Node *head2 = NULL; 
+      
+    /* Created linked list will be 12->56->2->11 */
+    push(&head, 12); 
+    push(&head, 56); 
+    push(&head, 2); 
+    push(&head, 11); 
+      
+    cout << "Original Circular Linked List"; 
+    printList(head);     
+      
+    /* Split the list */
+    splitList(head, &head1, &head2); 
+      
+    cout << "\nFirst Circular Linked List"; 
+    printList(head1); 
+      
+    cout << "\nSecond Circular Linked List"; 
+    printList(head2); 
+    return 0; 
+} 
+  
+Output: 
+Original Circular Linked List
+11 2 56 12 
+First Circular Linked List
+11 2 
+Second Circular Linked List
+56 12 
+Time Complexity: O(n) As we are only moving once through the list
+Auxiliary Space: O(1) As no extra space is used
+
+Check whether the Singly Linked list is a palindrome or not
+------------------------------------------------------------------
+Given a singly linked list of characters, write a function that returns true if the given list is a palindrome, else false.
+
+
+
+Examples:
+
+Input: R->A->D->A->R->NULL
+Output: Yes
+
+Input: C->O->D->E->NULL
+Output: No
+
+Using Stack:
+The idea is to use a stack and push all the nodes into the stack, then again iterate over the linked list to validate if the linked list is palindrome or not.
+
+Complete Interview Preparation - GFG
+
+Below image is a dry run of the above approach: 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Follow the steps below to solve the problem:
+
+A simple solution is to use a stack of list nodes. This mainly involves three steps.
+Traverse the given list from head to tail and push every visited node to stack.
+Traverse the list again. For every visited node, pop a node from the stack and compare data of popped node with the currently visited node.
+If all nodes matched, then return true, else false.
+
+#include <bits/stdc++.h>
+using namespace std;
+ 
+class Node {
+public:
+    int data;
+    Node(int d) { data = d; }
+    Node* ptr;
+};
+ 
+// Function to check if the linked list
+// is palindrome or not
+bool isPalin(Node* head)
+{
+ 
+    // Temp pointer
+    Node* slow = head;
+ 
+    // Declare a stack
+    stack<int> s;
+ 
+    // Push all elements of the list
+    // to the stack
+    while (slow != NULL) {
+        s.push(slow->data);
+ 
+        // Move ahead
+        slow = slow->ptr;
+    }
+ 
+    // Iterate in the list again and
+    // check by popping from the stack
+    while (head != NULL) {
+ 
+        // Get the top most element
+        int i = s.top();
+ 
+        // Pop the element
+        s.pop();
+ 
+        // Check if data is not
+        // same as popped element
+        if (head->data != i) {
+            return false;
+        }
+ 
+        // Move ahead
+        head = head->ptr;
+    }
+ 
+    return true;
+}
+ 
+// Driver Code
+int main()
+{
+ 
+    // Addition of linked list
+    Node one = Node(1);
+    Node two = Node(2);
+    Node three = Node(3);
+    Node four = Node(2);
+    Node five = Node(1);
+ 
+    // Initialize the next pointer
+    // of every current pointer
+    five.ptr = NULL;
+    one.ptr = &two;
+    two.ptr = &three;
+    three.ptr = &four;
+    four.ptr = &five;
+    Node* temp = &one;
+ 
+    // Call function to check palindrome or not
+    int result = isPalin(&one);
+ 
+    if (result == 1)
+        cout << "isPalindrome is true\n";
+    else
+        cout << "isPalindrome is false\n";
+ 
+    return 0;
+}
+ 
+Output
+isPalindrome is true
+Time complexity: O(N), Iterating over the linked list of size N.
+Auxiliary Space: O(N), Using an auxiliary stack
+
+Deletion from a Circular Linked list
+------------------------------------------
+Examples: 
+
+Input : 2->5->7->8->10->(head node)
+        data = 5
+Output : 2->7->8->10->(head node)
+
+Input : 2->5->7->8->10->(head node)
+         7
+Output : 2->5->8->10->(head node)
+Algorithm
+Case 1: List is empty. 
+
+If the list is empty we will simply return.
+Case 2:List is not empty  
+
+If the list is not empty then we define two pointers curr and prev and initialize the pointer curr with the head node.
+Traverse the list using curr to find the node to be deleted and before moving to curr to the next node, every time set prev = curr.
+If the node is found, check if it is the only node in the list. If yes, set head = NULL and free(curr).
+If the list has more than one node, check if it is the first node of the list. Condition to check this( curr == head). If yes, then move prev until it reaches the last node. After prev reaches the last node, set head = head -> next and prev -> next = head. Delete curr.
+If curr is not the first node, we check if it is the last node in the list. Condition to check this is (curr -> next == head).
+If curr is the last node. Set prev -> next = head and delete the node curr by free(curr).
+If the node to be deleted is neither the first node nor the last node, then set prev -> next = curr -> next and delete curr.
+
+// C++ program to delete a given key from linked list.
+#include <bits/stdc++.h>
+using namespace std;
+  
+/* structure for a node */
+class Node {
+public:
+    int data;
+    Node* next;
+};
+  
+/* Function to insert a node at the beginning of 
+a Circular linked list */
+void push(Node** head_ref, int data)
+{
+    // Create a new node and make head as next
+    // of it.
+    Node* ptr1 = new Node();
+    ptr1->data = data;
+    ptr1->next = *head_ref;
+  
+    /* If linked list is not NULL then set the 
+    next of last node */
+    if (*head_ref != NULL) 
+    {
+        // Find the node before head and update
+        // next of it.
+        Node* temp = *head_ref;
+        while (temp->next != *head_ref)
+            temp = temp->next;
+        temp->next = ptr1;
+    }
+    else
+        ptr1->next = ptr1; /*For the first node */
+  
+    *head_ref = ptr1;
+}
+  
+/* Function to print nodes in a given 
+circular linked list */
+void printList(Node* head)
+{
+    Node* temp = head;
+    if (head != NULL) {
+        do {
+            cout << temp->data << " ";
+            temp = temp->next;
+        } while (temp != head);
+    }
+  
+    cout << endl;
+}
+  
+/* Function to delete a given node from the list */
+void deleteNode(Node** head, int key) 
+{
+      
+    // If linked list is empty
+    if (*head == NULL)
+        return;
+          
+    // If the list contains only a single node
+    if((*head)->data==key && (*head)->next==*head)
+    {
+        free(*head);
+        *head=NULL;
+        return;
+    }
+      
+    Node *last=*head,*d;
+      
+    // If head is to be deleted
+    if((*head)->data==key) 
+    {
+          
+        // Find the last node of the list
+        while(last->next!=*head)
+            last=last->next;
+              
+        // Point last node to the next of head i.e. 
+        // the second node of the list
+        last->next=(*head)->next;
+        free(*head);
+        *head=last->next;
+      return;
+    }
+      
+    // Either the node to be deleted is not found 
+    // or the end of list is not reached
+    while(last->next!=*head&&last->next->data!=key) 
+    {
+        last=last->next;
+    }
+      
+    // If node to be deleted was found
+    if(last->next->data==key) 
+    {
+        d=last->next;
+        last->next=d->next;
+        free(d);
+    }
+    else
+        cout<<"no such keyfound";
+    }
+  
+/* Driver code */
+int main()
+{
+    /* Initialize lists as empty */
+    Node* head = NULL;
+  
+    /* Created linked list will be 2->5->7->8->10 */
+    push(&head, 2);
+    push(&head, 5);
+    push(&head, 7);
+    push(&head, 8);
+    push(&head, 10);
+  
+    cout << "List Before Deletion: ";
+    printList(head);
+  
+    deleteNode(&head, 7);
+  
+    cout << "List After Deletion: ";
+    printList(head);
+  
+    return 0;
+}
+  
+Output
+List Before Deletion: 10 8 7 5 2 
+List After Deletion: 10 8 5 2 
+Time Complexity: O(n)
+Worst case occurs when the element to be deleted is the last element and we need to move through the whole list.
+Auxiliary Space: O(1)
+As constant extra space is used.
+
+Reverse a Doubly Linked list
+--------------------------------------
+Given a Doubly Linked List, the task is to reverse the given Doubly Linked List.
+
+Example:
+
+Input:
+
+
+
+
+Output:
+
+
+
+
+
+Using the above approach:
+
+Traverse the linked list using a pointer
+Swap the prev and next pointers for all nodes
+At last, change the head pointer of the doubly linked list
+
+/* C++ program to reverse a doubly linked list */
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* Node of the doubly linked list */
+class Node {
+public:
+    int data;
+    Node* next;
+    Node* prev;
+};
+ 
+/* Function to reverse a Doubly Linked List */
+void reverse(Node** head_ref)
+{
+    Node* temp = NULL;
+    Node* current = *head_ref;
+ 
+/* swap next and prev for all nodes of doubly linked list */
+    while (current != NULL) {
+        temp = current->prev;
+        current->prev = current->next;
+        current->next = temp;
+        current = current->prev;
+    }
+ 
+    /* Before changing the head, check for the cases like
+       empty list and list with only one node */
+    if (temp != NULL)
+        *head_ref = temp->prev;
+}
+ 
+/* UTILITY FUNCTIONS */
+/* Function to insert a node at the
+beginning of the Doubly Linked List */
+void push(Node** head_ref, int new_data)
+{
+    /* allocate node */
+    Node* new_node = new Node();
+ 
+    /* put in the data */
+    new_node->data = new_data;
+ 
+    /* since we are adding at the beginning,
+    prev is always NULL */
+    new_node->prev = NULL;
+ 
+    /* link the old list of the new node */
+    new_node->next = (*head_ref);
+ 
+    /* change prev of head node to new node */
+    if ((*head_ref) != NULL)
+        (*head_ref)->prev = new_node;
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+/* Function to print nodes in a given doubly linked list
+This function is same as printList() of singly linked list
+*/
+void printList(Node* node)
+{
+    while (node != NULL) {
+        cout << node->data << " ";
+        node = node->next;
+    }
+}
+ 
+// Driver's code
+int main()
+{
+    /* Start with the empty list */
+    Node* head = NULL;
+ 
+    /* Let us create a sorted linked list to test the
+    functions Created linked list will be 10->8->4->2 */
+    push(&head, 2);
+    push(&head, 4);
+    push(&head, 8);
+    push(&head, 10);
+ 
+    cout << "Original Linked list" << endl;
+    printList(head);
+ 
+    // Function call
+    reverse(&head);
+ 
+    cout << "\nReversed Linked list" << endl;
+    printList(head);
+ 
+    return 0;
+}
+ 
+Output
+Original Linked list
+10 8 4 2 
+Reversed Linked list
+2 4 8 10 
+Time Complexity: O(N), where N denotes the number of nodes in the doubly linked list.
+Auxiliary Space: O(1)
+
+We can also swap data instead of pointers to reverse the Doubly Linked List. Method used for reversing array can be used to swap data. Swapping data can be costly compared to pointers if the size of the data item(s) is more.
+
+Reverse a Doubly Linked List using Stack:
+Push the node’s data into the stack while traversing the doubly linked list, then pop out the elements from the stack and copy the value to the nodes of the linked list by again traversing it
+
+Follow the given steps to solve the problem using the above approach:
+
+Traverse the whole Linked List and  Keep pushing the node’s data into the stack
+Then keep popping the elements out of the stack and updating the Doubly Linked List
+
+// C++ program to reverse a doubly linked list
+#include <bits/stdc++.h>
+using namespace std;
+struct LinkedList {
+    struct Node {
+        int data;
+        Node *next, *prev;
+        Node(int d)
+        {
+            data = d;
+            next = prev = NULL;
+        }
+    };
+    Node* head = NULL;
+ 
+    /* Function to reverse a Doubly Linked List using Stacks
+     */
+    void reverse()
+    {
+        stack<int> st;
+        Node* temp = head;
+        while (temp != NULL) {
+            st.push(temp->data);
+            temp = temp->next;
+        }
+ 
+        // added all the elements sequence wise in the
+        // st
+        temp = head;
+        while (temp != NULL) {
+            temp->data = st.top();
+            st.pop();
+            temp = temp->next;
+        }
+ 
+        // popped all the elements and the added in the
+        // linked list,
+        // which are in the reversed order->
+    }
+ 
+    /* UTILITY FUNCTIONS */
+    /* Function to insert a node at the beginning of the
+     * Doubly Linked List */
+    void Push(int new_data)
+    {
+ 
+        /* allocate node */
+        Node* new_node = new Node(new_data);
+ 
+        /* since we are adding at the beginning,
+         prev is always NULL */
+        new_node->prev = NULL;
+ 
+        /* link the old list of the new node */
+        new_node->next = head;
+ 
+        /* change prev of head node to new node */
+        if (head != NULL) {
+            head->prev = new_node;
+        }
+ 
+        /* move the head to point to the new node */
+        head = new_node;
+    }
+ 
+    /* Function to print nodes in a given doubly linked list
+     This function is same as printList() of singly linked
+     list */
+    void printList(Node* node)
+    {
+        while (node) {
+            cout << node->data << " ";
+            node = node->next;
+        }
+    }
+};
+ 
+// Driver Code
+int main()
+{
+    LinkedList list;
+ 
+    /* Let us create a sorted linked list to test the
+     functions Created linked list will be 10->8->4->2
+   */
+    list.Push(2);
+    list.Push(4);
+    list.Push(8);
+    list.Push(10);
+    cout << "Original linked list " << endl;
+    list.printList(list.head);
+    list.reverse();
+    cout << endl;
+    cout << "The reversed Linked List is " << endl;
+    list.printList(list.head);
+}
+ 
+Output
+Original linked list 
+10 8 4 2 
+The reversed Linked List is 
+2 4 8 10
+Time Complexity: O(N)
+Auxiliary Space: O(N)
+
+Find pairs with a given sum in a DLL
+--------------------------------------
+Given a sorted doubly linked list of positive distinct elements, the task is to find pairs in a doubly-linked list whose sum is equal to given value x, without using any extra space? 
+
+Example:  
+
+Input : head : 1 <-> 2 <-> 4 <-> 5 <-> 6 <-> 8 <-> 9
+        x = 7
+Output: (6, 1), (5,2)
+The expected time complexity is O(n) and auxiliary space is O(1).
+
+A simple approach for this problem is to one by one pick each node and find a second element whose sum is equal to x in the remaining list by traversing in the forward direction. The time complexity for this problem will be O(n^2), n is the total number of nodes in the doubly linked list.
+
+The algorithm :  
+
+Initialize two pointer variables to find the candidate elements in the sorted doubly linked list. Initialize first with the start of the doubly linked list i.e; first=head and initialize second with the last node of the doubly linked list i.e; second=last_node.
+We initialize first and second pointers as first and last nodes. Here we don’t have random access, so to find the second pointer, we traverse the list to initialize the second.
+If current sum of first and second is less than x, then we move first in forward direction. If current sum of first and second element is greater than x, then we move second in backward direction.
+Loop termination conditions are also different from arrays. The loop terminates when two pointers cross each other (second->next = first), or they become the same (first == second).
+The case when no pairs are present will be handled by the condition “first==second”
+Implementation:
+
+// C++ program to find a pair with given sum x.
+#include<bits/stdc++.h>
+using namespace std;
+ 
+// structure of node of doubly linked list
+struct Node
+{
+    int data;
+    struct Node *next, *prev;
+};
+ 
+// Function to find pair whose sum equal to given value x.
+void pairSum(struct Node *head, int x)
+{
+    // Set two pointers, first to the beginning of DLL
+    // and second to the end of DLL.
+    struct Node *first = head;
+    struct Node *second = head;
+    while (second->next != NULL)
+        second = second->next;
+ 
+    // To track if we find a pair or not
+    bool found = false;
+ 
+    // The loop terminates when two pointers
+    // cross each other (second->next
+    // == first), or they become same (first == second)
+    while (first != second && second->next != first)
+    {
+        // pair found
+        if ((first->data + second->data) == x)
+        {
+            found = true;
+            cout << "(" << first->data<< ", "
+                << second->data << ")" << endl;
+ 
+            // move first in forward direction
+            first = first->next;
+ 
+            // move second in backward direction
+            second = second->prev;
+        }
+        else
+        {
+            if ((first->data + second->data) < x)
+                first = first->next;
+            else
+                second = second->prev;
+        }
+    }
+ 
+    // if pair is not present
+    if (found == false)
+        cout << "No pair found";
+}
+ 
+// A utility function to insert a new node at the
+// beginning of doubly linked list
+void insert(struct Node **head, int data)
+{
+    struct Node *temp = new Node;
+    temp->data = data;
+    temp->next = temp->prev = NULL;
+    if (!(*head))
+        (*head) = temp;
+    else
+    {
+        temp->next = *head;
+        (*head)->prev = temp;
+        (*head) = temp;
+    }
+}
+ 
+// Driver program
+int main()
+{
+    struct Node *head = NULL;
+    insert(&head, 9);
+    insert(&head, 8);
+    insert(&head, 6);
+    insert(&head, 5);
+    insert(&head, 4);
+    insert(&head, 2);
+    insert(&head, 1);
+    int x = 7;
+ 
+    pairSum(head, x);
+ 
+    return 0;
+}
+Output
+(1, 6)
+(2, 5)
+Time complexity : O(n) 
+Auxiliary space : O(1)
+
+Count triplets in a sorted DLL whose sum is equal to given value “X”.	
+
+
+Given a sorted doubly linked list of distinct nodes(no two nodes have the same data) and a value x. Count triplets in the list that sum up to a given value x.
+
+Examples:
+ 
+
+
+
+
+
+
+
+Method 1 (Naive Approach): 
+Using three nested loops generate all triplets and check whether elements in the triplet sum up to x or not.
+
+// C++ implementation to count triplets in a sorted doubly linked list
+// whose sum is equal to a given value 'x'
+#include <bits/stdc++.h>
+using namespace std;
+  
+// structure of node of doubly linked list
+struct Node {
+    int data;
+    struct Node* next, *prev;
+};
+  
+// function to count triplets in a sorted doubly linked list
+// whose sum is equal to a given value 'x'
+int countTriplets(struct Node* head, int x)
+{
+    struct Node* ptr1, *ptr2, *ptr3;
+    int count = 0;
+  
+    // generate all possible triplets
+    for (ptr1 = head; ptr1 != NULL; ptr1 = ptr1->next)
+        for (ptr2 = ptr1->next; ptr2 != NULL; ptr2 = ptr2->next)
+            for (ptr3 = ptr2->next; ptr3 != NULL; ptr3 = ptr3->next)
+  
+                // if elements in the current triplet sum up to 'x'
+                if ((ptr1->data + ptr2->data + ptr3->data) == x)
+  
+                    // increment count
+                    count++;
+  
+    // required count of triplets
+    return count;
+}
+  
+// A utility function to insert a new node at the
+// beginning of doubly linked list
+void insert(struct Node** head, int data)
+{
+    // allocate node
+    struct Node* temp = new Node();
+  
+    // put in the data
+    temp->data = data;
+    temp->next = temp->prev = NULL;
+  
+    if ((*head) == NULL)
+        (*head) = temp;
+    else {
+        temp->next = *head;
+        (*head)->prev = temp;
+        (*head) = temp;
+    }
+}
+  
+// Driver program to test above
+int main()
+{
+    // start with an empty doubly linked list
+    struct Node* head = NULL;
+  
+    // insert values in sorted order
+    insert(&head, 9);
+    insert(&head, 8);
+    insert(&head, 6);
+    insert(&head, 5);
+    insert(&head, 4);
+    insert(&head, 2);
+    insert(&head, 1);
+  
+    int x = 17;
+  
+    cout << "Count = "
+         << countTriplets(head, x);
+    return 0;
+}
+Output: 
+Count = 2
+Time Complexity: O(n3) 
+Auxiliary Space: O(1)
+
+Method 2 (Hashing): 
+Create a hash table with (key, value) tuples represented as (node data, node pointer) tuples. Traverse the doubly linked list and store each node’s data and its pointer pair(tuple) in the hash table. Now, generate each possible pair of nodes. For each pair of nodes, calculate the p_sum(sum of data in the two nodes) and check whether (x-p_sum) exists in the hash table or not. If it exists, then also verify that the two nodes in the pair are not same to the node associated with (x-p_sum) in the hash table and finally increment count. Return (count / 3) as each triplet is counted 3 times in the above process.
+
+// C++ implementation to count triplets in a sorted doubly linked list
+// whose sum is equal to a given value 'x'
+#include <bits/stdc++.h>
+using namespace std;
+  
+// structure of node of doubly linked list
+struct Node {
+    int data;
+    struct Node* next, *prev;
+};
+
+// function to count triplets in a sorted doubly linked list
+// whose sum is equal to a given value 'x'
+int countTriplets(struct Node* head, int x)
+{
+    struct Node* ptr, *ptr1, *ptr2;
+    int count = 0;
+  
+    // unordered_map 'um' implemented as hash table
+    unordered_map<int, Node*> um;
+  
+    // insert the <node data, node pointer> tuple in 'um'
+    for (ptr = head; ptr != NULL; ptr = ptr->next)
+        um[ptr->data] = ptr;
+  
+    // generate all possible pairs
+    for (ptr1 = head; ptr1 != NULL; ptr1 = ptr1->next)
+        for (ptr2 = ptr1->next; ptr2 != NULL; ptr2 = ptr2->next) {
+  
+            // p_sum - sum of elements in the current pair
+            int p_sum = ptr1->data + ptr2->data;
+  
+            // if 'x-p_sum' is present in 'um' and either of the two nodes
+            // are not equal to the 'um[x-p_sum]' node
+            if (um.find(x - p_sum) != um.end() && um[x - p_sum] != ptr1
+                && um[x - p_sum] != ptr2)
+  
+                // increment count
+                count++;
+        }
+  
+    // required count of triplets
+    // division by 3 as each triplet is counted 3 times
+    return (count / 3);
+}
+  
+// A utility function to insert a new node at the
+// beginning of doubly linked list
+void insert(struct Node** head, int data)
+{
+    // allocate node
+    struct Node* temp = new Node();
+  
+    // put in the data
+    temp->data = data;
+    temp->next = temp->prev = NULL;
+  
+    if ((*head) == NULL)
+        (*head) = temp;
+    else {
+        temp->next = *head;
+        (*head)->prev = temp;
+        (*head) = temp;
+    }
+}
+  
+// Driver program to test above
+int main()
+{
+    // start with an empty doubly linked list
+    struct Node* head = NULL;
+  
+    // insert values in sorted order
+    insert(&head, 9);
+    insert(&head, 8);
+    insert(&head, 6);
+    insert(&head, 5);
+    insert(&head, 4);
+    insert(&head, 2);
+    insert(&head, 1);
+  
+    int x = 17;
+  
+    cout << "Count = "
+         << countTriplets(head, x);
+    return 0;
+}
+Output: 
+Count = 2
+Time Complexity: O(n2) 
+Auxiliary Space: O(n)
+
+Sort a “k”sorted Doubly Linked list.[Very IMP]	
+-------------------------------------------------
+Given a doubly linked list containing n nodes, where each node is at most k away from its target position in the list. The problem is to sort the given doubly linked list. 
+For example, let us consider k is 2, a node at position 7 in the sorted doubly linked list, can be at positions 5, 6, 7, 8, 9 in the given doubly linked list.
+
+Examples: 
+INPUT : DLL : 3 <-> 6 <-> 2 <-> 12 <-> 56 <-> 8 , K=2
+OUTPUT : 2 <-> 3 <-> 6 <-> 8 <-> 12 <-> 56
+
+Naive Approach: Sort the given doubly linked list using the insertion sort technique. While inserting each element in the sorted part of the list, there will be at most k swaps to place the element to its correct position since it is at most k steps away from its correct position.
+
+/ C++ implementation to sort a k sorted doubly linked list
+#include<bits/stdc++.h>
+using namespace std;
+ 
+// a node of the doubly linked list
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+};
+ 
+ 
+// function to sort a k sorted doubly linked list
+struct Node* sortAKSortedDLL(struct Node* head, int k)
+{
+    if(head == NULL || head->next == NULL)
+        return head;
+  
+    // perform on all the nodes in list
+    for(Node *i = head->next; i != NULL; i = i->next) {
+        Node *j = i;
+          // There will be atmost k swaps for each element in the list
+        // since each node is k steps away from its correct position
+        while(j->prev != NULL && j->data < j->prev->data) {
+              // swap j and j.prev node
+            Node* temp = j->prev->prev;
+            Node* temp2 = j->prev;
+            Node *temp3 = j->next;
+            j->prev->next = temp3;
+            j->prev->prev = j;
+            j->prev = temp;
+            j->next = temp2;
+            if(temp != NULL)
+                temp->next = j;
+            if(temp3 != NULL)
+                temp3->prev = temp2;
+        }
+          // if j is now the new head
+       // then reset head
+        if(j->prev == NULL)
+            head = j;
+    }
+    return head;
+}
+ 
+// Function to insert a node at the beginning
+// of the Doubly Linked List
+void push(struct Node** head_ref, int new_data)
+{
+    // allocate node
+    struct Node* new_node =
+        (struct Node*)malloc(sizeof(struct Node));
+ 
+    // put in the data
+    new_node->data = new_data;
+ 
+    // since we are adding at the beginning,
+    // prev is always NULL
+    new_node->prev = NULL;
+ 
+    // link the old list of the new node
+    new_node->next = (*head_ref);
+ 
+    // change prev of head node to new node
+    if ((*head_ref) != NULL)
+        (*head_ref)->prev = new_node;
+ 
+    // move the head to point to the new node
+    (*head_ref) = new_node;
+}
+ 
+// Function to print nodes in a given doubly linked list
+void printList(struct Node* head)
+{
+    // if list is empty
+    if (head == NULL)
+        cout << "Doubly Linked list empty";
+ 
+    while (head != NULL) {
+        cout << head->data << " ";
+        head = head->next;
+    }
+}
+ 
+// Driver program to test above
+int main()
+{
+    struct Node* head = NULL;
+ 
+    // Create the doubly linked list:
+    // 3<->6<->2<->12<->56<->8
+    push(&head, 8);
+    push(&head, 56);
+    push(&head, 12);
+    push(&head, 2);
+    push(&head, 6);
+    push(&head, 3);
+ 
+    int k = 2;
+ 
+    cout << "Original Doubly linked list:\n";
+    printList(head);
+ 
+    // sort the biotonic DLL
+    head = sortAKSortedDLL(head, k);
+ 
+    cout << "\nDoubly linked list after sorting:\n";
+    printList(head);
+ 
+    return 0;
+}
+ 
+Output
+Original Doubly linked list:
+3 6 2 12 56 8 
+Doubly Linked List after sorting:
+2 3 6 8 12 56 
+Time Complexity: O(n*k)
+Auxiliary Space: O(1)
+
+Rotate Doubly Linked list by N nodes
+-------------------------------------------
+Given a doubly-linked list, rotate the linked list counter-clockwise by N nodes. Here N is a given positive integer and is smaller than the count of nodes in linked list. 
+
+Examples:  
+
+Input : a  b  c  d  e   N = 2
+Output : c  d  e  a  b 
+
+Input : a  b  c  d  e  f  g  h   N = 4
+Output : e  f  g  h  a  b  c  d 
+
+To rotate the Doubly linked list, first, we need to traverse through the linked list and find the address of the last node. 
+Then make it a circular linked list.
+Then move the head as well as a temp by n nodes.
+Then make the linked list as un-circular.
+
+Solution 1:
+
+#include<iostream>
+using namespace std;
+ 
+class Node
+{
+    public:
+        char data;
+        Node* next;
+        Node* pre;
+    Node(int data)
+    {
+        this->data=data;
+        pre=NULL;
+        next=NULL;
+    }
+};
+ 
+void insertAtHead(Node* &head, int data)
+{
+    Node* n = new Node(data);
+    if(head==NULL)
+    {
+        head=n;
+        return;
+    }
+    n->next=head;
+    head->pre=n;
+    head=n;
+    return;
+}
+void insertAtTail(Node* &head, int data)
+{
+    if(head==NULL)
+    {
+        insertAtHead(head,data);
+        return;
+    }
+    Node* temp=head;
+    while(temp->next!=NULL)
+    {
+        temp=temp->next;
+    }
+    Node* n=new Node(data);
+    temp->next=n;
+    n->pre=temp;
+    return;
+}
+void display(Node* head)
+{
+    while(head!=NULL)
+    {
+        cout << head->data << "-->";
+        head=head->next;
+    }
+    cout << "NULL\n";
+}
+ 
+void rotateByN(Node* &head, int pos)
+{
+    // return without any changes if position is 0.
+    if(pos==0) return;
+ 
+    // Finding last node.
+    Node* temp=head;
+    while(temp->next!=NULL)
+    {
+        temp=temp->next;
+    }
+    // making the list circular.
+    temp->next=head;
+    head->pre=temp;
+ 
+    // move head and temp by the given position.
+    int count=1;
+    while(count<=pos)
+    {
+        head=head->next;
+        temp=temp->next;
+        count++;
+    }
+ 
+    // now again make list un-circular.
+    temp->next=NULL;
+    head->pre=NULL;
+}
+int main()
+{
+    Node* head=NULL;
+    insertAtTail(head,'a');
+    insertAtTail(head,'b');
+    insertAtTail(head,'c');
+    insertAtTail(head,'d');
+    insertAtTail(head,'e');
+ 
+    int n=2;
+    cout << "\nBefore Rotation : \n";
+    display(head);
+    rotateByN(head,n);
+    cout << "\nAfter Rotation : \n";
+    display(head);
+    cout << "\n\n";
+ 
+    return 0;
+}
+Output
+Before Rotation : 
+a-->b-->c-->d-->e-->NULL
+
+After Rotation : 
+c-->d-->e-->a-->b-->NULL
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+Solution 2: 
+
+#include<iostream>
+using namespace std;
+ 
+class Node
+{
+    public:
+        char data;
+        Node* next;
+        Node* pre;
+    Node(int data)
+    {
+        this->data=data;
+        pre=NULL;
+        next=NULL;
+    }
+};
+ 
+void insertAtHead(Node* &head, int data)
+{
+    Node* n = new Node(data);
+    if(head==NULL)
+    {
+        head=n;
+        return;
+    }
+    n->next=head;
+    head->pre=n;
+    head=n;
+    return;
+}
+void insertAtTail(Node* &head, int data)
+{
+    if(head==NULL)
+    {
+        insertAtHead(head,data);
+        return;
+    }
+    Node* temp=head;
+    while(temp->next!=NULL)
+    {
+        temp=temp->next;
+    }
+    Node* n=new Node(data);
+    temp->next=n;
+    n->pre=temp;
+    return;
+}
+void display(Node* head)
+{
+    while(head!=NULL)
+    {
+        cout << head->data << "-->";
+        head=head->next;
+    }
+    cout << "NULL\n";
+}
+ 
+void rotateByN(Node *&head, int pos)
+{
+    if (pos == 0)
+        return;
+ 
+    Node *curr = head;
+ 
+    while (pos)
+    {
+        curr = curr->next;
+        pos--;
+    }
+ 
+    Node *tail = curr->pre;
+    Node *NewHead = curr;
+    tail->next = NULL;
+    curr->pre = NULL;
+ 
+    while (curr->next != NULL)
+    {
+        curr = curr->next;
+    }
+     
+    curr->next = head;
+    head->pre = curr;
+    head = NewHead;
+}
+  
+int main()
+{
+    Node* head=NULL;
+    insertAtTail(head,'a');
+    insertAtTail(head,'b');
+    insertAtTail(head,'c');
+    insertAtTail(head,'d');
+    insertAtTail(head,'e');
+ 
+    int n=2;
+    cout << "\nBefore Rotation : \n";
+    display(head);
+    rotateByN(head,n);
+    cout << "\nAfter Rotation : \n";
+    display(head);
+    cout << "\n\n";
+ 
+    return 0;
+}
+Output
+Before Rotation : 
+a-->b-->c-->d-->e-->NULL
+
+After Rotation : 
+c-->d-->e-->a-->b-->NULL
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+Rotate a Doubly Linked list in group of Given Size.[Very IMP]	
+----------------------------------------------------------------
+Given a doubly linked list containing n nodes. The problem is to reverse every group of k nodes in the list.
+
+Examples: 
+
+
+
+
+
+
+
+
+
+
+
+Approach: Create a recursive function say reverse(head, k). This function receives the head or the first node of each group of k nodes. It reverses those groups of k nodes by applying the approach discussed in Reverse a doubly linked list | Set-2. After reversing the group of k nodes the function checks whether next group of nodes exists in the list or not. If a group exists then it makes a recursive call to itself with the first node of the next group and makes the necessary adjustments with the next and previous links of that group. Finally, it returns the new head node of the reversed group. 
+
+// C++ implementation to reverse a doubly linked list in groups of given size
+
+#include <bits/stdc++.h>
+using namespace std;
+  
+// a node of the doubly linked list
+struct Node {
+    int data;
+    Node *next, *prev;
+};
+  
+// function to get a new node
+Node* getNode(int data)
+{
+    // allocate space
+    Node* new_node = (Node*)malloc(sizeof(Node));
+  
+    // put in the data
+    new_node->data = data;
+    new_node->next = new_node->prev = NULL;
+    return new_node;
+}
+  
+// function to insert a node at the beginning
+// of the Doubly Linked List
+void push(Node** head_ref, Node* new_node)
+{
+    // since we are adding at the beginning,
+    // prev is always NULL
+    new_node->prev = NULL;
+  
+    // link the old list off the new node
+    new_node->next = (*head_ref);
+  
+    // change prev of head node to new node
+    if ((*head_ref) != NULL)
+        (*head_ref)->prev = new_node;
+  
+    // move the head to point to the new node
+    (*head_ref) = new_node;
+}
+ 
+// function to reverse a doubly linked list
+// in groups of given size
+Node* revListInGroupOfGivenSize(Node* head, int k)
+{
+    Node *current = head;
+    Node* next = NULL;
+    Node* newHead = NULL;
+    int count = 0;
+     
+    // reversing the current group of k
+    // or less than k nodes by adding
+    // them at the beginning of list
+    // 'newHead'
+    while (current != NULL && count < k)
+    {
+        next = current->next;
+        push(&newHead, current);
+        current = next;
+        count++;
+    }
+     
+    // if next group exists then making the desired
+    // adjustments in the link
+    if (next != NULL)
+    {
+        head->next = revListInGroupOfGivenSize(next, k);
+        head->next->prev = head;
+    }
+     
+    // pointer to the new head of the
+    // reversed group
+    // pointer to the new head should point to NULL, otherwise you won't be able to traverse list in reverse order using 'prev'
+    newHead->prev = NULL;
+    return newHead;
+}
+ 
+// Function to print nodes in a
+// given doubly linked list
+void printList(Node* head)
+{
+    while (head != NULL) {
+        cout << head->data << " ";
+        head = head->next;
+    }
+}
+  
+// Driver program to test above
+int main()
+{
+    // Start with the empty list
+    Node* head = NULL;
+  
+    // Create doubly linked: 10<->8<->4<->2
+    push(&head, getNode(2));
+    push(&head, getNode(4));
+    push(&head, getNode(8));
+    push(&head, getNode(10));
+     
+    int k = 2;
+  
+    cout << "Original list: ";
+    printList(head);
+  
+    // Reverse doubly linked list in groups of
+    // size 'k'
+    head = revListInGroupOfGivenSize(head, k);
+  
+    cout << "\nModified list: ";
+    printList(head);
+  
+    return 0;
+}
+Output
+Original list: 10 8 4 2 
+Modified list: 8 10 2 4 
+Time Complexity: O(n).
+ 
+
+We can further simplify the implementation of this algorithm using the same idea with recursion in just one function.
+
+#include <iostream>
+using namespace std;
+struct Node {
+    int data;
+    Node *next, *prev;
+};
+// function to add Node at the end of a Doubly LinkedList
+Node* insertAtEnd(Node* head, int data)
+{
+ 
+    Node* new_node = new Node();
+    new_node->data = data;
+    new_node->next = NULL;
+    Node* temp = head;
+    if (head == NULL) {
+        new_node->prev = NULL;
+        head = new_node;
+        return head;
+    }
+ 
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = new_node;
+    new_node->prev = temp;
+    return head;
+}
+// function to print Doubly LinkedList
+void printDLL(Node* head)
+{
+    while (head != NULL) {
+        cout << head->data << " ";
+        head = head->next;
+    }
+    cout << endl;
+}
+// function to Reverse a doubly linked list
+// in groups of given size
+Node* reverseByN(Node* head, int k)
+{
+    if (!head)
+        return NULL;
+    head->prev = NULL;
+    Node *temp, *curr = head, *newHead;
+    int count = 0;
+    while (curr != NULL && count < k) {
+        newHead = curr;
+        temp = curr->prev;
+        curr->prev = curr->next;
+        curr->next = temp;
+        curr = curr->prev;
+        count++;
+    }
+    // checking if the reversed LinkedList size is
+    // equal to K or not
+    // if it is not equal to k that means we have reversed
+    // the last set of size K and we don't need to call the
+    // recursive function
+    if (count >= k) {
+        Node* rest = reverseByN(curr, k);
+        head->next = rest;
+        if (rest != NULL)
+            // it is required for prev link otherwise u wont
+            // be backtrack list due to broken links
+            rest->prev = head;
+    }
+    return newHead;
+}
+int main()
+{
+    Node* head;
+    for (int i = 1; i <= 10; i++) {
+        head = insertAtEnd(head, i);
+    }
+    printDLL(head);
+    int n = 4;
+    head = reverseByN(head, n);
+    printDLL(head);
+}
+Output
+1 2 3 4 5 6 7 8 9 10 
+4 3 2 1 8 7 6 5 10 9 
+Another approach (Iterative Method) :  Here we will be using the iterative method in which we will begin from head node and reverse k nodes in the group. After reversing the k nodes we will continue this process with the next node after the k node until it becomes null. We will the achieving the desired result in only a single pass of the linked list with the time complexity of O(n) and space complexity of O(1). 
+
+
+// C++ implementation to reverse a doubly linked list
+// in groups of given size without recursion
+// Iterative Method
+ 
+#include <iostream>
+using namespace std;
+ 
+// Represents a node of doubly linked list
+struct Node {
+    int data;
+    Node *next, *prev;
+};
+ 
+// function to get a new node
+Node* getNode(int data)
+{
+    // allocating node
+    Node* new_node = new Node();
+    new_node->data = data;
+    new_node->next = new_node->prev = NULL;
+ 
+    return new_node;
+}
+ 
+// function to insert a node at the beginning
+// of the Doubly Linked List
+Node* push(Node* head, Node* new_node)
+{
+    // since we are adding at the beginning,
+    // prev is always NULL
+    new_node->prev = NULL;
+ 
+    // link the old list off the new node
+    new_node->next = head;
+    // change prev of head node to new node
+    if (head != NULL)
+        head->prev = new_node;
+ 
+    // move the head to point to the new node
+    head = new_node;
+    return head;
+}
+ 
+// function to reverse a doubly linked list
+// in groups of given size
+Node* revListInGroupOfGivenSize(Node* head, int k)
+{
+    if (!head)
+        return head;
+ 
+    Node* st = head;
+    Node* globprev = NULL;
+    Node* ans = NULL;
+    while (st) {
+        int count = 1; // to count k nodes
+        Node* curr = st;
+        Node* prev = NULL;
+        Node* next = NULL;
+        while (curr && count <= k) { // reversing k nodes
+            next = curr->next;
+            curr->prev = next;
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+            count++;
+        }
+ 
+        if (!ans) {
+            ans = prev; // to store ans i.e the new head
+            ans->prev = NULL;
+        }
+ 
+        if (!globprev)
+            globprev = st; // assigning the last node of the
+                           // reversed k nodes
+        else {
+            globprev->next = prev;
+            prev->prev
+                = globprev; // connecting last node of last
+                            // k group to the first node of
+                            // present k group
+            globprev = st;
+        }
+ 
+        st = curr; // advancing the pointer for the next k
+                   // group
+    }
+    return ans;
+}
+ 
+// Function to print nodes in a
+// given doubly linked list
+void printList(Node* head)
+{
+    while (head) {
+        cout << head->data << " ";
+        head = head->next;
+    }
+}
+ 
+// Driver code
+int main()
+{
+    // Start with the empty list
+    Node* head = NULL;
+ 
+    // Create doubly linked: 10<->8<->4<->2
+    head = push(head, getNode(2));
+    head = push(head, getNode(4));
+    head = push(head, getNode(8));
+    head = push(head, getNode(10));
+ 
+    int k = 2;
+ 
+    cout << "Original list: ";
+    printList(head);
+ 
+    // Reverse doubly linked list in groups of
+    // size 'k'
+    head = revListInGroupOfGivenSize(head, k);
+ 
+    cout << "\nModified list: ";
+    printList(head);
+    return 0;
+}
+ 
+Output
+Original list: 10 8 4 2 
+Modified list: 8 10 2 4 
+Time Complexity: O(n) , where n is the number of nodes in the original list
+Auxiliary Space: O(1)
+
+Flatten a Linked List	
+----------------------------------
+Given a linked list where every node represents a linked list and contains two pointers of its type: 
+
+Pointer to next node in the main list (we call it ‘right’ pointer in the code below) 
+Pointer to a linked list where this node is headed (we call it the ‘down’ pointer in the code below). 
+Note: All linked lists are sorted and the resultant linked list should also be sorted
+
+Examples: 
+
+Input:    5 -> 10 -> 19 -> 28
+          |     |     |     |
+          V     V     V     V
+          7     20    22    35
+          |           |     |
+          V           V     V
+          8           50    40
+          |                  |
+          V                  V
+          30                 45
+
+Output: 5->7->8->10->19->20->22->28->30->35->40->45->50
+
+Input:    3 -> 10 -> 7 -> 14
+          |    |     |    |
+          V    V     V    V
+          9    47    15   22
+          |          |        
+          V          V      
+          17         30
+
+Output: 3->9->7->10->14->15->17->22->30->47   
+
+The idea is to use the Merge() process of merge sort for linked lists. Use merge() to merge lists one by one, recursively merge() the current list with the already flattened list. The down pointer is used to link nodes of the flattened list.
+
+Follow the given steps to solve the problem:
+
+Recursively call to merge the current linked list with the next linked list
+If the current linked list is empty or there is no next linked list then return the current linked list (Base Case)
+Start merging the linked lists, starting from the last linked list
+After merging the current linked list with the next linked list, return the head node of the current linked list
+
+// C++ program for flattening a Linked List
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Link list node
+class Node {
+public:
+    int data;
+    Node *right, *down;
+};
+ 
+Node* head = NULL;
+ 
+// An utility function to merge two sorted
+// linked lists
+Node* merge(Node* a, Node* b)
+{
+ 
+    // If first linked list is empty then second
+    // is the answer
+    if (a == NULL)
+        return b;
+ 
+    // If second linked list is empty then first
+    // is the result
+    if (b == NULL)
+        return a;
+ 
+    // Compare the data members of the two linked
+    // lists and put the larger one in the result
+    Node* result;
+ 
+    if (a->data < b->data) {
+        result = a;
+        result->down = merge(a->down, b);
+    }
+ 
+    else {
+        result = b;
+        result->down = merge(a, b->down);
+    }
+    result->right = NULL;
+    return result;
+}
+ 
+Node* flatten(Node* root)
+{
+ 
+    // Base Cases
+    if (root == NULL || root->right == NULL)
+        return root;
+ 
+    // Recur for list on right
+    root->right = flatten(root->right);
+ 
+    // Now merge
+    root = merge(root, root->right);
+ 
+    // Return the root
+    // it will be in turn merged with its left
+    return root;
+}
+ 
+// Utility function to insert a node at
+// beginning of the linked list
+Node* push(Node* head_ref, int data)
+{
+ 
+    // Allocate the Node & Put in the data
+    Node* new_node = new Node();
+ 
+    new_node->data = data;
+    new_node->right = NULL;
+ 
+    // Make next of new Node as head
+    new_node->down = head_ref;
+ 
+    // Move the head to point to new Node
+    head_ref = new_node;
+ 
+    return head_ref;
+}
+ 
+void printList()
+{
+    Node* temp = head;
+    while (temp != NULL) {
+        cout << temp->data << " ";
+        temp = temp->down;
+    }
+    cout << endl;
+}
+ 
+// Driver's code
+int main()
+{
+ 
+    /* Let us create the following linked list
+        5 -> 10 -> 19 -> 28
+        |    |     |     |
+        V    V     V     V
+        7    20    22    35
+        |          |     |
+        V          V     V
+        8          50    40
+        |                |
+        V                V
+        30               45
+    */
+    head = push(head, 30);
+    head = push(head, 8);
+    head = push(head, 7);
+    head = push(head, 5);
+ 
+    head->right = push(head->right, 20);
+    head->right = push(head->right, 10);
+ 
+    head->right->right = push(head->right->right, 50);
+    head->right->right = push(head->right->right, 22);
+    head->right->right = push(head->right->right, 19);
+ 
+    head->right->right->right
+        = push(head->right->right->right, 45);
+    head->right->right->right
+        = push(head->right->right->right, 40);
+    head->right->right->right
+        = push(head->right->right->right, 35);
+    head->right->right->right
+        = push(head->right->right->right, 20);
+ 
+    // Function call
+    head = flatten(head);
+ 
+    printList();
+    return 0;
+}
+ 
+Output
+5 7 8 10 19 20 20 22 30 35 40 45 50 
+Time Complexity: O(N * N * M) – where N is the no of nodes in the main linked list and M is the no of nodes in a single sub-linked list 
+Explanation: As we are merging 2 lists at a time,
+
+
+After adding the first 2 lists, the time taken will be O(M+M) = O(2M).
+Then we will merge another list to above merged list -> time = O(2M + M) = O(3M).
+Then we will merge another list -> time = O(3M + M).
+We will keep merging lists to previously merged lists until all lists are merged.
+Total time taken will be O(2M + 3M + 4M + …. N*M) = (2 + 3 + 4 + … + N) * M
+Using arithmetic sum formula: time = O((N * N + N – 2) * M/2)
+The above expression is roughly equal to O(N * N * M) for a large value of N
+Auxiliary Space: O(N*M) – because of the recursion. The recursive functions will use a recursive stack of a size equivalent to a total number of elements in the lists, which is N*M.
+
+Flattening a Linked List using Priority Queues:
+The idea is, to build a Min-Heap and push head node of every linked list into it and then use Extract-min function to get minimum element from priority queue and then move forward in that linked list.
+
+Follow the given steps to solve the problem:
+
+Create a priority queue(Min-Heap) and push the head node of every linked list into it
+While the priority queue is not empty, extract the minimum value node from it and if there is a next node linked to the minimum value node then push it into the priority queue
+Also, print the value of the node every time after extracting the minimum value node
+
+// C++ code for the above approach
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Linked list Node
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* bottom;
+ 
+    Node(int x)
+    {
+        data = x;
+        next = NULL;
+        bottom = NULL;
+    }
+};
+ 
+// comparator function for priority queue
+struct mycomp {
+    bool operator()(Node* a, Node* b)
+    {
+        return a->data > b->data;
+    }
+};
+ 
+void flatten(Node* root)
+{
+    priority_queue<Node*, vector<Node*>, mycomp> p;
+    // pushing main link nodes into priority_queue.
+    while (root != NULL) {
+        p.push(root);
+        root = root->next;
+    }
+ 
+    // Extracting the minimum node
+    // while priority queue is not empty
+    while (!p.empty()) {
+ 
+        // extracting min
+        auto k = p.top();
+        p.pop();
+ 
+        // printing  least element
+        cout << k->data << " ";
+        if (k->bottom)
+            p.push(k->bottom);
+    }
+}
+ 
+// Driver's code
+int main(void)
+{
+    // This code builds the flattened linked list
+    // of first picture in this article ;
+    Node* head = new Node(5);
+    auto temp = head;
+    auto bt = head;
+    bt->bottom = new Node(7);
+    bt->bottom->bottom = new Node(8);
+    bt->bottom->bottom->bottom = new Node(30);
+    temp->next = new Node(10);
+ 
+    temp = temp->next;
+    bt = temp;
+    bt->bottom = new Node(20);
+    temp->next = new Node(19);
+    temp = temp->next;
+    bt = temp;
+    bt->bottom = new Node(22);
+    bt->bottom->bottom = new Node(50);
+    temp->next = new Node(28);
+    temp = temp->next;
+    bt = temp;
+    bt->bottom = new Node(35);
+    bt->bottom->bottom = new Node(40);
+    bt->bottom->bottom->bottom = new Node(45);
+ 
+    // Function call
+    flatten(head);
+    cout << endl;
+    return 0;
+}
+
+Output
+5 7 8 10 19 20 22 28 30 35 40 45 50 
+Time Complexity: O(N * M * log(N)) – where N is the no of nodes in the main linked list (reachable using the next pointer) and M is the no of nodes in a single sub-linked list (reachable using a bottom pointer).
+Auxiliary Space: O(N) – where N is the no of nodes in the main linked list (reachable using the next pointer).
+
+Sort a LL of 0’s, 1’s and 2’s	
+-------------------------------------------
+Given a linked list of 0s, 1s and 2s, The task is to sort and print it.
+
+Examples: 
+
+Input: 1 -> 1 -> 2 -> 0 -> 2 -> 0 -> 1 -> NULL 
+Output: 0 -> 0 -> 1 -> 1 -> 1 -> 2 -> 2 -> NULL
+
+Input: 1 -> 1 -> 2 -> 1 -> 0 -> NULL 
+Output: 0 -> 1 -> 1 -> 1 -> 2 -> NULL 
+
+using frequency counting:
+Follow the below steps to implement the idea: 
+
+Traverse the list and count the number of 0s, 1s, and 2s. Let the counts be n1, n2, and n3 respectively.
+Traverse the list again, fill the first n1 nodes with 0, then n2 nodes with 1, and finally n3 nodes with 2.
+
+Below image is a dry run of the above approach:
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// C++ Program to sort a linked list 0s, 1s or 2s
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* Link list node */
+class Node
+{
+    public:
+    int data;
+    Node* next;
+};
+ 
+// Function to sort a linked list of 0s, 1s and 2s
+void sortList(Node *head)
+{
+    int count[3] = {0, 0, 0}; // Initialize count of '0', '1' and '2' as 0
+    Node *ptr = head;
+ 
+    /* count total number of '0', '1' and '2'
+    * count[0] will store total number of '0's
+    * count[1] will store total number of '1's
+    * count[2] will store total number of '2's */
+    while (ptr != NULL)
+    {
+        count[ptr->data] += 1;
+        ptr = ptr->next;
+    }
+ 
+    int i = 0;
+    ptr = head;
+ 
+    /* Let say count[0] = n1, count[1] = n2 and count[2] = n3
+    * now start traversing list from head node,
+    * 1) fill the list with 0, till n1 > 0
+    * 2) fill the list with 1, till n2 > 0
+    * 3) fill the list with 2, till n3 > 0 */
+    while (ptr != NULL)
+    {
+        if (count[i] == 0)
+            ++i;
+        else
+        {
+            ptr->data = i;
+            --count[i];
+            ptr = ptr->next;
+        }
+    }
+}
+ 
+/* Function to push a node */
+void push (Node** head_ref, int new_data)
+{
+    /* allocate node */
+    Node* new_node = new Node();
+ 
+    /* put in the data */
+    new_node->data = new_data;
+ 
+    /* link the old list of the new node */
+    new_node->next = (*head_ref);
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+/* Function to print linked list */
+void printList(Node *node)
+{
+    while (node != NULL)
+    {
+        cout << node->data << " ";
+        node = node->next;
+    }
+    cout << endl;
+}
+ 
+/* Driver code*/
+int main(void)
+{
+    Node *head = NULL;
+    push(&head, 0);
+    push(&head, 1);
+    push(&head, 0);
+    push(&head, 2);
+    push(&head, 1);
+    push(&head, 1);
+    push(&head, 2);
+    push(&head, 1);
+    push(&head, 2);
+ 
+    cout << "Linked List before Sorting\n";
+    printList(head);
+ 
+    sortList(head);
+ 
+    cout << "Linked List after Sorting\n";
+    printList(head);
+ 
+    return 0;
+}
+ 
+Output
+Linked List before Sorting
+2 1 2 1 1 2 0 1 0 
+Linked List after Sorting
+0 0 1 1 1 1 2 2 2 
+Time Complexity: O(n) where n is the number of nodes in the linked list. 
+Auxiliary Space: O(1) 
+
+Clone a linked list with next and random pointer	
+-------------------------------------------------------
+An example of linked list with a random pointerGiven a linked list of size N where each node has two links: one pointer points to the next node and the second pointer points to any node in the list. The task is to create a clone of this linked list in O(N) time. 
+
+Note: The pointer pointing to the next node is ‘next‘ pointer and the one pointing to an arbitrary node is called ‘arbit’ pointer as it can point to any arbitrary node in the linked list. 
+
+An example of the linked list is shown in the below image:
+
+
+
+
+
+
+
+
+Approach 1 (Using Extra Space): The idea to solve this problem is: 
+
+First create a single linked list with only the ‘next’ pointer and use a mapping to map the new nodes to their corresponding nodes in the given linked list. Now use this mapping to point the arbitrary node from any node in the newly created list. 
+
+Follow the steps mentioned beloved to implement the above idea:
+
+Create a duplicate (say Y) for each node (say X) and map them with corresponding old nodes (say mp, So mp[X] = Y).
+Create the single linked list of the duplicate nodes where each node only has the ‘next’ pointer.
+Now iterate over the old linked list and do the following:
+Find the duplicate node mapped with the current one. (i.e., if the current node is X then duplicate is mp[x])
+Make the arbit pointer of the duplicate node pointing to the duplicate of the current->arbit node (i.e., mp[x]->arbit will point to mp[X->arbit]).
+The linked list created in this way is the required linked list. 
+Follow the illustration below for a better understanding:
+
+Illustration:
+
+Consider the linked list shown below:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// C++ code to implement the approach
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Structure of a node of linked list
+struct Node {
+    int val;
+    Node* next;
+    Node* arbit;
+   
+    // Constructor
+    Node(int x)
+    {
+        this->val = x;
+        this->next = NULL;
+        this->arbit = NULL;
+    }
+};
+ 
+// Function to clone the linked list
+Node* cloneLinkedList(Node* head)
+{
+    // Map to store the mapping of old nodes with new ones
+    unordered_map<Node*, Node*> mp;
+    Node *temp, *nhead;
+   
+    // Duplicate of the first node
+    temp = head;
+    nhead = new Node(temp->val);
+    mp[temp] = nhead;
+   
+    // Loop to create duplicates of nodes with only next pointer
+    while (temp->next != NULL) {
+        nhead->next
+            = new Node(temp->next->val);
+        temp = temp->next;
+        nhead = nhead->next;
+        mp[temp] = nhead;
+    }
+    temp = head;
+   
+    // Loop to clone the arbit pointers
+    while (temp != NULL) {
+        mp[temp]->arbit = mp[temp->arbit];
+        temp = temp->next;
+    }
+   
+    // Return the head of the clone
+    return mp[head];
+}
+ 
+// Function to print the linked list
+void printList(Node* head)
+{
+    cout << head->val << "("
+         << head->arbit->val << ")";
+    head = head->next;
+    while (head != NULL) {
+        cout << " -> " << head->val << "("
+             << head->arbit->val << ")";
+        head = head->next;
+    }
+    cout << endl;
+}
+ 
+// Driver code
+int main()
+{
+    // Creating a linked list with random pointer
+    Node* head = new Node(1);
+    head->next = new Node(2);
+    head->next->next = new Node(3);
+    head->next->next->next = new Node(4);
+    head->next->next->next->next
+        = new Node(5);
+    head->arbit = head->next->next;
+    head->next->arbit = head;
+    head->next->next->arbit
+        = head->next->next->next->next;
+    head->next->next->next->arbit
+        = head->next->next;
+    head->next->next->next->next->arbit
+        = head->next;
+   
+    // Print the original list
+    cout << "The original linked list:\n";
+    printList(head);
+   
+    // Function call
+    Node* sol = cloneLinkedList(head);
+   
+    cout << "The cloned linked list:\n";
+    printList(sol);
+   
+    return 0;
+}
+
+Time Complexity: O(N) 
+Auxiliary Space: O(N) 
+
+Approach 2 (Using Constant Extra Space):  The idea to solve is using constant extra space is:
+
+Create duplicate of a node and insert it in between that node and the node just next to it. 
+
+Now for a node X its duplicate will be X->next and the arbitrary pointer of the duplicate will point to X->arbit->next [as that is the duplicate of X->arbit]
+
+Follow the steps mentioned below to implement the idea:
+
+Create the copy of node 1 and insert it between node 1 and node 2 in the original Linked List, create the copy of node 2 and insert it between 2nd and 3rd node and so on. Add the copy of N after the Nth node 
+Now copy the arbitrary link in this fashion:
+original->next->arbitrary = original->arbitrary->next 
+
+Now restore the original and copy linked lists in this fashion in a single loop. 
+original->next = original->next->next;
+copy->next = copy->next->next;
+
+Make sure that the last element of original->next is NULL. 
+ 
+Time Complexity: O(N) 
+Auxiliary Space: O(1) 
+
+Merge K sorted Linked list	
+--------------------------------------------------
+Given K linked lists each of size N and each list is sorted in non-decreasing order, merge them into a single sorted (non-decreasing order) linked list and print the sorted linked list as output.
+
+Examples:
+
+Input: K = 3, N =  4
+list1 = 1->3->5->7->NULL
+list2 = 2->4->6->8->NULL
+list3 = 0->9->10->11->NULL
+
+Output: 0->1->2->3->4->5->6->7->8->9->10->11
+Merged lists in a sorted order where every element is greater than the previous element.
+
+Input: K = 3, N =  3
+list1 = 1->3->7->NULL
+list2 = 2->4->8->NULL
+list3 = 9->10->11->NULL
+
+Output: 1->2->3->4->7->8->9->10->11
+Merged lists in a sorted order where every element is greater than the previous element.
+
+Approach (Min-Heap): To solve the problem using this approach follow the below idea:
+
+This solution is based on the MIN HEAP approach. The process must start with creating a MinHeap and inserting the first element of all the k Linked Lists. Remove the root element of Minheap and put it in the output Linked List and insert the next element from the Linked List of removed element. To get the result the step must continue until there is no element left in the MinHeap.
+Note: Mapping the elements of a heap into an array is trivial, If a node is stored at index k, then its left child is stored at index 2k + 1 and its right child at index 2k + 2.
+
+Follow the given steps to solve the problem:
+
+Create a min-heap and insert the first element of all the ‘k’ linked lists.
+As long as the min-heap is not empty, perform the following steps: 
+Remove the Root of the min-heap (which is the current minimum among all the elements in the min-heap) and add it to the result list.
+If there exists an element (in the same linked list) next to the element that popped out in the previous step, then insert it into the min-heap.
+Return the head node address of the merged list.
+
+// C++ implementation to merge k sorted linked lists Using MIN HEAP method
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+struct Node
+{
+    int data;
+    struct Node* next;
+};
+ 
+// Utility function to create
+// a new node
+struct Node* newNode(int data)
+{
+    // Allocate node
+    struct Node* new_node = new Node();
+ 
+    // Put in the data
+    new_node->data = data;
+    new_node->next = NULL;
+ 
+    return new_node;
+}
+ 
+// 'compare' function used to build
+// up the priority queue
+struct compare
+{
+    bool operator()(
+         struct Node* a, struct Node* b)
+    {
+        return a->data > b->data;
+    }
+};
+ 
+// Function to merge k sorted linked lists
+struct Node* mergeKSortedLists(
+             struct Node* arr[], int K)
+{
+//Priority_queue 'pq' implemented as min heap with the help of 'compare' function
+    priority_queue<Node*, vector<Node*>, compare> pq;
+ 
+    // Push the head nodes of all
+    // the k lists in 'pq'
+    for (int i = 0; i < K; i++)
+        if (arr[i] != NULL)
+            pq.push(arr[i]);
+     
+      // Handles the case when k = 0
+      // or lists have no elements in them   
+      if (pq.empty())
+        return NULL;
+   
+      struct Node *dummy = newNode(0);
+      struct Node *last = dummy;
+   
+    // Loop till 'pq' is not empty
+    while (!pq.empty()) 
+    {
+        // Get the top element of 'pq'
+        struct Node* curr = pq.top();
+        pq.pop();
+ 
+        // Add the top element of 'pq'
+        // to the resultant merged list
+        last->next = curr;
+        last = last->next; 
+       
+        // Check if there is a node
+         // next to the 'top' node
+        // in the list of which 'top'
+        // node is a member
+        if (curr->next != NULL)
+             
+        // Push the next node of top node
+        // in 'pq'
+        pq.push(curr->next);
+    }
+ 
+    // Address of head node of the required
+    // merged list
+    return dummy->next;
+}
+ 
+// Function to print the singly
+// linked list
+void printList(struct Node* head)
+{
+    while (head != NULL)
+    {
+        cout << head->data << " ";
+        head = head->next;
+    }
+}
+ 
+// Driver code
+int main()
+{
+    // Number of linked lists
+    int N = 3;
+ 
+    // Number of elements in each list
+    int K = 4;
+ 
+    // An array of pointers storing the
+    // head nodes of the linked lists
+    Node* arr[N];
+ 
+    // Creating k = 3 sorted lists
+    arr[0] = newNode(1);
+    arr[0]->next = newNode(3);
+    arr[0]->next->next = newNode(5);
+    arr[0]->next->next->next = newNode(7);
+ 
+    arr[1] = newNode(2);
+    arr[1]->next = newNode(4);
+    arr[1]->next->next = newNode(6);
+    arr[1]->next->next->next = newNode(8);
+ 
+    arr[2] = newNode(0);
+    arr[2]->next = newNode(9);
+    arr[2]->next->next = newNode(10);
+    arr[2]->next->next->next = newNode(11);
+ 
+    // Merge the k sorted lists
+    struct Node* head = mergeKSortedLists(arr, N);
+ 
+    // Print the merged list
+    printList(head);
+ 
+    return 0;
+}
+Output
+0 1 2 3 4 5 6 7 8 9 10 11 
+Time Complexity: O(N * K * log K)
+Auxiliary Space: O(K)
+
+Multiply 2 no. represented by LL	
+---------------------------------------
+Given two numbers represented by linked lists, write a function that returns the multiplication of these two linked lists.
+
+Examples: 
+
+Input : 9->4->6
+        8->4
+Output : 79464
+
+Input : 3->2->1
+        1->2
+Output : 3852
+
+Solution: 
+Traverse both lists and generate the required numbers to be multiplied and then return the multiplied values of the two numbers. 
+Algorithm to generate the number from linked list representation: 
+
+1) Initialize a variable to zero
+2) Start traversing the linked list
+3) Add the value of first node to this variable
+4) From the second node, multiply the variable by 10
+   and also take modulus of this value by 10^9+7
+   and then add the value of the node to this 
+   variable.
+5) Repeat step 4 until we reach the last node of the list. 
+Use the above algorithm with both of linked lists to generate the numbers. 
+
+Below is the program for multiplying two numbers represented as linked lists:  
+
+
+// C++ program to Multiply two numbers represented as linked lists
+#include<bits/stdc++.h>
+#include<stdio.h>
+using namespace std;
+    
+// Linked list node
+struct Node
+{
+    int data;
+    struct Node* next;
+};
+    
+// Function to create a new node 
+// with given data
+struct Node *newNode(int data)
+{
+    struct Node *new_node = (struct Node *) malloc(sizeof(struct Node));
+    new_node->data = data;
+    new_node->next = NULL;
+    return new_node;
+}
+    
+// Function to insert a node at the 
+// beginning of the Linked List
+void push(struct Node** head_ref, int new_data)
+{
+    // allocate node 
+    struct Node* new_node = newNode(new_data);
+    
+    // link the old list off the new node 
+    new_node->next = (*head_ref);
+    
+    // move the head to point to the new node 
+    (*head_ref) = new_node;
+}
+    
+// Multiply contents of two linked lists
+long long multiplyTwoLists (Node* first, Node* second)
+{
+    long long N= 1000000007;
+    long long num1 = 0, num2 = 0;
+    while (first || second){
+          
+        if(first){
+            num1 = ((num1)*10)%N + first->data;
+            first = first->next;
+        }
+          
+        if(second)
+        {
+            num2 = ((num2)*10)%N + second->data;
+            second = second->next;
+        }
+          
+    }
+    return ((num1%N)*(num2%N))%N;
+}
+    
+// A utility function to print a linked list
+void printList(struct Node *node)
+{
+    while(node != NULL)
+    {
+        cout<<node->data;
+        if(node->next)
+            cout<<"->";
+        node = node->next;
+    }
+    cout<<"\n";
+}
+    
+// Driver program to test above function
+int main()
+{
+    struct Node* first = NULL;
+    struct Node* second = NULL;
+    
+    // create first list 9->4->6
+    push(&first, 6);
+    push(&first, 4);
+    push(&first, 9);
+    printf("First List is: ");
+    printList(first);
+    
+    // create second list 8->4
+    push(&second, 4);
+    push(&second, 8);
+    printf("Second List is: ");
+    printList(second);
+    
+    // Multiply the two lists and see result
+    cout<<"Result is: ";
+    cout<<multiplyTwoLists(first, second);
+    
+    return 0;
+}
+
+Output
+First List is: 9->4->6
+Second List is: 8->4
+Result is: 79464
+
+Time Complexity: O(max(n1, n2)), where n1 and n2 represents the number of nodes present in the first and second linked list respectively.
+Auxiliary Space: O(1), no extra space is required, so it is a constant.
+
+Delete nodes which have a greater value on right side	
+---------------------------------------------------------------
+Given a singly linked list, remove all the nodes which have a greater value on the right side. 
+
+Examples: 
+a) The list 12->15->10->11->5->6->2->3->NULL should be changed to 15->11->6->3->NULL. Note that 12, 10, 5 and 2 have been deleted because there is a greater value on the right side. 
+When we examine 12, we see that after 12 there is one node with a value greater than 12 (i.e. 15), so we delete 12. 
+When we examine 15, we find no node after 15 that has a value greater than 15, so we keep this node. 
+When we go like this, we get 15->6->3
+b) The list 10->20->30->40->50->60->NULL should be changed to 60->NULL. Note that 10, 20, 30, 40, and 50 have been deleted because they all have a greater value on the right side.
+c) The list 60->50->40->30->20->10->NULL should not be changed. 
+
+Method 1 (Simple) 
+Use two loops. In the outer loop, pick nodes of the linked list one by one. In the inner loop, check if there exists a node whose value is greater than the picked node. If there exists a node whose value is greater, then delete the picked node. 
+Time Complexity: O(n^2)
+
+Method 2 (Use Reverse) 
+Thanks to Paras for providing the below algorithm. 
+1. Reverse the list. 
+2. Traverse the reversed list. Keep max till now. If the next node is less than max, then delete the next node, otherwise max = next node. 
+3. Reverse the list again to retain the original order. 
+Time Complexity: O(n)
+
+// C++ program to delete nodes which have a greater value on right side
+#include <bits/stdc++.h>
+using namespace std;
+  
+/* structure of a linked list node */
+struct Node
+{
+    int data;
+    struct Node* next;
+};
+  
+/* prototype for utility functions */
+void reverseList(struct Node** headref);
+void _delLesserNodes(struct Node* head);
+  
+/* Deletes nodes which have a node with greater value node on left side */
+void delLesserNodes(struct Node** head_ref)
+{
+    /* 1) Reverse the linked list */
+    reverseList(head_ref);
+  
+    /* 2) In the reversed list, delete nodes which have a node with greater value node on left side. Note that head node is never deleted because it is the leftmost node.*/
+    _delLesserNodes(*head_ref);
+  
+    /* 3) Reverse the linked list again to 
+    retain the original order */
+    reverseList(head_ref);
+}
+  
+/* Deletes nodes which have
+greater value node(s) on left side */
+void _delLesserNodes(struct Node* head)
+{
+    struct Node* current = head;
+  
+    /* Initialize max */
+    struct Node* maxnode = head;
+    struct Node* temp;
+  
+    while (current != NULL && 
+           current->next != NULL) 
+    {
+        /* If current is smaller than max,
+        then delete current */
+        if (current->next->data < maxnode->data) 
+        {
+            temp = current->next;
+            current->next = temp->next;
+            free(temp);
+        }
+  
+        /* If current is greater than max, 
+            then update max and move current */
+        else
+        {
+            current = current->next;
+            maxnode = current;
+        }
+    }
+}
+  
+/* Utility function to insert a node 
+at the beginning */
+void push(struct Node** head_ref, int new_data)
+{
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->data = new_data;
+    new_node->next = *head_ref;
+    *head_ref = new_node;
+}
+  
+/* Utility function to reverse a linked list */
+void reverseList(struct Node** headref)
+{
+    struct Node* current = *headref;
+    struct Node* prev = NULL;
+    struct Node* next;
+    while (current != NULL) 
+    {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    *headref = prev;
+}
+  
+/* Utility function to print a linked list */
+void printList(struct Node* head)
+{
+    while (head != NULL) 
+    {
+        cout << " " << head->data ;
+        head = head->next;
+    }
+    cout << "\n" ;
+}
+  
+/* Driver program to test above functions */
+int main()
+{
+    struct Node* head = NULL;
+  
+    /* Create following linked list
+    12->15->10->11->5->6->2->3 */
+    push(&head, 3);
+    push(&head, 2);
+    push(&head, 6);
+    push(&head, 5);
+    push(&head, 11);
+    push(&head, 10);
+    push(&head, 15);
+    push(&head, 12);
+  
+    cout << "Given Linked List \n" ;
+    printList(head);
+  
+    delLesserNodes(&head);
+  
+    cout << "Modified Linked List \n" ;
+    printList(head);
+  
+    return 0;
+}
+  
+Output
+Given Linked List 
+ 12 15 10 11 5 6 2 3
+Modified Linked List 
+ 15 11 6 3
+Time complexity: O(n) where n is no of nodes in the Linked list
+Auxiliary Space: O(n)
+
+Segregate even and odd nodes in a Linked List	
+------------------------------------------------------
+Given a Linked List of integers, write a function to modify the linked list such that all even numbers appear before all the odd numbers in the modified linked list. Also, keep the order of even and odd numbers the same.
+
+Examples: 
+
+Input: 17->15->8->12->10->5->4->1->7->6->NULL
+Output: 8->12->10->4->6->17->15->5->1->7->NULL
+
+Input: 8->12->10->5->4->1->6->NULL
+Output: 8->12->10->4->6->5->1->NULL
+
+// If all numbers are even then do not change the list
+Input: 8->12->10->NULL
+Output: 8->12->10->NULL
+
+// If all numbers are odd then do not change the list
+Input: 1->3->5->7->NULL
+Output: 1->3->5->7->NULL
+
+Method 1 
+The idea is to get pointer to the last node of list. And then traverse the list starting from the head node and move the odd valued nodes from their current position to end of the list.
+
+Follow the steps below to implement the above idea:
+
+Get a pointer to the last node. 
+Move all the odd nodes to the end. 
+Consider all odd nodes before the first even node and move them to end. 
+Change the head pointer to point to the first even node. 
+ Consider all odd nodes after the first even node and move them to the end. 
+
+// C++ program to segregate even and odd nodes in a Linked List
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* a node of the singly linked list */
+class Node
+{
+    public:
+    int data;
+    Node *next;
+};
+ 
+void segregateEvenOdd(Node **head_ref)
+{
+    Node *end = *head_ref;
+    Node *prev = NULL;
+    Node *curr = *head_ref;
+ 
+    /* Get pointer to the last node */
+    while (end->next != NULL)
+        end = end->next;
+ 
+    Node *new_end = end;
+ 
+    /* Consider all odd nodes before the first even node and move then after end */
+    while (curr->data % 2 != 0 && curr != end)
+    {
+        new_end->next = curr;
+        curr = curr->next;
+        new_end->next->next = NULL;
+        new_end = new_end->next;
+    }
+ 
+    // 10->8->17->17->15
+    /* Do following steps only if there is any even node */
+    if (curr->data%2 == 0)
+    {
+        /* Change the head pointer to point to first even node */
+        *head_ref = curr;
+ 
+        /* now current points to the first even node */
+        while (curr != end)
+        {
+            if ( (curr->data) % 2 == 0 )
+            {
+                prev = curr;
+                curr = curr->next;
+            }
+            else
+            {
+                /* break the link between
+                prev and current */
+                prev->next = curr->next;
+ 
+                /* Make next of curr as NULL */
+                curr->next = NULL;
+ 
+                /* Move curr to end */
+                new_end->next = curr;
+ 
+                /* make curr as new end of list */
+                new_end = curr;
+ 
+                /* Update current pointer to
+                next of the moved node */
+                curr = prev->next;
+            }
+        }
+    }
+ 
+    /* We must have prev set before executing lines following this statement */
+    else prev = curr;
+ 
+    /* If there are more than 1 odd nodes and end of original list is odd then move this node to end to maintain same order of odd numbers in modified list */
+    if (new_end != end && (end->data) % 2 != 0)
+    {
+        prev->next = end->next;
+        end->next = NULL;
+        new_end->next = end;
+    }
+    return;
+}
+ 
+/* UTILITY FUNCTIONS */
+/* Function to insert a node at the beginning */
+void push(Node** head_ref, int new_data)
+{
+    /* allocate node */
+    Node* new_node = new Node();
+ 
+    /* put in the data */
+    new_node->data = new_data;
+ 
+    /* link the old list off the new node */
+    new_node->next = (*head_ref);
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+/* Function to print nodes in a given linked list */
+void printList(Node *node)
+{
+    while (node != NULL)
+    {
+        cout << node->data <<" ";
+        node = node->next;
+    }
+}
+ 
+/* Driver code*/
+int main()
+{
+    /* Start with the empty list */
+    Node* head = NULL;
+ 
+    /* Let us create a sample linked list as following
+    0->2->4->6->8->10->11 */
+ 
+    push(&head, 11);
+    push(&head, 10);
+    push(&head, 8);
+    push(&head, 6);
+    push(&head, 4);
+    push(&head, 2);
+    push(&head, 0);
+ 
+    cout << "Original Linked list ";
+    printList(head);
+ 
+    segregateEvenOdd(&head);
+ 
+    cout << "\nModified Linked list ";
+    printList(head);
+ 
+    return 0;
+}
+ 
+Output
+Original Linked list 0 2 4 6 8 10 11 
+Modified Linked list 0 2 4 6 8 10 11 
+Time Complexity: O(n), As we are only traversing linearly through the list.
+Auxiliary Space: O(1)
+
+Method 2: 
+
+The idea is to split the linked list into two:  one containing all even nodes and the other containing all odd nodes. And finally, attach the odd node linked list after the even node linked list. 
+To split the Linked List, traverse the original Linked List and move all odd nodes to a separate Linked List of all odd nodes. At the end of loop, the original list will have all the even nodes and the odd node list will have all the odd nodes. To keep the ordering of all nodes same, we must insert all the odd nodes at the end of the even node list. And to do that in constant time, we must keep track of last pointer in the even node list.
+
+// CPP program to segregate even and odd nodes in a Linked List
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/* a node of the singly linked list */
+struct Node {
+    int data;
+    struct Node* next;
+};
+ 
+// Function to segregate even and odd nodes.
+void segregateEvenOdd(struct Node** head_ref)
+{
+    // Starting node of list having even values.
+    Node* evenStart = NULL;
+    // Ending node of even values list.
+    Node* evenEnd = NULL;
+    // Starting node of odd values list.
+    Node* oddStart = NULL;
+    // Ending node of odd values list.
+    Node* oddEnd = NULL;
+    // Node to traverse the list.
+    Node* currNode = *head_ref;
+ 
+    while (currNode != NULL) {
+        int val = currNode->data;
+ 
+        // If current value is even, add it to even values list.
+        if (val % 2 == 0) {
+            if (evenStart == NULL) {
+                evenStart = currNode;
+                evenEnd = evenStart;
+            }
+            else {
+                evenEnd->next = currNode;
+                evenEnd = evenEnd->next;
+            }
+        }
+ 
+// If current value is odd, add it to odd values list.
+        else {
+            if (oddStart == NULL) {
+                oddStart = currNode;
+                oddEnd = oddStart;
+            }
+            else {
+                oddEnd->next = currNode;
+                oddEnd = oddEnd->next;
+            }
+        }
+ 
+        // Move head pointer one step in forward direction
+        currNode = currNode->next;
+    }
+ 
+    // If either odd list or even list is empty, no change
+    // is required as all elements are either even or odd.
+    if (oddStart == NULL || evenStart == NULL)
+        return;
+ 
+    // Add odd list after even list.
+    evenEnd->next = oddStart;
+    oddEnd->next = NULL;
+ 
+    // Modify head pointer to starting of even list.
+    *head_ref = evenStart;
+}
+ 
+/* UTILITY FUNCTIONS */
+/* Function to insert a node at the beginning */
+void push(Node** head_ref, int new_data)
+{
+    /* allocate node */
+    Node* new_node = new Node();
+    /* put in the data */
+    new_node->data = new_data;
+    /* link the old list off the new node */
+    new_node->next = (*head_ref);
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+/* Function to print nodes in a given linked list */
+void printList(Node* node)
+{
+    while (node != NULL) {
+        cout << node->data << " ";
+        node = node->next;
+    }
+}
+ 
+/* Driver program to test above functions*/
+int main()
+{
+    /* Start with the empty list */
+    Node* head = NULL;
+ 
+    /* Let us create a sample linked list as following
+    0->1->4->6->9->10->11 */
+ 
+    push(&head, 11);
+    push(&head, 10);
+    push(&head, 9);
+    push(&head, 6);
+    push(&head, 4);
+    push(&head, 1);
+    push(&head, 0);
+ 
+    cout << "Original Linked list" << endl;
+    printList(head);
+ 
+    segregateEvenOdd(&head);
+ 
+    cout << endl << "Modified Linked list " << endl;
+    printList(head);
+ 
+    return 0;
+}
+ 
+Output
+Original Linked list
+0 1 4 6 9 10 11 
+Modified Linked list 
+0 4 6 10 1 9 11 
+Time Complexity: O(n), As we are only traversing linearly through the list.
+Auxiliary Space: O(1)
+
+Program for n’th node from the end of a Linked List	
+----------------------------------------------------------
+Given a Linked List and a number N, write a function that returns the value at the Nth node from the end of the Linked List.
+
+Examples:
+
+Input: 1 -> 2 -> 3 -> 4, N = 3
+Output: 2
+
+Input: 35 -> 15 -> 4 -> 20, N = 4
+Output: 35
+
+Naive Approach: Follow the given steps to solve the problem using this approach: 
+
+Calculate the length of the Linked List. Let the length be len. 
+Print the (len – n + 1)th node from the beginning of the Linked List. 
+Below is the implementation of the above approach:
+
+
+// C program to find N'th node from end
+#include <stdio.h>
+#include <stdlib.h>
+ 
+/* Link list node */
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+ 
+/* Function to get the nth node from the last of a linked
+ * list*/
+void printNthFromLast(Node* head, int N)
+{
+    int len = 0, i;
+    Node* temp = head;
+ 
+    // Count the number of nodes in Linked List
+    while (temp != NULL) {
+        temp = temp->next;
+        len++;
+    }
+ 
+    // Check if value of N is not
+    // more than length of the linked list
+    if (len < N)
+        return;
+    temp = head;
+ 
+    // Get the (len-N+1)th node from the beginning
+    for (i = 1; i < len - N + 1; i++)
+        temp = temp->next;
+    printf("%d", temp->data);
+    return;
+}
+ 
+void push(struct Node** head_ref, int new_data)
+{
+    /* Allocate node */
+    Node* new_node = (Node*)malloc(sizeof(Node));
+ 
+    /* Put in the data */
+    new_node->data = new_data;
+ 
+    /* link the old list of the new node */
+    new_node->next = (*head_ref);
+ 
+    /* move the head to point to the new node */
+    (*head_ref) = new_node;
+}
+ 
+// Driver's Code
+int main()
+{
+ 
+    /* Start with the empty list */
+    struct Node* head = NULL;
+ 
+    // create linked 35->15->4->20
+    push(&head, 20);
+    push(&head, 4);
+    push(&head, 15);
+    push(&head, 35);
+   
+      // Function call
+    printNthFromLast(head, 4);
+    return 0;
+}
+ 
+// This code is contributed by Aditya Kumar (adityakumar129)
+Output
+35
+Time complexity: O(M) where M is the size of the linked list
+Auxiliary Space: O(1)
+
+
+//Below is a recursive code for the same method.
+void printNthFromLast(struct Node* head, int N)
+{
+    static int i = 0;
+    if (head == NULL)
+        return;
+    printNthFromLast(head->next, N);
+    if (++i == N)
+        cout<<head->data;
+}
+
+Time Complexity: O(M) where M is the length of the linked list. 
+Auxiliary Space: O(M) for call stack
+
+// BY SHIBAM NATH
