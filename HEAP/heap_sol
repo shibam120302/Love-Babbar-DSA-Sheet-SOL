@@ -1,0 +1,2963 @@
+-------------------------------------------------------------------------------
+                                 Heap
+-------------------------------------------------------------------------------
+
+Implement a Maxheap/MinHeap using arrays and recursion.	
+----------------------------------------------------------
+Given an array of N elements. The task is to build a Binary Heap from the given array. The heap can be either Max Heap or Min Heap.
+
+Examples: 
+
+Input: arr[] = {4, 10, 3, 5, 1}
+Output: Corresponding Max-Heap:
+
+       10
+     /   \
+   5      3
+  /  \
+4     1
+
+
+Input: arr[] = {1, 3, 5, 4, 6, 13, 10, 9, 8, 15, 17}
+Output: Corresponding Max-Heap:
+
+                 17
+              /      \
+          15         13
+         /    \      /  \
+       9      6    5   10
+     / \    /  \
+   4   8  3    1
+
+Note:
+
+Root is at index 0 in array.
+Left child of i-th node is at (2*i + 1)th index.
+Right child of i-th node is at (2*i + 2)th index.
+Parent of i-th node is at (i-1)/2 index.
+
+Naive Approach:  To solve the problem follow the below idea:
+
+To build a Max-Heap from the above-given array elements, It can be clearly seen that the above complete binary tree formed does not follow the Heap property. So, the idea is to heapify the complete binary tree formed from the array in reverse level order following a top-down approach. That is first heapify, the last node in level order traversal of the tree, then heapify the second last node and so on. 
+
+Time Complexity Analysis: Heapify a single node takes O(log N) time complexity where N is the total number of Nodes. Therefore, building the entire Heap will take N heapify operations and the total time complexity will be O(N*logN).
+Note: In reality, building a heap takes O(n) time depending on the implementation which can be seen here
+
+Efficient Approach: To solve the problem using this approach follow the below idea:
+
+The above approach can be optimized by observing the fact that the leaf nodes need not to be heapified as they already follow the heap property. Also, the array representation of the complete binary tree contains the level order traversal of the tree. So the idea is to find the position of the last non-leaf node and perform the heapify operation of each non-leaf node in reverse level order. 
+
+Last non-leaf node = parent of last-node.
+or, Last non-leaf node = parent of node at (n-1)th index.
+or, Last non-leaf node = Node at index ((n-1) – 1)/2 = (n/2) – 1.
+
+Heapify Illustration: 
+ 
+
+Array = {1, 3, 5, 4, 6, 13, 10, 9, 8, 15, 17}
+Corresponding Complete Binary Tree is:
+
+                 1
+              /     \
+           3         5
+        /    \     /  \
+      4      6   13  10
+     / \    / \
+   9   8  15 17
+
+The task to build a Max-Heap from above array.
+
+Total Nodes = 11.
+Last Non-leaf node index = (11/2) – 1 = 4.
+Therefore, last non-leaf node = 6.
+
+To build the heap, heapify only the nodes: [1, 3, 5, 4, 6] in reverse order.
+
+Heapify 6: Swap 6 and 17.
+
+                 1
+              /     \
+           3         5
+        /    \      /  \
+     4      17   13  10
+    / \    /  \
+  9   8  15   6
+
+Heapify 4: Swap 4 and 9.
+
+                 1
+              /     \
+           3         5
+        /    \      /  \
+     9      17   13  10
+    / \    /  \
+  4   8  15   6
+
+Heapify 5: Swap 13 and 5.
+
+                 1
+              /     \
+           3         13
+        /    \      /  \
+     9      17   5   10
+    / \    /  \
+ 4   8  15   6
+
+Heapify 3: First Swap 3 and 17, again swap 3 and 15.
+
+                 1
+             /     \
+        17         13
+       /    \      /  \
+    9      15   5   10
+   / \    /  \
+ 4   8  3   6
+
+Heapify 1: First Swap 1 and 17, again swap 1 and 15, finally swap 1 and 6.
+
+                 17
+              /      \
+          15         13
+         /    \      /  \
+       9      6    5   10
+      / \    /  \
+    4   8  3    1
+
+// C++ program for building Heap from Array
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// To heapify a subtree rooted with node i which is
+// an index in arr[]. N is size of heap
+void heapify(int arr[], int N, int i)
+{
+    int largest = i; // Initialize largest as root
+    int l = 2 * i + 1; // left = 2*i + 1
+    int r = 2 * i + 2; // right = 2*i + 2
+ 
+    // If left child is larger than root
+    if (l < N && arr[l] > arr[largest])
+        largest = l;
+ 
+    // If right child is larger than largest so far
+    if (r < N && arr[r] > arr[largest])
+        largest = r;
+ 
+    // If largest is not root
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+ 
+        // Recursively heapify the affected sub-tree
+        heapify(arr, N, largest);
+    }
+}
+ 
+// Function to build a Max-Heap from the given array
+void buildHeap(int arr[], int N)
+{
+    // Index of last non-leaf node
+    int startIdx = (N / 2) - 1;
+ 
+    // Perform reverse level order traversal
+    // from last non-leaf node and heapify
+    // each node
+    for (int i = startIdx; i >= 0; i--) {
+        heapify(arr, N, i);
+    }
+}
+ 
+// A utility function to print the array
+// representation of Heap
+void printHeap(int arr[], int N)
+{
+    cout << "Array representation of Heap is:\n";
+ 
+    for (int i = 0; i < N; ++i)
+        cout << arr[i] << " ";
+    cout << "\n";
+}
+ 
+// Driver Code
+int main()
+{
+    // Binary Tree Representation
+    // of input array
+    //             1
+    //           /    \
+    //         3        5
+    //       /  \     /  \
+    //     4      6  13  10
+    //    / \    / \
+    //   9   8  15 17
+    int arr[] = {1, 3, 5, 4, 6, 13, 10, 9, 8, 15, 17};
+ 
+    int N = sizeof(arr) / sizeof(arr[0]);
+ 
+    // Function call
+    buildHeap(arr, N);
+    printHeap(arr, N);
+   
+    // Final Heap:
+    //              17
+    //            /    \
+    //          15      13
+    //         /  \     / \
+    //        9     6  5   10
+    //       / \   / \
+    //      4   8 3   1
+ 
+    return 0;
+}
+Output
+Array representation of Heap is:
+17 15 13 9 6 5 10 4 8 3 1 
+Time Complexity: O(N)
+Auxiliary Space: O(N)
+
+Maximum of all subarrays of size k.	
+----------------------------------------------------
+Given an array and an integer K, find the maximum for each and every contiguous subarray of size K.
+
+Examples : 
+
+Input: arr[] = {1, 2, 3, 1, 4, 5, 2, 3, 6}, K = 3 
+Output: 3 3 4 5 5 5 6
+Explanation: Maximum of 1, 2, 3 is 3
+                       Maximum of 2, 3, 1 is 3
+                       Maximum of 3, 1, 4 is 4
+                       Maximum of 1, 4, 5 is 5
+                       Maximum of 4, 5, 2 is 5 
+                       Maximum of 5, 2, 3 is 5
+                       Maximum of 2, 3, 6 is 6
+
+Input: arr[] = {8, 5, 10, 7, 9, 4, 15, 12, 90, 13}, K = 4 
+Output: 10 10 10 15 15 90 90
+Explanation: Maximum of first 4 elements is 10, similarly for next 4 
+                       elements (i.e from index 1 to 4) is 10, So the sequence 
+                       generated is 10 10 10 15 15 90 90
+
+Naive Approach: To solve the problem using this approach follow the below idea:
+
+The idea is very basic run a nested loop, the outer loop which will mark the starting point of the subarray of length K, the inner loop will run from the starting index to index+K, and print the maximum element among these K elements. 
+
+Follow the given steps to solve the problem:
+
+Create a nested loop, the outer loop from starting index to N – Kth elements. The inner loop will run for K iterations.
+Create a variable to store the maximum of K elements traversed by the inner loop.
+Find the maximum of K elements traversed by the inner loop.
+Print the maximum element in every iteration of the outer loop
+Below is the implementation of the above approach:
+
+
+// C++ program for the above approach
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Method to find the maximum for each
+// and every contiguous subarray of size K.
+void printKMax(int arr[], int N, int K)
+{
+    int j, max;
+ 
+    for (int i = 0; i <= N - K; i++) {
+        max = arr[i];
+ 
+        for (j = 1; j < K; j++) {
+            if (arr[i + j] > max)
+                max = arr[i + j];
+        }
+        cout << max << " ";
+    }
+}
+ 
+// Driver's code
+int main()
+{
+    int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    int N = sizeof(arr) / sizeof(arr[0]);
+    int K = 3;
+   
+      // Function call
+    printKMax(arr, N, K);
+    return 0;
+}
+ 
+Output
+3 4 5 6 7 8 9 10 
+Time Complexity: O(N * K), The outer loop runs N-K+1 times and the inner loop runs K times for every iteration of the outer loop. So time complexity is O((n-k+1)*k) which can also be written as O(N * K)
+Auxiliary Space: O(1)
+
+Maximum of all subarrays of size K using Deque: 
+Create a Deque, Qi of capacity K, that stores only useful elements of current window of K elements. An element is useful if it is in current window and is greater than all other elements on right side of it in current window. Process all array elements one by one and maintain Qi to contain useful elements of current window and these useful elements are maintained in sorted order. The element at front of the Qi is the largest and element at rear/back of Qi is the smallest of current window.
+
+Below is the dry run of the above approach: 
+
+
+
+Follow the given steps to solve the problem:
+
+Create a deque to store K elements.
+Run a loop and insert the first K elements in the deque. Before inserting the element, check if the element at the back of the queue is smaller than the current element, if it is so remove the element from the back of the deque until all elements left in the deque are greater than the current element. Then insert the current element, at the back of the deque.
+Now, run a loop from K to the end of the array.
+Print the front element of the deque.
+Remove the element from the front of the queue if they are out of the current window.
+Insert the next element in the deque. Before inserting the element, check if the element at the back of the queue is smaller than the current element, if it is so remove the element from the back of the deque until all elements left in the deque are greater than the current element. Then insert the current element, at the back of the deque.
+Print the maximum element of the last window.
+
+// CPP program for the above approach
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// A Dequeue (Double ended queue) based
+// method for printing maximum element of
+// all subarrays of size k
+void printKMax(int arr[], int N, int K)
+{
+ 
+    // Create a Double Ended Queue,
+    // Qi that will store indexes
+    // of array elements
+    // The queue will store indexes
+    // of useful elements in every
+    // window and it will
+    // maintain decreasing order of
+    // values from front to rear in Qi, i.e.,
+    // arr[Qi.front[]] to arr[Qi.rear()]
+    // are sorted in decreasing order
+    std::deque<int> Qi(K);
+ 
+    /* Process first k (or first window)
+     elements of array */
+    int i;
+    for (i = 0; i < K; ++i) {
+ 
+        // For every element, the previous
+        // smaller elements are useless so
+        // remove them from Qi
+        while ((!Qi.empty()) && arr[i] >= arr[Qi.back()])
+ 
+            // Remove from rear
+            Qi.pop_back();
+ 
+        // Add new element at rear of queue
+        Qi.push_back(i);
+    }
+ 
+    // Process rest of the elements,
+    // i.e., from arr[k] to arr[n-1]
+    for (; i < N; ++i) {
+ 
+        // The element at the front of
+        // the queue is the largest element of
+        // previous window, so print it
+        cout << arr[Qi.front()] << " ";
+ 
+        // Remove the elements which
+        // are out of this window
+        while ((!Qi.empty()) && Qi.front() <= i - K)
+ 
+            // Remove from front of queue
+            Qi.pop_front();
+ 
+        // Remove all elements
+        // smaller than the currently
+        // being added element (remove
+        // useless elements)
+        while ((!Qi.empty()) && arr[i] >= arr[Qi.back()])
+            Qi.pop_back();
+ 
+        // Add current element at the rear of Qi
+        Qi.push_back(i);
+    }
+ 
+    // Print the maximum element
+    // of last window
+    cout << arr[Qi.front()];
+}
+ 
+// Driver's code
+int main()
+{
+    int arr[] = { 12, 1, 78, 90, 57, 89, 56 };
+    int N = sizeof(arr) / sizeof(arr[0]);
+    int K = 3;
+ 
+    // Function call
+    printKMax(arr, N, K);
+    return 0;
+}
+Output
+78 90 90 90 89
+Time Complexity: O(N). It seems more than O(N) at first look. It can be observed that every element of the array is added and removed at most once. So there are total of 2n operations.
+Auxiliary Space: O(K). Elements stored in the dequeue take O(K) space.
+
+“K” largest element in an array	
+----------------------------------------
+Write an efficient program for printing k largest elements in an array. Elements in an array can be in any order.
+For example: if the given array is [1, 23, 12, 9, 30, 2, 50] and you are asked for the largest 3 elements i.e., k = 3 then your program should print 50, 30, and 23.
+
+Method 1 (Use Bubble k times) 
+
+1) Modify Bubble Sort to run the outer loop at most k times. 
+2) Print the last k elements of the array obtained in step 1.
+Time Complexity: O(n*k) 
+Like Bubble sort, other sorting algorithms like Selection Sort can also be modified to get the k largest elements.
+
+Method 2 (Use temporary array) 
+K largest elements from arr[0..n-1]
+
+1) Store the first k elements in a temporary array temp[0..k-1]. 
+2) Find the smallest element in temp[], let the smallest element be min. 
+3-a) For each element x in arr[k] to arr[n-1]. O(n-k) 
+If x is greater than the min then remove min from temp[] and insert x. 
+3-b)Then, determine the new min from temp[]. O(k) 
+4) Print final k elements of temp[]
+
+Time Complexity: O((n-k)*k). If we want the output sorted then O((n-k)*k + k*log(k))
+Thanks to nesamani1822 for suggesting this method. 
+
+Method 3(Use Sorting) 
+1) Sort the elements in descending order in O(n*log(n)) 
+2) Print the first k numbers of the sorted array O(k). 
+
+// C++ code for k largest elements in an array
+#include <bits/stdc++.h>
+using namespace std;
+ 
+void kLargest(int arr[], int n, int k)
+{
+    // Sort the given array arr in reverse order.
+    sort(arr, arr + n, greater<int>());
+ 
+    // Print the first kth largest elements
+    for (int i = 0; i < k; i++)
+        cout << arr[i] << " ";
+}
+ 
+// driver program
+int main()
+{
+    int arr[] = { 1, 23, 12, 9, 30, 2, 50 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int k = 3;
+    kLargest(arr, n, k);
+}
+ 
+Output
+50 30 23 
+Time complexity: O(n*log(n))
+Auxiliary Space: O(1)
+
+Kth smallest and largest element in an unsorted array	
+------------------------------------------------------------
+Given an array and a number K where K is smaller than the size of the array. Find the K’th smallest element in the given array. Given that all array elements are distinct.
+
+Examples:  
+
+Input: arr[] = {7, 10, 4, 3, 20, 15}, K = 3 
+Output: 7
+
+Input: arr[] = {7, 10, 4, 3, 20, 15}, K = 4 
+Output: 10 
+
+Using sorting:
+Sort the given array and return the element at index K-1 in the sorted array. 
+
+Follow the given steps to solve the problem:
+
+Sort the input array in the increasing order
+Return the element at the K-1 index (0 – Based indexing) in the sorted array
+
+// C++ program to find K'th smallest element
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to return K'th smallest element in a given array
+int kthSmallest(int arr[], int N, int K)
+{
+    // Sort the given array
+    sort(arr, arr + N);
+ 
+    // Return k'th element in the sorted array
+    return arr[K - 1];
+}
+ 
+// Driver's code
+int main()
+{
+    int arr[] = { 12, 3, 5, 7, 19 };
+    int N = sizeof(arr) / sizeof(arr[0]), K = 2;
+ 
+    // Function call
+    cout << "K'th smallest element is "
+         << kthSmallest(arr, N, K);
+    return 0;
+}
+ 
+
+Output
+K'th smallest element is 5
+Time Complexity: O(N log N)
+Auxiliary Space: O(1) 
+
+Using set data structure:
+Set data structure can be used to find the kth smallest element as it stores the distinct elements in sorted order. Set can be used because it is mentioned in the question that all the elements in the array are distinct.
+
+Follow the given steps to solve the problem:
+
+Insert all array elements into the set
+Advance the iterator to the Kth element in the set
+Return the value of the element at which the iterator is pointing
+
+// C++ code for the above approach
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+int main()
+{
+    int arr[] = { 12, 3, 5, 7, 19 };
+    int N = sizeof(arr) / sizeof(arr[0]);
+    int K = 4;
+ 
+    set<int> s(arr, arr + N);
+ 
+    // s.begin() returns a pointer to first
+    // element in the set
+    set<int>::iterator itr = s.begin();
+ 
+    advance(itr, K - 1); // itr points to kth element in set
+ 
+    cout << *itr << "\n";
+ 
+    return 0;
+}
+Time Complexity:  O(N*log N)
+Auxiliary Space: O(N)
+
+K’th smallest element in an unsorted array using heap data structure:
+K’th smallest element in an unsorted array using Min-Heap
+Min-Heap can be used to find the kth smallest element, by inserting all the elements into Min-Heap and then and call extractMin() function K times. 
+
+Follow the given steps to solve the problem:
+
+Insert all the array elements into the Min-Heap
+Call extractMin() function K times
+Return the value obtained at the last call of extractMin() function 
+
+// C++ program to find K'th smallest element using min heap
+ 
+#include <climits>
+#include <iostream>
+using namespace std;
+ 
+// Prototype of a utility function to swap two integers
+void swap(int* x, int* y);
+ 
+// A class for Min Heap
+class MinHeap {
+ 
+    int* harr; // pointer to array of elements in heap
+    int capacity; // maximum possible size of min heap
+    int heap_size; // Current number of elements in min heap
+public:
+    MinHeap(int a[], int size); // Constructor
+ 
+    // To minheapify subtree rooted with index i
+    void MinHeapify(int i);
+    int parent(int i) { return (i - 1) / 2; }
+    int left(int i) { return (2 * i + 1); }
+    int right(int i) { return (2 * i + 2); }
+ 
+    int extractMin(); // extracts root (minimum) element
+    int getMin() { return harr[0]; } // Returns minimum
+};
+ 
+MinHeap::MinHeap(int a[], int size)
+{
+    heap_size = size;
+    harr = a; // store address of array
+    int i = (heap_size - 1) / 2;
+    while (i >= 0) {
+        MinHeapify(i);
+        i--;
+    }
+}
+ 
+// Method to remove minimum element (or root) from min heap
+int MinHeap::extractMin()
+{
+    if (heap_size == 0)
+        return INT_MAX;
+ 
+    // Store the minimum value.
+    int root = harr[0];
+ 
+    // If there are more than 1 items, move the last item to
+    // root and call heapify.
+    if (heap_size > 1) {
+        harr[0] = harr[heap_size - 1];
+        MinHeapify(0);
+    }
+    heap_size--;
+ 
+    return root;
+}
+ 
+// A recursive method to heapify a subtree with root at
+// given index This method assumes that the subtrees are
+// already heapified
+void MinHeap::MinHeapify(int i)
+{
+    int l = left(i);
+    int r = right(i);
+    int smallest = i;
+ 
+    if (l < heap_size && harr[l] < harr[i])
+        smallest = l;
+ 
+    if (r < heap_size && harr[r] < harr[smallest])
+        smallest = r;
+ 
+    if (smallest != i) {
+        swap(&harr[i], &harr[smallest]);
+        MinHeapify(smallest);
+    }
+}
+ 
+// A utility function to swap two elements
+void swap(int* x, int* y)
+{
+    int temp = *x;
+    *x = *y;
+    *y = temp;
+}
+ 
+// Function to return k'th smallest element in a given array
+int kthSmallest(int arr[], int N, int K)
+{
+    // Build a heap of n elements: O(n) time
+    MinHeap mh(arr, N);
+ 
+    // Do extract min (K-1) times
+    for (int i = 0; i < K - 1; i++)
+        mh.extractMin();
+ 
+    // Return root
+    return mh.getMin();
+}
+ 
+// Driver's code
+int main()
+{
+    int arr[] = { 12, 3, 5, 7, 19 };
+    int N = sizeof(arr) / sizeof(arr[0]), K = 2;
+ 
+    // Function call
+    cout << "K'th smallest element is "
+         << kthSmallest(arr, N, K);
+    return 0;
+}
+Output
+K'th smallest element is 5
+Time complexity: O(N + K Log N).
+Auxiliary Space: O(N)
+
+Merge “K” sorted arrays. [ IMP ]	
+--------------------------------------------
+Given K sorted arrays of size N each, merge them and print the sorted output.
+
+Examples:
+
+Input: K = 3, N = 4, arr = { {1, 3, 5, 7}, {2, 4, 6, 8}, {0, 9, 10, 11}}
+Output: 0 1 2 3 4 5 6 7 8 9 10 11 
+Explanation: The output array is a sorted array that contains all the elements of the input matrix. 
+
+Input: k = 4, n = 4, arr = { {1, 5, 6, 8}, {2, 4, 10, 12}, {3, 7, 9, 11}, {13, 14, 15, 16}} 
+Output: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 
+Explanation: The output array is a sorted array that contains all the elements of the input matrix. 
+
+Naive Approach for Merging k sorted arrays:
+Create an output array of size (N * K) and then copy all the elements into the output array followed by sorting. 
+
+Follow the given steps to solve the problem:
+
+Create an output array of size N * K. 
+Traverse the matrix from start to end and insert all the elements in the output array.
+Sort and print the output array.
+
+// C++ program to merge K sorted arrays of size n each.
+#include <bits/stdc++.h>
+using namespace std;
+#define N 4
+ 
+// A utility function to print array elements
+void printArray(int arr[], int size)
+{
+    for (int i = 0; i < size; i++)
+        cout << arr[i] << " ";
+}
+ 
+// This function takes an array of arrays as an argument and
+// All arrays are assumed to be sorted. It merges them
+// together and prints the final sorted output.
+void mergeKArrays(int arr[][N], int a, int output[])
+{
+    int c = 0;
+ 
+    // traverse the matrix
+    for (int i = 0; i < a; i++) {
+        for (int j = 0; j < N; j++)
+            output = arr[i][j];
+    }
+ 
+    // sort the array
+    sort(output, output + N * a);
+}
+ 
+// Driver's code
+int main()
+{
+    // Change N at the top to change number of elements
+    // in an array
+    int arr[][N] = { { 2, 6, 12, 34 },
+                     { 1, 9, 20, 1000 },
+                     { 23, 34, 90, 2000 } };
+    int K = sizeof(arr) / sizeof(arr[0]);
+ 
+    int output[N * K];
+ 
+    // Function call
+    mergeKArrays(arr, 3, output);
+ 
+    cout << "Merged array is " << endl;
+    printArray(output, N * K);
+ 
+    return 0;
+}
+Output
+Merged array is 
+1 2 6 9 12 20 23 34 34 90 1000 2000 
+Time Complexity: O(N * K * log (N*K)), Since the resulting array is of size N*K.
+Space Complexity: O(N * K), The output array is of size N * K.
+
+Merge K sorted arrays using merging:
+The process begins with merging arrays into groups of two. After the first merge, there will be K/2 arrays remaining. Again merge arrays in groups, now K/4 arrays will be remaining. This is similar to merge sort. Divide K arrays into two halves containing an equal number of arrays until there are two arrays in a group. This is followed by merging the arrays in a bottom-up manner. 
+
+Follow the given steps to solve the problem:
+
+Create a recursive function that takes K arrays and returns the output array.
+In the recursive function, if the value of K is 1 then return the array else if the value of K is 2 then merge the two arrays in linear time and return the array.
+If the value of K is greater than 2 then divide the group of k elements into two equal halves and recursively call the function, i.e 0 to K/2 array in one recursive function and K/2 to K array in another recursive function.
+Print the output array.
+
+// C++ program to merge K sorted arrays of size n each.
+#include <bits/stdc++.h>
+using namespace std;
+#define N 4
+ 
+// Merge arr1[0..N1-1] and arr2[0..N2-1] into
+// arr3[0..N1+N2-1]
+void mergeArrays(int arr1[], int arr2[], int N1, int N2,
+                 int arr3[])
+{
+    int i = 0, j = 0, k = 0;
+ 
+    // Traverse both array
+    while (i < N1 && j < N2) {
+        // Check if current element of first
+        // array is smaller than current element
+        // of second array. If yes, store first
+        // array element and increment first array
+        // index. Otherwise do same with second array
+        if (arr1[i] < arr2[j])
+            arr3[k++] = arr1[i++];
+        else
+            arr3[k++] = arr2[j++];
+    }
+ 
+    // Store remaining elements of first array
+    while (i < N1)
+        arr3[k++] = arr1[i++];
+ 
+    // Store remaining elements of second array
+    while (j < N2)
+        arr3[k++] = arr2[j++];
+}
+ 
+// A utility function to print array elements
+void printArray(int arr[], int size)
+{
+    for (int i = 0; i < size; i++)
+        cout << arr[i] << " ";
+}
+ 
+// This function takes an array of arrays as an argument and
+// All arrays are assumed to be sorted. It merges them
+// together and prints the final sorted output.
+void mergeKArrays(int arr[][N], int i, int j, int output[])
+{
+    // If one array is in range
+    if (i == j) {
+        for (int p = 0; p < N; p++)
+            output[p] = arr[i][p];
+        return;
+    }
+ 
+    // if only two arrays are left them merge them
+    if (j - i == 1) {
+        mergeArrays(arr[i], arr[j], N, N, output);
+        return;
+    }
+ 
+    // Output arrays
+    int out1[N * (((i + j) / 2) - i + 1)],
+        out2[N * (j - ((i + j) / 2))];
+ 
+    // Divide the array into halves
+    mergeKArrays(arr, i, (i + j) / 2, out1);
+    mergeKArrays(arr, (i + j) / 2 + 1, j, out2);
+ 
+    // Merge the output array
+    mergeArrays(out1, out2, N * (((i + j) / 2) - i + 1),
+                N * (j - ((i + j) / 2)), output);
+}
+ 
+// Driver's code
+int main()
+{
+    // Change N at the top to change number of elements
+    // in an array
+    int arr[][N] = { { 2, 6, 12, 34 },
+                     { 1, 9, 20, 1000 },
+                     { 23, 34, 90, 2000 } };
+    int K = sizeof(arr) / sizeof(arr[0]);
+    int output[N * K];
+    mergeKArrays(arr, 0, 2, output);
+ 
+    // Function call
+    cout << "Merged array is " << endl;
+    printArray(output, N * K);
+ 
+    return 0;
+}
+Output
+Merged array is 
+1 2 6 9 12 20 23 34 34 90 1000 2000 
+Time Complexity: O(N * K * log K).  There are log K levels as in each level the K arrays are divided in half and at each level, the K arrays are traversed.
+Auxiliary Space: O(N * K * log K). In each level O(N * K) space is required.
+
+Merge 2 Binary Max Heaps	
+-------------------------------------------
+Given two binary max heaps as arrays, the task is to merge the given heaps.
+
+Examples : 
+
+Input: a = {10, 5, 6, 2}, b = {12, 7, 9}
+Output: {12, 10, 9, 2, 5, 7, 6}
+
+Input: a = {2, 5, 1, 9, 12}, b = {3, 7, 4, 10}
+Output: {12, 10, 7, 9, 5, 3, 1, 4, 2}
+
+Approach: To solve the problem follow the below idea:
+
+Create an array to store the result. Copy both given arrays one by one into result. Once all the elements have been copied, then call standard build heap to construct full merged max heap. 
+
+Follow the given steps to solve the problem:
+
+Create an array merged of size N+M
+Copy elements of both the arrays in the array merged
+Build Max-Heap of this array
+Print elements of the Max-Heap
+
+// C++ program to merge two max heaps.
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Standard heapify function to heapify a
+// subtree rooted under idx. It assumes
+// that subtrees of node are already heapified.
+void maxHeapify(int arr[], int N, int idx)
+{
+    // Find largest of node and its children
+    if (idx >= N)
+        return;
+ 
+    int l = 2 * idx + 1;
+    int r = 2 * idx + 2;
+    int max = idx;
+    if (l < N && arr[l] > arr[idx])
+        max = l;
+    if (r < N && arr[r] > arr[max])
+        max = r;
+ 
+    // Put maximum value at root and
+    // recur for the child with the
+    // maximum value
+    if (max != idx) {
+        swap(arr[max], arr[idx]);
+        maxHeapify(arr, N, max);
+    }
+}
+ 
+// Builds a max heap of given arr[0..n-1]
+void buildMaxHeap(int arr[], int N)
+{
+    // building the heap from first non-leaf
+    // node by calling max heapify function
+    for (int i = N / 2 - 1; i >= 0; i--)
+        maxHeapify(arr, N, i);
+}
+ 
+// Merges max heaps a[] and b[] into merged[]
+void mergeHeaps(int merged[], int a[], int b[], int N,
+                int M)
+{
+    // Copy elements of a[] and b[] one by one
+    // to merged[]
+    for (int i = 0; i < N; i++)
+        merged[i] = a[i];
+    for (int i = 0; i < M; i++)
+        merged[N + i] = b[i];
+ 
+    // build heap for the modified array of
+    // size n+m
+    buildMaxHeap(merged, N + M);
+}
+ 
+// Driver's code
+int main()
+{
+    int a[] = { 10, 5, 6, 2 };
+    int b[] = { 12, 7, 9 };
+ 
+    int N = sizeof(a) / sizeof(a[0]);
+    int M = sizeof(b) / sizeof(b[0]);
+ 
+    int merged[N + M];
+ 
+    // Function call
+    mergeHeaps(merged, a, b, N, M);
+ 
+    for (int i = 0; i < N + M; i++)
+        cout << merged[i] << " ";
+ 
+    return 0;
+}
+Output
+12 10 9 2 5 7 6 
+Time Complexity: O(N + M)
+Auxiliary Space: O(N + M)  
+
+Kth largest sum continuous subarrays	
+----------------------------------------------
+Given an array of integers. Write a program to find the K-th largest sum of contiguous subarray within the array of numbers that has both negative and positive numbers.
+
+Examples: 
+
+Input: a[] = {20, -5, -1}, K = 3
+Output: 14
+Explanation: All sum of contiguous subarrays are (20, 15, 14, -5, -6, -1) 
+so the 3rd largest sum is 14.
+
+Input: a[] = {10, -10, 20, -40}, k = 6
+Output: -10
+Explanation: The 6th largest sum among
+sum of all contiguous subarrays is -10.
+
+Brute force Approach: Store all the contiguous sums in another array and sort it and print the Kth largest. But in the case of the number of elements being large, the array in which we store the contiguous sums will run out of memory as the number of contiguous subarrays will be large (quadratic order)
+
+Using Min-Heap:
+The key idea is to store the pre-sum of the array in a sum[] array. One can find the sum of contiguous subarray from index i to j as sum[j] – sum[i-1]. Now generate all possible contiguous subarray sums and push them into the Min-Heap only if the size of Min-Heap is less than K or the current sum is greater than the root of the Min-Heap. In the end, the root of the Min-Heap is the required answer
+
+Follow the given steps to solve the problem using the above approach:
+
+Create a prefix sum array of the input array
+Create a Min-Heap that stores the subarray sum
+Iterate over the given array using the variable i such that 1 <= i <= N, here i denotes the starting point of the subarray
+Create a nested loop inside this loop using a variable j such that i <= j <= N, here j denotes the ending point of the subarray
+Calculate the sum of the current subarray represented by i and j, using the prefix sum array
+If the size of the Min-Heap is less than K, then push this sum into the heap
+Otherwise, if the current sum is greater than the root of the Min-Heap, then pop out the root and push the current sum into the Min-Heap
+Now the root of the Min-Heap denotes the Kth largest sum, Return it
+
+// C++ program to find the K-th largest sum of subarray
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to calculate Kth largest element
+// in contiguous subarray sum
+int kthLargestSum(int arr[], int N, int K)
+{
+    // array to store prefix sums
+    int sum[N + 1];
+    sum[0] = 0;
+    sum[1] = arr[0];
+    for (int i = 2; i <= N; i++)
+        sum[i] = sum[i - 1] + arr[i - 1];
+ 
+    // priority_queue of min heap
+    priority_queue<int, vector<int>, greater<int> > Q;
+ 
+    // loop to calculate the contiguous subarray
+    // sum position-wise
+    for (int i = 1; i <= N; i++) {
+ 
+        // loop to traverse all positions that
+        // form contiguous subarray
+        for (int j = i; j <= N; j++) {
+            // calculates the contiguous subarray
+            // sum from j to i index
+            int x = sum[j] - sum[i - 1];
+ 
+            // if queue has less than k elements,
+            // then simply push it
+            if (Q.size() < K)
+                Q.push(x);
+ 
+            else {
+                // it the min heap has equal to
+                // k elements then just check
+                // if the largest kth element is
+                // smaller than x then insert
+                // else its of no use
+                if (Q.top() < x) {
+                    Q.pop();
+                    Q.push(x);
+                }
+            }
+        }
+    }
+ 
+    // the top element will be then kth
+    // largest element
+    return Q.top();
+}
+ 
+// Driver's code
+int main()
+{
+    int a[] = { 10, -10, 20, -40 };
+    int N = sizeof(a) / sizeof(a[0]);
+    int K = 6;
+ 
+    // Function call
+    cout << kthLargestSum(a, N, K);
+    return 0;
+}
+
+// C++ program to find the K-th largest sum of subarray
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to calculate Kth largest element
+// in contiguous subarray sum
+int kthLargestSum(int arr[], int N, int K)
+{
+    // array to store prefix sums
+    int sum[N + 1];
+    sum[0] = 0;
+    sum[1] = arr[0];
+    for (int i = 2; i <= N; i++)
+        sum[i] = sum[i - 1] + arr[i - 1];
+ 
+    // priority_queue of min heap
+    priority_queue<int, vector<int>, greater<int> > Q;
+ 
+    // loop to calculate the contiguous subarray
+    // sum position-wise
+    for (int i = 1; i <= N; i++) {
+ 
+        // loop to traverse all positions that
+        // form contiguous subarray
+        for (int j = i; j <= N; j++) {
+            // calculates the contiguous subarray
+            // sum from j to i index
+            int x = sum[j] - sum[i - 1];
+ 
+            // if queue has less than k elements,
+            // then simply push it
+            if (Q.size() < K)
+                Q.push(x);
+ 
+            else {
+                // it the min heap has equal to
+                // k elements then just check
+                // if the largest kth element is
+                // smaller than x then insert
+                // else its of no use
+                if (Q.top() < x) {
+                    Q.pop();
+                    Q.push(x);
+                }
+            }
+        }
+    }
+ 
+    // the top element will be then kth
+    // largest element
+    return Q.top();
+}
+ 
+// Driver's code
+int main()
+{
+    int a[] = { 10, -10, 20, -40 };
+    int N = sizeof(a) / sizeof(a[0]);
+    int K = 6;
+ 
+    // Function call
+    cout << kthLargestSum(a, N, K);
+    return 0;
+}
+Output
+-10
+Time Complexity: O(N2 log K) 
+Auxiliary Space: O(N), but this can be reduced to O(K) for min-heap and we can store the prefix sum array in the input array itself as it is of no use.
+
+Leetcode- reorganize strings	
+------------------------------------
+Given a string with lowercase repeated characters, the task is to rearrange characters in a string so that no two adjacent characters are the same. If it is not possible to do so, then print “Not possible”.
+
+Examples: 
+
+Input: aaabc 
+Output: abaca 
+
+Input: aaabb
+Output: ababa 
+
+Input: aa 
+Output: Not Possible
+
+Input: aaaabc 
+Output: Not Possible
+
+To solve the problem using this approach follow the below idea:
+
+The idea is to put the highest frequency character first (a greedy approach). Use a priority queue (Or Binary Max Heap) and put all characters and ordered by their frequencies (highest frequency character at root). One by one take the highest frequency character from the heap and add it to result. After adding it, just decrease the frequency of the character and then temporarily move this character out of priority queue so that it is not picked again next time.
+
+Follow the given steps to solve the problem:
+
+Build a Priority_queue or max_heap, pq that stores characters with their frequencies. 
+Priority_queue or max_heap is built on the bases of the frequency of character. 
+Create a temporary Key that will be used as the previously visited element (the previous element in the resultant string. Initialize it { char = ‘#’ , freq = ‘-1’ } 
+While pq is not empty. 
+Pop an element and add it to the result. 
+Decrease the frequency of the popped element by ‘1’ 
+Push the previous element back into the priority_queue if its frequency is greater than zero. 
+Make the current element as the previous element for the next iteration. 
+If the length of the resultant string and the original string is not equal, then print “not possible”, else print the resultant string.
+
+// C++ program to rearrange characters in a string
+// so that no two adjacent characters are same.
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+const int MAX_CHAR = 26;
+ 
+struct Key {
+ 
+    int freq; // store frequency of character
+    char ch;
+ 
+    // Function for priority_queue to store Key
+    // according to freq
+    bool operator<(const Key& k) const
+    {
+        return freq < k.freq;
+    }
+};
+ 
+// Function to rearrange character of a string
+// so that no char repeat twice
+void rearrangeString(string str)
+{
+    int N = str.length();
+ 
+    // Store frequencies of all characters in string
+    int count[MAX_CHAR] = { 0 };
+    for (int i = 0; i < N; i++)
+        count[str[i] - 'a']++;
+ 
+    // Insert all characters with their frequencies
+    // into a priority_queue
+    priority_queue<Key> pq;
+    for (char c = 'a'; c <= 'z'; c++) {
+        int val = c - 'a';
+        if (count[val]) {
+            pq.push(Key{ count[val], c });
+        }
+    }
+ 
+    // 'str' that will store resultant value
+    str = "";
+ 
+    // work as the previous visited element
+    // initial previous element be. ( '#' and
+    // it's frequency '-1' )
+    Key prev{ -1, '#' };
+ 
+    // traverse queue
+    while (!pq.empty()) {
+        // pop top element from queue and add it
+        // to string.
+        Key k = pq.top();
+        pq.pop();
+        str = str + k.ch;
+ 
+        // IF frequency of previous character is less
+        // than zero that means it is useless, we
+        // need not to push it
+        if (prev.freq > 0)
+            pq.push(prev);
+ 
+        // Make current character as the previous 'char'
+        // decrease frequency by 'one'
+        (k.freq)--;
+        prev = k;
+    }
+ 
+    // If length of the resultant string and original
+    // string is not same then string is not valid
+    if (N != str.length())
+        cout << " Not possible " << endl;
+ 
+    else // valid string
+        cout << str << endl;
+}
+ 
+// Driver's code
+int main()
+{
+    string str = "bbbaa";
+ 
+    // Function call
+    rearrangeString(str);
+    return 0;
+}
+Output
+babab
+Time complexity : O(N log(N))
+Auxiliary Space: O(N), Extra space is used to store the resultant string
+
+Merge “K” Sorted Linked Lists [V.IMP]	
+----------------------------------------------
+Given K sorted linked lists of size N each, the task is to merge them all maintaining their sorted order.
+
+Examples: 
+
+Input: K = 3, N =  4
+list1 = 1->3->5->7->NULL
+list2 = 2->4->6->8->NULL
+list3 = 0->9->10->11->NULL
+Output: 0->1->2->3->4->5->6->7->8->9->10->11
+Merged lists in a sorted order where every element is greater than the previous element.
+
+Input: K = 3, N =  3
+list1 = 1->3->7->NULL
+list2 = 2->4->8->NULL
+list3 = 9->10->11->NULL
+Output: 1->2->3->4->7->8->9->10->11
+Merged lists in a sorted order where every element is greater than the previous element.
+
+Naive Approach:
+
+A Simple Solution is to initialize the result as the first list. Now traverse all lists starting from the second list. Insert every node of the currently traversed list into the result in a sorted way.  
+
+// C++ program to merge k sorted arrays of size n each
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// A Linked List node
+struct Node {
+    int data;
+    Node* next;
+};
+ 
+/* Function to print nodes in
+   a given linked list */
+void printList(Node* node)
+{
+    while (node != NULL) {
+        printf("%d ", node->data);
+        node = node->next;
+    }
+}
+ 
+// The main function that
+// takes an array of lists
+// arr[0..last] and generates
+// the sorted output
+Node* mergeKLists(Node* arr[], int last)
+{
+ 
+    // Traverse form second list to last
+    for (int i = 1; i <= last; i++) {
+        while (true) {
+            // head of both the lists,
+            // 0 and ith list.
+            Node *head_0 = arr[0], *head_i = arr[i];
+ 
+            // Break if list ended
+            if (head_i == NULL)
+                break;
+ 
+            // Smaller than first element
+            if (head_0->data >= head_i->data) {
+                arr[i] = head_i->next;
+                head_i->next = head_0;
+                arr[0] = head_i;
+            }
+            else
+                // Traverse the first list
+                while (head_0->next != NULL) {
+                    // Smaller than next element
+                    if (head_0->next->data
+                        >= head_i->data) {
+                        arr[i] = head_i->next;
+                        head_i->next = head_0->next;
+                        head_0->next = head_i;
+                        break;
+                    }
+                    // go to next node
+                    head_0 = head_0->next;
+ 
+                    // if last node
+                    if (head_0->next == NULL) {
+                        arr[i] = head_i->next;
+                        head_i->next = NULL;
+                        head_0->next = head_i;
+                        head_0->next->next = NULL;
+                        break;
+                    }
+                }
+        }
+    }
+ 
+    return arr[0];
+}
+ 
+// Utility function to create a new node.
+Node* newNode(int data)
+{
+    struct Node* temp = new Node;
+    temp->data = data;
+    temp->next = NULL;
+    return temp;
+}
+ 
+// Driver program to test
+// above functions
+int main()
+{
+    // Number of linked lists
+    int k = 3;
+ 
+    // Number of elements in each list
+    int n = 4;
+ 
+    // an array of pointers storing the
+    // head nodes of the linked lists
+    Node* arr[k];
+ 
+    arr[0] = newNode(1);
+    arr[0]->next = newNode(3);
+    arr[0]->next->next = newNode(5);
+    arr[0]->next->next->next = newNode(7);
+ 
+    arr[1] = newNode(2);
+    arr[1]->next = newNode(4);
+    arr[1]->next->next = newNode(6);
+    arr[1]->next->next->next = newNode(8);
+ 
+    arr[2] = newNode(0);
+    arr[2]->next = newNode(9);
+    arr[2]->next->next = newNode(10);
+    arr[2]->next->next->next = newNode(11);
+ 
+    // Merge all lists
+    Node* head = mergeKLists(arr, k - 1);
+ 
+    printList(head);
+ 
+    return 0;
+}
+Output
+0 1 2 3 4 5 6 7 8 9 10 11 
+Time complexity: O(NK-1), Traversing N times on each of the K lists.
+Auxiliary Space: O(1).
+
+Smallest range in “K” Lists	
+----------------------------------------
+Given K sorted lists of integers of size N each, find the smallest range that includes at least one element from each of the K lists. If more than one smallest range is found, print any one of them.
+
+Examples: 
+
+Input: K = 3
+arr1[] : {4, 7, 9, 12, 15}
+arr2[] : {0, 8, 10, 14, 20}
+arr3[] : {6, 12, 16, 30, 50}
+
+Output: The smallest range is [6 8]
+Explanation: Smallest range is formed by  number 7 from the first list, 8 from second list and 6 from the third list.
+
+Input: k = 3
+arr1[] : {4, 7}
+arr2[] : {1, 2}
+arr3[] : {20, 40}
+
+Output: The smallest range is [2 20]
+Explanation:The range [2, 20] contains 2, 4, 7, 20 which contains element from all the three arrays.
+
+Naive Approach: 
+The idea is to keep k pointers which will constitute the elements in the range, by taking the min and max of the K elements the range can be formed. Initially, all the pointers will point to the start of all the K arrays. Store the range max to min. If the range has to be minimized then either the minimum value has to be increased or the maximum value has to be decreased. To decrease the maximum value we have to move our pointer of current maximum to the left and since we are currently at 0 the index of every list so we can’t move our pointer to left, hence we can’t decrease the current max. So, the only possible option to get a better range is to increase the current minimum. To continue increasing the minimum value, increase the pointer of the list containing the minimum value and update the range until one of the lists exhausts.
+
+Follow the given steps to solve the problem:
+
+Create an extra space ptr of length K to store the pointers and a variable minrange initialized to a maximum value.
+Initially, the index of every list is 0, therefore initialize every element of ptr[0..k] to 0, and the array ptr will store the index of the elements in the range.
+Repeat the following steps until at least one list exhausts: 
+Now find the minimum and maximum value among the current elements of all the lists pointed by the ptr[0…k] array.
+Update the minrange if the current (max-min) is less than minrange.
+increment the pointer pointing to the current minimum element.
+
+// C++ program to finds out smallest range that includes
+// elements from each of the given sorted lists.
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// array for storing the current index of list i
+int ptr[501];
+ 
+// This function takes an k sorted lists in the form of
+// 2D array as an argument. It finds out smallest range
+// that includes elements from each of the k lists.
+void findSmallestRange(vector<vector<int> >& arr, int N,
+                       int K)
+{
+    int i, minval, maxval, minrange, minel, maxel, flag,
+        minind;
+ 
+    // initializing to 0 index;
+    for (i = 0; i <= K; i++)
+        ptr[i] = 0;
+ 
+    minrange = INT_MAX;
+ 
+    while (1) {
+        // for maintaining the index of list containing the
+        // minimum element
+        minind = -1;
+        minval = INT_MAX;
+        maxval = INT_MIN;
+        flag = 0;
+ 
+        // iterating over all the list
+        for (i = 0; i < K; i++) {
+            // if every element of list[i] is traversed then
+            // break the loop
+            if (ptr[i] == N) {
+                flag = 1;
+                break;
+            }
+            // find minimum value among all the list
+            // elements pointing by the ptr[] array
+            if (ptr[i] < N && arr[i][ptr[i]] < minval) {
+                minind = i; // update the index of the list
+                minval = arr[i][ptr[i]];
+            }
+            // find maximum value among all the list
+            // elements pointing by the ptr[] array
+            if (ptr[i] < N && arr[i][ptr[i]] > maxval) {
+                maxval = arr[i][ptr[i]];
+            }
+        }
+ 
+        // if any list exhaust we will not get any better
+        // answer, so break the while loop
+        if (flag)
+            break;
+ 
+        ptr[minind]++;
+ 
+        // updating the minrange
+        if ((maxval - minval) < minrange) {
+            minel = minval;
+            maxel = maxval;
+            minrange = maxel - minel;
+        }
+    }
+ 
+    printf("The smallest range is [%d, %d]\n", minel,
+           maxel);
+}
+ 
+// Driver's code
+int main()
+{
+    vector<vector<int> > arr = { { 4, 7, 9, 12, 15 },
+                                 { 0, 8, 10, 14, 20 },
+                                 { 6, 12, 16, 30, 50 } };
+ 
+    int K = arr.size();
+    int N = arr[0].size();
+ 
+    // Function call
+    findSmallestRange(arr, N, K);
+ 
+    return 0;
+}
+Output
+The smallest range is [6, 8]
+Time complexity: O(N * K2)
+Space complexity: O(K)
+
+The smallest range containing elements from k lists using Min-Heap:
+Min-Heap can be used to find the maximum and minimum value in logarithmic time or log k time instead of linear time. Rest of the approach remains the same. 
+
+Follow the given steps to solve the problem:
+
+create a Min-Heap to store K elements, one from each array, and a variable minrange initialized to a maximum value and also keep a variable max to store the maximum integer.
+Initially put the first element from each list and store the maximum value in max.
+Repeat the following steps until at least one list exhausts : 
+To find the minimum value or min, use the top or root of the Min heap which is the minimum element.
+Now update the minrange if the current (max-min) is less than minrange.
+remove the top or root element from the priority queue, insert the next element from the list containing the min element, and update the max with the new element inserted.
+
+// C++ program to finds out smallest range that includes
+// elements from each of the given sorted lists.
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+#define N 5
+ 
+// A min heap node
+struct MinHeapNode {
+    // The element to be stored
+    int element;
+ 
+    // index of the list from which the element is taken
+    int i;
+ 
+    // index of the next element to be picked from list
+    int j;
+};
+ 
+// Prototype of a utility function to swap two min heap
+// nodes
+void swap(MinHeapNode* x, MinHeapNode* y);
+ 
+// A class for Min Heap
+class MinHeap {
+ 
+    // pointer to array of elements in heap
+    MinHeapNode* harr;
+ 
+    // size of min heap
+    int heap_size;
+ 
+public:
+    // Constructor: creates a min heap of given size
+    MinHeap(MinHeapNode a[], int size);
+ 
+    // to heapify a subtree with root at given index
+    void MinHeapify(int);
+ 
+    // to get index of left child of node at index i
+    int left(int i) { return (2 * i + 1); }
+ 
+    // to get index of right child of node at index i
+    int right(int i) { return (2 * i + 2); }
+ 
+    // to get the root
+    MinHeapNode getMin() { return harr[0]; }
+ 
+    // to replace root with new node x and heapify() new
+    // root
+    void replaceMin(MinHeapNode x)
+    {
+        harr[0] = x;
+        MinHeapify(0);
+    }
+};
+ 
+// Constructor: Builds a heap from a
+// given array a[] of given size
+MinHeap::MinHeap(MinHeapNode a[], int size)
+{
+    heap_size = size;
+    harr = a; // store address of array
+    int i = (heap_size - 1) / 2;
+    while (i >= 0) {
+        MinHeapify(i);
+        i--;
+    }
+}
+ 
+// A recursive method to heapify a subtree with root at
+// given index. This method assumes that the subtrees
+// are already heapified
+void MinHeap::MinHeapify(int i)
+{
+    int l = left(i);
+    int r = right(i);
+    int smallest = i;
+ 
+    if (l < heap_size && harr[l].element < harr[i].element)
+        smallest = l;
+ 
+    if (r < heap_size
+        && harr[r].element < harr[smallest].element)
+        smallest = r;
+ 
+    if (smallest != i) {
+        swap(harr[i], harr[smallest]);
+        MinHeapify(smallest);
+    }
+}
+ 
+// This function takes an K sorted lists in the form of
+// 2D array as an argument. It finds out smallest range
+// that includes elements from each of the k lists.
+void findSmallestRange(int arr[][N], int K)
+{
+    // Create a min heap with k heap nodes. Every heap node
+    // has first element of an list
+    int range = INT_MAX;
+    int min = INT_MAX, max = INT_MIN;
+    int start, end;
+ 
+    MinHeapNode* harr = new MinHeapNode[K];
+    for (int i = 0; i < K; i++) {
+        // Store the first element
+        harr[i].element = arr[i][0];
+ 
+        // index of list
+        harr[i].i = i;
+ 
+        // Index of next element to be stored
+        // from list
+        harr[i].j = 1;
+ 
+        // store max element
+        if (harr[i].element > max)
+            max = harr[i].element;
+    }
+ 
+    // Create the heap
+    MinHeap hp(harr, K);
+ 
+    // Now one by one get the minimum element from min
+    // heap and replace it with next element of its list
+    while (1) {
+        // Get the minimum element and store it in output
+        MinHeapNode root = hp.getMin();
+ 
+        // update min
+        min = hp.getMin().element;
+ 
+        // update range
+        if (range > max - min + 1) {
+            range = max - min + 1;
+            start = min;
+            end = max;
+        }
+ 
+        // Find the next element that will replace current
+        // root of heap. The next element belongs to same
+        // list as the current root.
+        if (root.j < N) {
+            root.element = arr[root.i][root.j];
+            root.j += 1;
+ 
+            // update max element
+            if (root.element > max)
+                max = root.element;
+        }
+ 
+        // break if we have reached end of any list
+        else
+            break;
+ 
+        // Replace root with next element of list
+        hp.replaceMin(root);
+    }
+ 
+    cout << "The smallest range is "
+         << "[" << start << " " << end << "]" << endl;
+    ;
+}
+ 
+// Driver's code
+int main()
+{
+    int arr[][N] = { { 4, 7, 9, 12, 15 },
+                     { 0, 8, 10, 14, 20 },
+                     { 6, 12, 16, 30, 50 } };
+ 
+    int K = sizeof(arr) / sizeof(arr[0]);
+ 
+    // Function call
+    findSmallestRange(arr, K);
+ 
+    return 0;
+}
+Output
+The smallest range is [6 8]
+Time complexity: O(N * K * log K)
+Auxiliary Space: O(K)
+
+Median in a stream of Integers	
+---------------------------------------
+Given that integers are read from a data stream. Find median of elements read so for in an efficient way. For simplicity assume, there are no duplicates. For example, let us consider the stream 5, 15, 1, 3 … 
+
+After reading 1st element of stream - 5 -> median - 5
+After reading 2nd element of stream - 5, 15 -> median - 10
+After reading 3rd element of stream - 5, 15, 1 -> median - 5
+After reading 4th element of stream - 5, 15, 1, 3 -> median - 4, so on...
+Making it clear, when the input size is odd, we take the middle element of sorted data. If the input size is even, we pick the average of the middle two elements in the sorted stream.
+Note that output is the effective median of integers read from the stream so far. Such an algorithm is called an online algorithm. Any algorithm that can guarantee the output of i-elements after processing i-th element, is said to be online algorithm. Let us discuss three solutions to the above problem.
+
+Method 1: Insertion Sort
+
+If we can sort the data as it appears, we can easily locate the median element. Insertion Sort is one such online algorithm that sorts the data appeared so far. At any instance of sorting, say after sorting i-th element, the first i elements of the array are sorted. The insertion sort doesn’t depend on future data to sort data input till that point. In other words, insertion sort considers data sorted so far while inserting the next element. This is the key part of insertion sort that makes it an online algorithm.
+
+However, insertion sort takes O(n2) time to sort n elements. Perhaps we can use binary search on insertion sort to find the location of the next element in O(log n) time. Yet, we can’t do data movement in O(log n) time. No matter how efficient the implementation is, it takes polynomial time in case of insertion sort.
+Interested readers can try the implementation of Method 1.
+
+
+// This code is contributed by Anjali Saxena
+ 
+#include <bits/stdc++.h>
+ 
+using namespace std;
+ 
+// Function to find position to insert current element of
+// stream using binary search
+int binarySearch(int arr[], int item, int low, int high)
+{
+    if (low >= high) {
+        return (item > arr[low]) ? (low + 1) : low;
+    }
+ 
+    int mid = (low + high) / 2;
+ 
+    if (item == arr[mid])
+        return mid + 1;
+ 
+    if (item > arr[mid])
+        return binarySearch(arr, item, mid + 1, high);
+ 
+    return binarySearch(arr, item, low, mid - 1);
+}
+ 
+// Function to print median of stream of integers
+void printMedian(int arr[], int n)
+{
+    int i, j, pos, num;
+    int count = 1;
+ 
+    cout << "Median after reading 1"
+         << " element is " << arr[0] << "\n";
+ 
+    for (i = 1; i < n; i++) {
+        float median;
+        j = i - 1;
+        num = arr[i];
+ 
+        // find position to insert current element in sorted
+        // part of array
+        pos = binarySearch(arr, num, 0, j);
+ 
+        // move elements to right to create space to insert
+        // the current element
+        while (j >= pos) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+ 
+        arr[j + 1] = num;
+ 
+        // increment count of sorted elements in array
+        count++;
+ 
+        // if odd number of integers are read from stream
+        // then middle element in sorted order is median
+        // else average of middle elements is median
+        if (count % 2 != 0) {
+            median = arr[count / 2];
+        }
+        else {
+            median = (arr[(count / 2) - 1] + arr[count / 2])
+                     / 2;
+        }
+ 
+        cout << "Median after reading " << i + 1
+             << " elements is " << median << "\n";
+    }
+}
+ 
+// Driver Code
+int main()
+{
+    int arr[] = { 5, 15, 1, 3, 2, 8, 7, 9, 10, 6, 11, 4 };
+    int n = sizeof(arr) / sizeof(arr[0]);
+ 
+    printMedian(arr, n);
+ 
+    return 0;
+}
+Output
+Median after reading 1 element is 5
+Median after reading 2 elements is 10
+Median after reading 3 elements is 5
+Median after reading 4 elements is 4
+Median after reading 5 elements is 3
+Median after reading 6 elements is 4
+Median after reading 7 elements is 5
+Median after reading 8 elements is 6
+Median after reading 9 elements is 7
+Median after reading 10 elements is 6
+Median after reading 11 elements is 7
+Median after reading 12 elements is 6
+Time Complexity: O(n2)
+Space Complexity: O(1)
+
+Method 2: Augmented self-balanced binary search tree (AVL, RB, etc…)
+At every node of BST, maintain a number of elements in the subtree rooted at that node. We can use a node as the root of a simple binary tree, whose left child is self-balancing BST with elements less than root and right child is self-balancing BST with elements greater than root. The root element always holds effective median.
+
+If the left and right subtrees contain a same number of elements, the root node holds the average of left and right subtree root data. Otherwise, the root contains the same data as the root of subtree which is having more elements. After processing an incoming element, the left and right subtrees (BST) are differed utmost by 1.
+
+Self-balancing BST is costly in managing the balancing factor of BST. However, they provide sorted data which we don’t need. We need median only. The next method makes use of Heaps to trace the median.
+
+Method 3: Heaps
+Similar to balancing BST in Method 2 above, we can use a max heap on the left side to represent elements that are less than effective median, and a min-heap on the right side to represent elements that are greater than effective median.
+
+After processing an incoming element, the number of elements in heaps differs utmost by 1 element. When both heaps contain the same number of elements, we pick the average of heaps root data as effective median. When the heaps are not balanced, we select effective median from the root of the heap containing more elements.
+
+Given below is the implementation of the above method. For the algorithm to build these heaps, please read the highlighted code.
+
+
+// C++ code to implement the approach
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to find the median of stream of data
+void streamMed(int A[], int n)
+{
+    // Declared two max heap
+    priority_queue<int> g, s;
+   
+    for (int i = 0; i < n; i++) {
+        s.push(A[i]);
+        int temp = s.top();
+        s.pop();
+       
+        // Negation for treating it as min heap
+        g.push(-1 * temp);
+        if (g.size() > s.size()) {
+            temp = g.top();
+            g.pop();
+            s.push(-1 * temp);
+        }
+        if (g.size() != s.size())
+            cout << (double)s.top() << "\n";
+        else
+            cout << (double)((s.top() * 1.0
+                              - g.top() * 1.0)
+                             / 2)
+                 << "\n";
+    }
+}
+ 
+// Driver code
+int main()
+{
+    int A[] = { 5, 15, 1, 3, 2, 8, 7, 9, 10, 6, 11, 4 };
+    int N = sizeof(A) / sizeof(A[0]);
+   
+    // Function call
+    streamMed(A, N);
+    return 0;
+}
+Output
+5
+10
+5
+4
+3
+4
+5
+6
+7
+6.5
+7
+6.5
+Time Complexity: If we omit the way how stream was read, complexity of median finding is O(N log N), as we need to read the stream, and due to heap insertions/deletions.
+Auxiliary Space: O(N)
+
+Check if a Binary Tree is Heap	
+-------------------------------------------
+Given a binary tree, check if it has heap property or not, Binary tree needs to fulfill the following two conditions for being a heap
+
+It should be a complete tree (i.e. all levels except the last should be full).
+Every node’s value should be greater than or equal to its child node (considering max-heap).
+Examples:
+
+Input: 
+
+
+
+
+
+Output: Given binary tree is a heap 
+
+Input: 
+
+
+
+
+
+
+
+
+Output: Given binary tree is not a heap
+
+Using Complete Binary Tree
+Follow the given steps to solve the problem:
+
+Check each of the above conditions separately, for checking completeness isComplete and for checking heap isHeapUtil functions are written. 
+First, check if the given binary tree is complete or not.
+Then to check if the binary tree is a heap or not, check the following points:
+Every Node has 2 children, 0 children (last level nodes), or 1 child (there can be at most one such node).
+If Node has No children then it’s a leaf node and returns true (Base case)
+If Node has one child (it must be the left child because it is a complete tree) then compare this node with its single child only.
+If the Node has both children then check heap property at this Node and recur for both subtrees. 
+
+/* C++ program to checks if a binary tree is max heap or not */
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+/*  Tree node structure */
+struct Node {
+ 
+    int key;
+    struct Node* left;
+    struct Node* right;
+};
+ 
+/* Helper function that
+allocates a new node */
+struct Node* newNode(int k)
+{
+    struct Node* node = new Node;
+    node->key = k;
+    node->right = node->left = NULL;
+    return node;
+}
+ 
+/* This function counts the
+number of nodes in a binary tree */
+unsigned int countNodes(struct Node* root)
+{
+    if (root == NULL)
+        return (0);
+    return (1 + countNodes(root->left)
+            + countNodes(root->right));
+}
+ 
+/* This function checks if the
+binary tree is complete or not */
+bool isCompleteUtil(struct Node* root, unsigned int index,
+                    unsigned int number_nodes)
+{
+    // An empty tree is complete
+    if (root == NULL)
+        return (true);
+ 
+    // If index assigned to
+    // current node is more than
+    // number of nodes in tree,
+    // then tree is not complete
+    if (index >= number_nodes)
+        return (false);
+ 
+    // Recur for left and right subtrees
+    return (isCompleteUtil(root->left, 2 * index + 1,
+                           number_nodes)
+            && isCompleteUtil(root->right, 2 * index + 2,
+                              number_nodes));
+}
+ 
+// This Function checks the
+// heap property in the tree.
+bool isHeapUtil(struct Node* root)
+{
+    //  Base case : single
+    // node satisfies property
+    if (root->left == NULL && root->right == NULL)
+        return (true);
+ 
+    //  node will be in
+    // second last level
+    if (root->right == NULL) {
+        //  check heap property at Node
+        //  No recursive call ,
+        // because no need to check last level
+        return (root->key >= root->left->key);
+    }
+    else {
+        //  Check heap property at Node and
+        //  Recursive check heap
+        // property at left and right subtree
+        if (root->key >= root->left->key
+            && root->key >= root->right->key)
+            return ((isHeapUtil(root->left))
+                    && (isHeapUtil(root->right)));
+        else
+            return (false);
+    }
+}
+ 
+//  Function to check binary
+// tree is a Heap or Not.
+bool isHeap(struct Node* root)
+{
+    // These two are used
+    // in isCompleteUtil()
+    unsigned int node_count = countNodes(root);
+    unsigned int index = 0;
+ 
+    if (isCompleteUtil(root, index, node_count)
+        && isHeapUtil(root))
+        return true;
+    return false;
+}
+ 
+// Driver's code
+int main()
+{
+    struct Node* root = NULL;
+    root = newNode(10);
+    root->left = newNode(9);
+    root->right = newNode(8);
+    root->left->left = newNode(7);
+    root->left->right = newNode(6);
+    root->right->left = newNode(5);
+    root->right->right = newNode(4);
+    root->left->left->left = newNode(3);
+    root->left->left->right = newNode(2);
+    root->left->right->left = newNode(1);
+ 
+    // Function call
+    if (isHeap(root))
+        cout << "Given binary tree is a Heap\n";
+    else
+        cout << "Given binary tree is not a Heap\n";
+ 
+    return 0;
+}
+ 
+Output
+Given binary tree is a Heap
+Time Complexity: O(N), where N is the number of nodes
+Auxiliary Space: O(logN), for recursive stack space.
+
+Check if a given Binary Tree is Heap using Level Order Traversal:
+Level order traversal can be used to check heap properties at each level of the binary tree. Check whether value of each node is greater than the value of its children and keep track of when the last node is encountered and whether it is following the heap properties using a boolean flag 
+
+declare a queue for level order traversal and a flag variable nullish equal to false
+Start level order traversal 
+Check for the left child of the node and if either the nullish is true or root’s value is less than its left child node, then return false, else push this node into the queue
+If the node’s left child is null then set nullish equal to true, which means we have already encountered the last node, as the node with only zero or one children can occur only once in the complete tree
+Now check the right child of the node and if either the nullish is true or root’s value is less than its right child node, then return false, else push this node into the queue.
+If the node’s right child is null then set nullish equal to true, which means we have already encountered the last node, as the node with only zero or one children can occur only once in the complete tree
+Return true after checking every node in the level order traversal
+
+// C++ program to checks if a
+// binary tree is max heap or not
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Tree node structure
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+ 
+// To add a new node
+struct Node* newNode(int k)
+{
+    struct Node* node = new Node;
+    node->data = k;
+    node->right = node->left = NULL;
+    return node;
+}
+ 
+bool isHeap(Node* root)
+{
+    // Your code here
+    queue<Node*> q;
+    q.push(root);
+    bool nullish = false;
+    while (!q.empty()) {
+        Node* temp = q.front();
+        q.pop();
+        if (temp->left) {
+            if (nullish || temp->left->data > temp->data) {
+                return false;
+            }
+            q.push(temp->left);
+        }
+        else {
+            nullish = true;
+        }
+        if (temp->right) {
+            if (nullish || temp->right->data > temp->data) {
+                return false;
+            }
+            q.push(temp->right);
+        }
+        else {
+            nullish = true;
+        }
+    }
+    return true;
+}
+ 
+// Driver's code
+int main()
+{
+    struct Node* root = NULL;
+    root = newNode(10);
+    root->left = newNode(9);
+    root->right = newNode(8);
+    root->left->left = newNode(7);
+    root->left->right = newNode(6);
+    root->right->left = newNode(5);
+    root->right->right = newNode(4);
+    root->left->left->left = newNode(3);
+    root->left->left->right = newNode(2);
+    root->left->right->left = newNode(1);
+ 
+    // Function call
+    if (isHeap(root))
+        cout << "Given binary tree is a Heap\n";
+    else
+        cout << "Given binary tree is not a Heap\n";
+ 
+    return 0;
+}
+Output
+Given binary tree is a Heap
+Time Complexity: O(N) where N is the total number of nodes in a given binary tree.
+Auxiliary Space: O(N)
+
+Connect “n” ropes with minimum cost	
+----------------------------------------------
+Given are N ropes of different lengths, the task is to connect these ropes into one rope with minimum cost, such that the cost to connect two ropes is equal to the sum of their lengths.
+
+Examples:
+
+Input: arr[] = {4,3,2,6} , N = 4
+Output: 29
+Explanation: 
+
+First, connect ropes of lengths 2 and 3. Now we have three ropes of lengths 4, 6, and 5. 
+Now connect ropes of lengths 4 and 5. Now we have two ropes of lengths 6 and 9. 
+Finally connect the two ropes and all ropes have connected.
+                 
+
+
+
+
+
+
+
+
+
+Input: arr[] = {1, 2, 3} , N = 3
+Output: 9
+Explanation: 
+
+First, connect ropes of lengths 1 and 2. Now we have two ropes of lengths 3 and 3. 
+Finally connect the two ropes and all ropes have connected.
+
+Connect N ropes with minimum cost using Min-Heap
+Approach: If we observe the above problem closely, we can notice that the lengths of the ropes which are picked first are included more than once in the total cost. Therefore, the idea is to connect the smallest two ropes first and recur for the remaining ropes. This approach is similar to Huffman Coding. We put the smallest ropes down the tree so they can be repeated multiple times rather than the longer ones.
+
+
+Illustration:
+
+First, we will connect ropes of lengths 2 and 3 because they are the smallest. Now we have three ropes left of lengths 4, 6, and 5.
+Now we connect ropes of lengths 4 and 5. Now we have two ropes of lengths 6 and 9.
+Finally, we will connect the two ropes so that all ropes are connected.
+
+The total cost contains the sum of depth of each value. For array [ 2, 3, 4, 6 ] the sum is equal to (2 * 3) + (3 * 3) + (4 * 2) + (6 * 1) = 29 (According to the diagram). 
+Algorithm: Follow the steps mentioned below to implement the idea:
+
+Create a min-heap and insert all lengths into the min-heap.
+Do following while the number of elements in min-heap is greater than one. 
+Extract the minimum and second minimum from min-heap
+Add the above two extracted values and insert the added value to the min-heap.
+Maintain a variable for total cost and keep incrementing it by the sum of extracted values.
+Return the value of total cost.
+
+// C++ program for connecting n ropes with minimum cost
+#include <bits/stdc++.h>
+ 
+using namespace std;
+ 
+// A Min Heap: Collection of min heap nodes
+struct MinHeap {
+    unsigned size; // Current size of min heap
+    unsigned capacity; // capacity of min heap
+    int* harr; // Array of minheap nodes
+};
+ 
+// A utility function to create
+// a min-heap of a given capacity
+struct MinHeap* createMinHeap(unsigned capacity)
+{
+    struct MinHeap* minHeap = new MinHeap;
+    minHeap->size = 0; // current size is 0
+    minHeap->capacity = capacity;
+    minHeap->harr = new int[capacity];
+    return minHeap;
+}
+ 
+// A utility function to swap two min heap nodes
+void swapMinHeapNode(int* a, int* b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+ 
+// The standard minHeapify function.
+void minHeapify(struct MinHeap* minHeap, int idx)
+{
+    int smallest = idx;
+    int left = 2 * idx + 1;
+    int right = 2 * idx + 2;
+ 
+    if (left < minHeap->size
+        && minHeap->harr[left] < minHeap->harr[smallest])
+        smallest = left;
+ 
+    if (right < minHeap->size
+        && minHeap->harr[right] < minHeap->harr[smallest])
+        smallest = right;
+ 
+    if (smallest != idx) {
+        swapMinHeapNode(&minHeap->harr[smallest],
+                        &minHeap->harr[idx]);
+        minHeapify(minHeap, smallest);
+    }
+}
+ 
+// A utility function to check
+// if size of heap is 1 or not
+int isSizeOne(struct MinHeap* minHeap)
+{
+    return (minHeap->size == 1);
+}
+ 
+// A standard function to extract
+// minimum value node from heap
+int extractMin(struct MinHeap* minHeap)
+{
+    int temp = minHeap->harr[0];
+    minHeap->harr[0] = minHeap->harr[minHeap->size - 1];
+    --minHeap->size;
+    minHeapify(minHeap, 0);
+    return temp;
+}
+ 
+// A utility function to insert
+// a new node to Min Heap
+void insertMinHeap(struct MinHeap* minHeap, int val)
+{
+    ++minHeap->size;
+    int i = minHeap->size - 1;
+    while (i && (val < minHeap->harr[(i - 1) / 2])) {
+        minHeap->harr[i] = minHeap->harr[(i - 1) / 2];
+        i = (i - 1) / 2;
+    }
+    minHeap->harr[i] = val;
+}
+ 
+// A standard function to build min-heap
+void buildMinHeap(struct MinHeap* minHeap)
+{
+    int n = minHeap->size - 1;
+    int i;
+    for (i = (n - 1) / 2; i >= 0; --i)
+        minHeapify(minHeap, i);
+}
+ 
+// Creates a min-heap of capacity
+// equal to size and inserts all values
+// from len[] in it. Initially, size
+// of min heap is equal to capacity
+struct MinHeap* createAndBuildMinHeap(int len[], int size)
+{
+    struct MinHeap* minHeap = createMinHeap(size);
+    for (int i = 0; i < size; ++i)
+        minHeap->harr[i] = len[i];
+    minHeap->size = size;
+    buildMinHeap(minHeap);
+    return minHeap;
+}
+ 
+// The main function that returns
+// the minimum cost to connect n
+// ropes of lengths stored in len[0..n-1]
+int minCost(int len[], int n)
+{
+    int cost = 0; // Initialize result
+ 
+    // Create a min heap of capacity
+    // equal to n and put all ropes in it
+    struct MinHeap* minHeap = createAndBuildMinHeap(len, n);
+ 
+    // Iterate while size of heap doesn't become 1
+    while (!isSizeOne(minHeap)) {
+        // Extract two minimum length
+        // ropes from min heap
+        int min = extractMin(minHeap);
+        int sec_min = extractMin(minHeap);
+ 
+        cost += (min + sec_min); // Update total cost
+ 
+        // Insert a new rope in min heap
+        // with length equal to sum
+        // of two extracted minimum lengths
+        insertMinHeap(minHeap, min + sec_min);
+    }
+ 
+    // Finally return total minimum
+    // cost for connecting all ropes
+    return cost;
+}
+ 
+// Driver program to test above functions
+int main()
+{
+    int len[] = { 4, 3, 2, 6 };
+    int size = sizeof(len) / sizeof(len[0]);
+    cout << "Total cost for connecting ropes is "
+         << minCost(len, size);
+    return 0;
+}
+Output
+Total cost for connecting ropes is 29
+Time Complexity: O(N*log(N))
+Auxiliary Space: O(N)
+
+Using Pre Defined Function
+In this approach, we use the predefined priority queue which is already available. The approach and algorithm remain the same. The min heap is replaced by a priority queue.
+
+Follow the steps mentioned below to implement the idea:
+
+declare a priority queue and push all the elements in it.
+Do following while the number of elements in min-heap is greater than one. 
+Extract the minimum and second minimum from min-heap
+Add the above two extracted values and insert the added value to the min-heap.
+Maintain a variable for total cost and keep incrementing it by the sum of extracted values.
+Return the value of total cost.
+
+#include <bits/stdc++.h>
+using namespace std;
+ 
+int minCost(int arr[], int n)
+{
+    // Create a priority queue
+    // By default 'less' is used which is for decreasing
+    // order and 'greater' is used for increasing order
+    priority_queue<int, vector<int>, greater<int> > pq(
+        arr, arr + n);
+ 
+    // Initialize result
+    int res = 0;
+ 
+    // While size of priority queue is more than 1
+    while (pq.size() > 1) {
+        // Extract shortest two ropes from pq
+        int first = pq.top();
+        pq.pop();
+        int second = pq.top();
+        pq.pop();
+ 
+        // Connect the ropes: update result and
+        // insert the new rope to pq
+        res += first + second;
+        pq.push(first + second);
+    }
+ 
+    return res;
+}
+ 
+// Driver program to test above function
+int main()
+{
+    int len[] = { 4, 3, 2, 6 };
+    int size = sizeof(len) / sizeof(len[0]);
+    cout << "Total cost for connecting ropes is "
+         << minCost(len, size);
+    return 0;
+}
+Output
+Total cost for connecting ropes is 29
+Time Complexity: O(N*log(N))
+Auxiliary Space: O(N)
+
+Convert BST to Min Heap	
+------------------------------------------
+Given a binary search tree which is also a complete binary tree. The problem is to convert the given BST into a Min Heap with the condition that all the values in the left subtree of a node should be less than all the values in the right subtree of the node. This condition is applied to all the nodes, in the resultant converted Min Heap. 
+
+Examples: 
+
+Input:            4
+                /   \
+               2     6
+            /  \   /  \
+           1   3  5    7  
+Output:          1
+               /   \
+             2     5
+           /  \   /  \
+           3   4  6    7 
+Explanation: The given BST has been transformed into a Min Heap. All the nodes in the Min Heap satisfies the given condition, that is, values in the left subtree of a node should be less than the values in the right subtree of the node. 
+
+Approach: To solve the problem using this approach follow the below idea:
+
+Store the inorder traversal of the BST in array and then do preorder traversal of the BST and while doing preorder traversal copy the values of inorder traversal into the current node, as copying the sorted elements while doing preorder traversal will make sure that a Min-Heap is constructed with the condition that all the values in the left subtree of a node are less than all the values in the right subtree of the node.
+
+Follow the given steps to solve the problem:
+
+Create an array arr[] of size N, where N is the number of nodes in the given BST.
+Perform the inorder traversal of the BST and copy the node values in the arr[] in sorted order.
+Now perform the preorder traversal of the tree.
+While traversing the root during the preorder traversal, one by one copy the values from the array arr[] to the nodes of the BST.
+
+// C++ implementation to convert the given BST to Min Heap
+#include <bits/stdc++.h>
+using namespace std; 
+// Structure of a node of BST
+struct Node {
+ 
+    int data;
+    Node *left, *right;
+};
+ 
+/* Helper function that allocates a new node
+   with the given data and NULL left and right
+   pointers. */
+struct Node* getNode(int data)
+{
+    struct Node* newNode = new Node;
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+ 
+// function prototype for preorder traversal
+// of the given tree
+void preorderTraversal(Node*);
+ 
+// function for the inorder traversal of the tree
+// so as to store the node values in 'arr' in
+// sorted order
+void inorderTraversal(Node* root, vector<int>& arr)
+{
+    if (root == NULL)
+        return;
+ 
+    // first recur on left subtree
+    inorderTraversal(root->left, arr);
+ 
+    // then copy the data of the node
+    arr.push_back(root->data);
+ 
+    // now recur for right subtree
+    inorderTraversal(root->right, arr);
+}
+ 
+// function to convert the given BST to MIN HEAP
+// performs preorder traversal of the tree
+void BSTToMinHeap(Node* root, vector<int> arr, int* i)
+{
+    if (root == NULL)
+        return;
+ 
+    // first copy data at index 'i' of 'arr' to
+    // the node
+    root->data = arr[++*i];
+ 
+    // then recur on left subtree
+    BSTToMinHeap(root->left, arr, i);
+ 
+    // now recur on right subtree
+    BSTToMinHeap(root->right, arr, i);
+}
+ 
+// utility function to convert the given BST to MIN HEAP
+void convertToMinHeapUtil(Node* root)
+{
+    // vector to store the data of all the
+    // nodes of the BST
+    vector<int> arr;
+    int i = -1;
+ 
+    // inorder traversal to populate 'arr'
+    inorderTraversal(root, arr);
+ 
+    // BST to MIN HEAP conversion
+    BSTToMinHeap(root, arr, &i);
+}
+ 
+// function for the preorder traversal of the tree
+void preorderTraversal(Node* root)
+{
+    if (!root)
+        return;
+ 
+    // first print the root's data
+    cout << root->data << " ";
+ 
+    // then recur on left subtree
+    preorderTraversal(root->left);
+ 
+    // now recur on right subtree
+    preorderTraversal(root->right);
+}
+ 
+// Driver program to test above
+int main()
+{
+    // BST formation
+    struct Node* root = getNode(4);
+    root->left = getNode(2);
+    root->right = getNode(6);
+    root->left->left = getNode(1);
+    root->left->right = getNode(3);
+    root->right->left = getNode(5);
+    root->right->right = getNode(7);
+ 
+    // Function call
+    convertToMinHeapUtil(root);
+    cout << "Preorder Traversal:" << endl;
+    preorderTraversal(root);
+ 
+    return 0;
+}
+Output
+Preorder Traversal:
+1 2 3 4 5 6 7 
+Time Complexity: O(N) 
+Auxiliary Space: O(N) 
+
+Convert min heap to max heap	
+---------------------------------------
+Given an array representation of min Heap, convert it to max Heap.
+
+Examples: 
+
+Input: arr[] = {3, 5, 9, 6, 8, 20, 10, 12, 18, 9}
+
+               3
+            /     \
+          5       9
+        /   \    /  \
+      6     8  20   10
+    /  \   /
+12   18 9 
+
+
+Output: arr[] = {20, 18, 10, 12, 9, 9, 3, 5, 6, 8}
+
+           20
+         /    \
+      18      10
+     /    \    /  \
+  12     9  9    3
+ /  \   /
+5    6 8 
+
+Input: arr[] = {3, 4, 8, 11, 13}
+Output:  arr[] = {13, 11, 8, 4, 3}
+ 
+
+ 
+Approach: To solve the problem follow the below idea:
+
+The idea is, simply build Max Heap without caring about the input. Start from the bottom-most and rightmost internal node of Min-Heap and heapify all internal modes in the bottom-up way to build the Max heap.
+
+Follow the given steps to solve the problem:
+
+Call the Heapify function from the rightmost internal node of Min-Heap
+Heapify all internal nodes in the bottom-up way to build max heap
+Print the Max-Heap
+
+// A C++ program to convert min Heap to max Heap
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// to heapify a subtree with root at given index
+void MaxHeapify(int arr[], int i, int N)
+{
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+    int largest = i;
+ 
+    if (l < N && arr[l] > arr[i])
+        largest = l;
+    if (r < N && arr[r] > arr[largest])
+        largest = r;
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+        MaxHeapify(arr, largest, N);
+    }
+}
+ 
+// This function basically builds max heap
+void convertMaxHeap(int arr[], int N)
+{
+    // Start from bottommost and rightmost
+    // internal mode and heapify all internal
+    // modes in bottom up way
+    for (int i = (N - 2) / 2; i >= 0; --i)
+        MaxHeapify(arr, i, N);
+}
+ 
+// A utility function to print a given array
+// of given size
+void printArray(int* arr, int size)
+{
+    for (int i = 0; i < size; ++i)
+        cout << arr[i] << " ";
+}
+ 
+// Driver's code
+int main()
+{
+    // array representing Min Heap
+    int arr[] = { 3, 5, 9, 6, 8, 20, 10, 12, 18, 9 };
+    int N = sizeof(arr) / sizeof(arr[0]);
+ 
+    printf("Min Heap array : ");
+    printArray(arr, N);
+ 
+    // Function call
+    convertMaxHeap(arr, N);
+ 
+    printf("\nMax Heap array : ");
+    printArray(arr, N);
+ 
+    return 0;
+}
+Output
+Min Heap array : 3 5 9 6 8 20 10 12 18 9 
+Max Heap array : 20 18 10 12 9 9 3 5 6 8 
+Time complexity: O(N), for details, please refer: Time Complexity of building a heap
+Auxiliary Space: O(N)
+
+Rearrange characters in a string such that no two adjacent are same.	
+------------------------------------------------------------------------------
+Given a string with lowercase repeated characters, the task is to rearrange characters in a string so that no two adjacent characters are the same. If it is not possible to do so, then print “Not possible”.
+
+Examples: 
+
+Input: aaabc 
+Output: abaca 
+
+Input: aaabb
+Output: ababa
+
+Input: aa 
+Output: Not Possible
+
+Input: aaaabc 
+Output: Not Possible
+
+To solve the problem using this approach follow the below idea:
+
+The idea is to put the highest frequency character first (a greedy approach). Use a priority queue (Or Binary Max Heap) and put all characters and ordered by their frequencies (highest frequency character at root). One by one take the highest frequency character from the heap and add it to result. After adding it, just decrease the frequency of the character and then temporarily move this character out of priority queue so that it is not picked again next time.
+
+Follow the given steps to solve the problem:
+
+Build a Priority_queue or max_heap, pq that stores characters with their frequencies. 
+Priority_queue or max_heap is built on the bases of the frequency of character. 
+Create a temporary Key that will be used as the previously visited element (the previous element in the resultant string. Initialize it { char = ‘#’ , freq = ‘-1’ } 
+While pq is not empty. 
+Pop an element and add it to the result. 
+Decrease the frequency of the popped element by ‘1’ 
+Push the previous element back into the priority_queue if its frequency is greater than zero. 
+Make the current element as the previous element for the next iteration. 
+If the length of the resultant string and the original string is not equal, then print “not possible”, else print the resultant string.
+
+// C++ program to rearrange characters in a string
+// so that no two adjacent characters are same.
+#include <bits/stdc++.h>
+using namespace std;
+ 
+const int MAX_CHAR = 26;
+ 
+struct Key {
+ 
+    int freq; // store frequency of character
+    char ch;
+ 
+    // Function for priority_queue to store Key
+    // according to freq
+    bool operator<(const Key& k) const
+    {
+        return freq < k.freq;
+    }
+};
+ 
+// Function to rearrange character of a string
+// so that no char repeat twice
+void rearrangeString(string str)
+{
+    int N = str.length();
+ 
+    // Store frequencies of all characters in string
+    int count[MAX_CHAR] = { 0 };
+    for (int i = 0; i < N; i++)
+        count[str[i] - 'a']++;
+ 
+    // Insert all characters with their frequencies
+    // into a priority_queue
+    priority_queue<Key> pq;
+    for (char c = 'a'; c <= 'z'; c++) {
+        int val = c - 'a';
+        if (count[val]) {
+            pq.push(Key{ count[val], c });
+        }
+    }
+ 
+    // 'str' that will store resultant value
+    str = "";
+ 
+    // work as the previous visited element
+    // initial previous element be. ( '#' and
+    // it's frequency '-1' )
+    Key prev{ -1, '#' };
+ 
+    // traverse queue
+    while (!pq.empty()) {
+        // pop top element from queue and add it
+        // to string.
+        Key k = pq.top();
+        pq.pop();
+        str = str + k.ch;
+ 
+        // IF frequency of previous character is less
+        // than zero that means it is useless, we
+        // need not to push it
+        if (prev.freq > 0)
+            pq.push(prev);
+ 
+        // Make current character as the previous 'char'
+        // decrease frequency by 'one'
+        (k.freq)--;
+        prev = k;
+    }
+ 
+    // If length of the resultant string and original
+    // string is not same then string is not valid
+    if (N != str.length())
+        cout << " Not possible " << endl;
+ 
+    else // valid string
+        cout << str << endl;
+}
+ 
+// Driver's code
+int main()
+{
+    string str = "bbbaa";
+ 
+    // Function call
+    rearrangeString(str);
+    return 0;
+}
+Output
+babab
+Time complexity : O(N log(N))
+Auxiliary Space: O(N), Extra space is used to store the resultant string
+
+Minimum sum of two numbers formed from digits of an array	
+-----------------------------------------------------------------------
+Given an array of digits (values are from 0 to 9), the task is to find the minimum possible sum of two numbers formed from digits of the array. Please note that all digits of the given array must be used to form the two numbers. 
+
+Examples: 
+
+Input: {6, 8, 4, 5, 2, 3}
+Output: 604
+Explanation: The minimum sum is formed by numbers 358 and 246
+
+Input: {5, 3, 0, 7, 4}
+Output: 82
+Explanation: The minimum sum is formed by numbers 35 and 047 
+
+Using Sorting:
+A minimum number will be formed from set of digits when smallest digit appears at most significant position and next smallest digit appears at next most significant position and so on. The idea is to sort the array in increasing order and build two numbers by alternating picking digits from the array. So first number is formed by digits present in odd positions in the array and second number is formed by digits from even positions in the array.
+
+Follow the given steps to solve the problem:
+
+Sort the array in increasing order
+Declare two variables a and b, representing the two numbers to be formed
+Traverse the array and if the index is odd then add this element into a, else add it to b
+Return the sum of two variables (a + b)
+
+// C++ program to find minimum sum of two numbers formed from digits of the array.
+ 
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to find and return minimum sum of
+// two numbers formed from digits of the array.
+int solve(int arr[], int N)
+{
+    // Sort the array
+    sort(arr, arr + N);
+ 
+    // Let two numbers be a and b
+    int a = 0, b = 0;
+    for (int i = 0; i < N; i++) {
+        // fill a and b with every alternate digit
+        // of input array
+        if (i & 1)
+            a = a * 10 + arr[i];
+        else
+            b = b * 10 + arr[i];
+    }
+ 
+    // return the sum
+    return a + b;
+}
+ 
+// Driver's code
+int main()
+{
+    int arr[] = { 6, 8, 4, 5, 2, 3 };
+    int N = sizeof(arr) / sizeof(arr[0]);
+ 
+    // Function call
+    cout << "Sum is " << solve(arr, N);
+    return 0;
+}
+Output
+Sum is 604
+Time Complexity: O(Nlog2N) because of arr.sort()  
+Auxiliary Space: O(1)
+
+Using Strings:
+The basic idea of approaching the question is the same as above, but instead of using numbers, strings will be used to handle sum of two large numbers
+
+Follow the given steps to solve the problem:
+
+Sort the array in increasing order
+Declare two strings a and b, representing the two numbers to be formed
+Traverse the array and if the index is odd then add this element into string a, else add it to the string b
+Return the sum of two strings, in the form of a string
+
+// C++ code for the above approach
+#include <bits/stdc++.h>
+using namespace std;
+ 
+string solve(int arr[], int n)
+{
+ 
+    sort(arr, arr + n);
+ 
+    // Two String for storing our two minimum numbers
+    string a = "", b = "";
+ 
+    for (int i = 0; i < n; i += 2) {
+        a += (arr[i] + '0');
+    }
+    for (int i = 1; i < n; i += 2) {
+        b += (arr[i] + '0');
+    }
+ 
+    int j = a.length() - 1;
+    int k = b.length() - 1;
+ 
+    // as initial carry is zero
+    int carry = 0;
+    string ans = "";
+    while (j >= 0 && k >= 0) {
+        int sum = 0;
+        sum += (a[j] - '0') + (b[k] - '0') + carry;
+        ans += to_string(sum % 10);
+        carry = sum / 10;
+        j--;
+        k--;
+    }
+ 
+    // If string b is over and string a is left
+    // here we dont need to put here while condition
+    // as it would run at max one time. Because the
+    // difference between both the strings could be at
+    // max 1.
+    while (j >= 0) {
+        int sum = 0;
+        sum += (a[j] - '0') + carry;
+        ans += to_string(sum % 10);
+        carry = sum / 10;
+        j--;
+    }
+ 
+    // If string a is over and string b is left
+    while (k >= 0) {
+        int sum = 0;
+        sum += (b[k] - '0') + carry;
+        ans += to_string(sum % 10);
+        carry = sum / 10;
+        k--;
+    }
+    // if carry is left
+    if (carry) {
+        ans += to_string(carry);
+    }
+ 
+    // to remove leading zeroes as they will be ahead of our
+    // sum
+    while (!ans.empty() and ans.back() == '0')
+        ans.pop_back();
+ 
+    // reverse our final string because we were storing sum
+    // from left to right
+    reverse(ans.begin(), ans.end());
+    return ans;
+}
+ 
+//  Driver's Code
+int main()
+{
+    int arr[] = { 6, 8, 4, 5, 2, 3 };
+    int N = sizeof(arr) / sizeof(arr[0]);
+ 
+    // Function call
+    cout << "Sum is " << solve(arr, N);
+    return 0;
+} //  Driver Code Ends
+Output
+Sum is 604
+Time complexity: O(Nlog2N) because we are sorting the given array.
+Auxiliary Space: O(N) 
+
+//  BY SHIBAM NATH
